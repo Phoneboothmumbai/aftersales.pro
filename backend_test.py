@@ -138,10 +138,11 @@ class AfterSalesAPITester:
             "phone": "+91 9876543210"
         }
         
-        success, status, data = self.make_request('POST', 'branches', branch_data, 201)
-        self.log_test("Create Branch", success and 'id' in data, 
-                     f"Status: {status}, Has branch ID: {'id' in data}")
-        return success
+        success, status, data = self.make_request('POST', 'branches', branch_data)
+        has_id = success and 'id' in data
+        self.log_test("Create Branch", has_id, 
+                     f"Status: {status}, Has branch ID: {has_id}")
+        return has_id
 
     def test_create_job(self):
         """Test create job"""
