@@ -1,0 +1,162 @@
+{
+  "identity": {
+    "name": "E1",
+    "archetype": "The Soft Utility",
+    "vibe": "Clean, Organized, Technical but Friendly",
+    "core_principle": "Chaos to Order. The software is the calm center of a busy repair shop."
+  },
+  "typography": {
+    "headings": {
+      "family": "Space Grotesk, sans-serif",
+      "weights": ["600", "700"],
+      "usage": "All section headers, page titles, and major stats.",
+      "letter_spacing": "tracking-tight"
+    },
+    "body": {
+      "family": "Inter, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "General text, form inputs, data tables.",
+      "letter_spacing": "tracking-normal"
+    },
+    "mono": {
+      "family": "JetBrains Mono, monospace",
+      "usage": "Job IDs, Serial Numbers, SKU codes."
+    }
+  },
+  "colors": {
+    "light": {
+      "background": "#F9FAFB",
+      "foreground": "#111827",
+      "card": "#FFFFFF",
+      "card_foreground": "#111827",
+      "primary": "#4F46E5",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#F3F4F6",
+      "secondary_foreground": "#1F2937",
+      "muted": "#F3F4F6",
+      "muted_foreground": "#6B7280",
+      "accent": "#F97316",
+      "accent_foreground": "#FFFFFF",
+      "destructive": "#EF4444",
+      "destructive_foreground": "#FFFFFF",
+      "border": "#E5E7EB",
+      "input": "#E5E7EB",
+      "ring": "#4F46E5"
+    },
+    "dark": {
+      "background": "#0F172A",
+      "foreground": "#F9FAFB",
+      "card": "#1E293B",
+      "card_foreground": "#F9FAFB",
+      "primary": "#6366F1",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#334155",
+      "secondary_foreground": "#F9FAFB",
+      "muted": "#1E293B",
+      "muted_foreground": "#94A3B8",
+      "accent": "#F97316",
+      "accent_foreground": "#FFFFFF",
+      "destructive": "#7F1D1D",
+      "destructive_foreground": "#F9FAFB",
+      "border": "#334155",
+      "input": "#334155",
+      "ring": "#6366F1"
+    },
+    "status_colors": {
+      "received": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+      "diagnosed": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+      "waiting": "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+      "repaired": "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+      "closed": "bg-gray-100 text-gray-700 dark:bg-gray-800/30 dark:text-gray-300"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "usage": "Sticky headers, floating action bars, status timeline overlays.",
+      "classes": "bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-white/20 dark:border-white/10"
+    },
+    "grid_borders": {
+      "usage": "Job lists and data tables to give a 'ledger' feel.",
+      "classes": "border-r border-b border-border/40"
+    },
+    "shadows": {
+      "card": "shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300",
+      "float": "shadow-[0_12px_32px_rgba(79,70,229,0.15)]"
+    }
+  },
+  "layout_strategies": {
+    "landing_page": {
+      "grid_type": "Tetris Grid",
+      "classes": "grid grid-cols-1 md:grid-cols-12 gap-8",
+      "hero_span": "col-span-full md:col-span-8 row-span-2",
+      "feature_span": "col-span-4 row-span-1"
+    },
+    "dashboard": {
+      "grid_type": "Control Room Grid",
+      "classes": "grid grid-cols-1 md:grid-cols-4 gap-6",
+      "main_content": "col-span-3",
+      "sidebar": "col-span-1"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "rounded-lg font-medium shadow-sm hover:translate-y-[-1px] active:translate-y-[0px] transition-all",
+      "secondary": "rounded-lg font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors"
+    },
+    "cards": {
+      "default": "rounded-xl border bg-card text-card-foreground shadow-sm",
+      "interactive": "rounded-xl border bg-card text-card-foreground shadow-sm hover:border-primary/50 cursor-pointer transition-colors"
+    },
+    "inputs": {
+      "default": "rounded-lg border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+    }
+  },
+  "image_urls": {
+    "landing_hero": {
+      "url": "https://images.unsplash.com/photo-1676630444903-163fe485c5d1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1NzZ8MHwxfHNlYXJjaHwxfHxlbGVjdHJvbmljcyUyMHJlcGFpciUyMHRlY2huaWNpYW4lMjB3b3JraW5nfGVufDB8fHx8MTc2ODQxNDc1N3ww&ixlib=rb-4.1.0&q=85",
+      "alt": "Expert technician repairing a circuit board",
+      "usage": "Hero section background or main visual"
+    },
+    "feature_broken_screen": {
+      "url": "https://images.unsplash.com/photo-1746017354744-1e4d2f7be845?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBzbWFydHBob25lJTIwcmVwYWlyJTIwY2xvc2UlMjB1cHxlbnwwfHx8fDE3Njg0MTQ3NTl8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Cracked smartphone screen",
+      "usage": "Problem statement section"
+    },
+    "feature_tools": {
+      "url": "https://images.unsplash.com/photo-1746005718004-1f992c399428?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBzbWFydHBob25lJTIwcmVwYWlyJTIwY2xvc2UlMjB1cHxlbnwwfHx8fDE3Njg0MTQ3NTl8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Disassembled phone with tools",
+      "usage": "Process or 'How it works' section"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Use 'Space Grotesk' for all headings to give a technical, modern feel.",
+    "Use 'Inter' for body text for maximum legibility.",
+    "Implement the 'Status Colors' strictly for job statuses (Received, Diagnosed, etc.).",
+    "Use the 'Glassmorphism' style for the sticky top navigation and any floating action buttons.",
+    "Ensure all interactive elements have a 'data-testid' attribute.",
+    "For the Dashboard, use the 'Control Room Grid' layout.",
+    "For the Landing Page, use the 'Tetris Grid' layout with the provided images.",
+    "Do not use gradients for backgrounds; use solid colors or subtle noise textures.",
+    "Ensure dark mode is fully supported and tested."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: `transition: all`. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add `.App { text-align: center; }` in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use `sonner` for toasts. Sonner component are located in `/app/src/components/ui/sonner.tsx`"
+  ]
+}
