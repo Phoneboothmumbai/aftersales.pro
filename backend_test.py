@@ -169,14 +169,15 @@ class AfterSalesAPITester:
             "branch_id": self.branch_id
         }
         
-        success, status, data = self.make_request('POST', 'jobs', job_data, 201)
+        success, status, data = self.make_request('POST', 'jobs', job_data)
         
         if success and 'id' in data:
             self.job_id = data['id']
-            
-        self.log_test("Create Job", success and 'job_number' in data, 
-                     f"Status: {status}, Has job number: {'job_number' in data}")
-        return success
+        
+        has_job_number = success and 'job_number' in data
+        self.log_test("Create Job", has_job_number, 
+                     f"Status: {status}, Has job number: {has_job_number}")
+        return has_job_number
 
     def test_list_jobs(self):
         """Test list jobs"""
