@@ -38,6 +38,8 @@ export default function JobCreate() {
       serial_imei: "",
       condition: "",
       condition_notes: "",
+      notes: "",
+      password: "",
     },
     accessories: [...DEFAULT_ACCESSORIES],
     problem_description: "",
