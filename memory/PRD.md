@@ -97,6 +97,21 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `GET /api/metrics/technicians` - Technician performance
 - `GET /api/metrics/overview` - Shop overview stats
 
+### Super Admin (NEW)
+- `POST /api/super-admin/login` - Super admin login
+- `GET /api/super-admin/me` - Get current super admin
+- `GET /api/super-admin/stats` - Platform-wide statistics
+- `GET /api/super-admin/plans` - Get subscription plans
+- `GET /api/super-admin/tenants` - List all tenants with plan info
+- `GET /api/super-admin/tenants/{id}` - Tenant details with payments/logs
+- `PUT /api/super-admin/tenants/{id}` - Update tenant status
+- `POST /api/super-admin/tenants/{id}/assign-plan` - Assign subscription plan
+- `POST /api/super-admin/tenants/{id}/extend-validity` - Extend trial/subscription
+- `POST /api/super-admin/tenants/{id}/record-payment` - Record offline payment
+- `GET /api/super-admin/tenants/{id}/payments` - View payment history
+- `GET /api/super-admin/tenants/{id}/action-logs` - View admin action logs
+- `GET /api/super-admin/payments` - All recent payments across tenants
+
 ### Public
 - `GET /api/public/track/{job_number}/{tracking_token}` - Public job status
 
