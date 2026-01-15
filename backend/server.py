@@ -290,6 +290,155 @@ async def require_admin(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
+# ==================== PLAN LIMIT ENFORCEMENT ====================
+
+async def get_tenant_plan(tenant_id: str) -> dict:
+    """Get the current plan for a tenant"""
+    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    if not tenant:
+        return None
+    
+    plan_id = tenant.get("subscription_plan", "free")
+    plan = await db.subscription_plans.find_one({"id": plan_id, "is_active": True}, {"_id": 0})
+    
+    if not plan:
+        # Fallback to free plan limits if plan not found
+        plan = await db.subscription_plans.find_one({"id": "free"}, {"_id": 0})
+    
+    return plan
+
+async def check_user_limit(tenant_id: str) -> dict:
+    """Check if tenant can add more users"""
+    plan = await get_tenant_plan(tenant_id)
+    if not plan:
+        return {"allowed": False, "message": "Tenant not found"}
+    
+    max_users = plan.get("max_users", 1)
+    if max_users == -1:  # Unlimited
+        return {"allowed": True}
+    
+    current_users = await db.users.count_documents({"tenant_id": tenant_id})
+    if current_users >= max_users:
+        return {
+            "allowed": False,
+            "message": f"User limit reached ({current_users}/{max_users}). Upgrade your plan to add more users.",
+            "current": current_users,
+            "limit": max_users,
+            "plan": plan.get("name", "Free")
+        }
+    return {"allowed": True, "current": current_users, "limit": max_users}
+
+async def check_branch_limit(tenant_id: str) -> dict:
+    """Check if tenant can add more branches"""
+    plan = await get_tenant_plan(tenant_id)
+    if not plan:
+        return {"allowed": False, "message": "Tenant not found"}
+    
+    max_branches = plan.get("max_branches", 1)
+    if max_branches == -1:  # Unlimited
+        return {"allowed": True}
+    
+    current_branches = await db.branches.count_documents({"tenant_id": tenant_id})
+    if current_branches >= max_branches:
+        return {
+            "allowed": False,
+            "message": f"Branch limit reached ({current_branches}/{max_branches}). Upgrade your plan to add more branches.",
+            "current": current_branches,
+            "limit": max_branches,
+            "plan": plan.get("name", "Free")
+        }
+    return {"allowed": True, "current": current_branches, "limit": max_branches}
+
+async def check_job_limit(tenant_id: str) -> dict:
+    """Check if tenant can create more jobs this month"""
+    plan = await get_tenant_plan(tenant_id)
+    if not plan:
+        return {"allowed": False, "message": "Tenant not found"}
+    
+    max_jobs = plan.get("max_jobs_per_month", 50)
+    if max_jobs == -1:  # Unlimited
+        return {"allowed": True}
+    
+    # Count jobs created this month
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    current_jobs = await db.jobs.count_documents({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": month_start}
+    })
+    
+    if current_jobs >= max_jobs:
+        return {
+            "allowed": False,
+            "message": f"Monthly job limit reached ({current_jobs}/{max_jobs}). Upgrade your plan to create more jobs.",
+            "current": current_jobs,
+            "limit": max_jobs,
+            "plan": plan.get("name", "Free")
+        }
+    return {"allowed": True, "current": current_jobs, "limit": max_jobs}
+
+async def check_inventory_limit(tenant_id: str) -> dict:
+    """Check if tenant can add more inventory items"""
+    plan = await get_tenant_plan(tenant_id)
+    if not plan:
+        return {"allowed": False, "message": "Tenant not found"}
+    
+    max_items = plan.get("max_inventory_items", 50)
+    if max_items == -1:  # Unlimited
+        return {"allowed": True}
+    
+    current_items = await db.inventory.count_documents({"tenant_id": tenant_id})
+    if current_items >= max_items:
+        return {
+            "allowed": False,
+            "message": f"Inventory limit reached ({current_items}/{max_items}). Upgrade your plan to add more items.",
+            "current": current_items,
+            "limit": max_items,
+            "plan": plan.get("name", "Free")
+        }
+    return {"allowed": True, "current": current_items, "limit": max_items}
+
+async def check_photo_limit(tenant_id: str, job_id: str) -> dict:
+    """Check if job can have more photos"""
+    plan = await get_tenant_plan(tenant_id)
+    if not plan:
+        return {"allowed": False, "message": "Tenant not found"}
+    
+    max_photos = plan.get("max_photos_per_job", 3)
+    if max_photos == -1:  # Unlimited
+        return {"allowed": True}
+    
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": tenant_id})
+    if not job:
+        return {"allowed": False, "message": "Job not found"}
+    
+    current_photos = len(job.get("photos", []))
+    if current_photos >= max_photos:
+        return {
+            "allowed": False,
+            "message": f"Photo limit reached ({current_photos}/{max_photos}). Upgrade your plan to add more photos.",
+            "current": current_photos,
+            "limit": max_photos,
+            "plan": plan.get("name", "Free")
+        }
+    return {"allowed": True, "current": current_photos, "limit": max_photos}
+
+async def check_feature_access(tenant_id: str, feature: str) -> dict:
+    """Check if tenant has access to a specific feature"""
+    plan = await get_tenant_plan(tenant_id)
+    if not plan:
+        return {"allowed": False, "message": "Tenant not found"}
+    
+    features = plan.get("features", {})
+    if not features.get(feature, False):
+        return {
+            "allowed": False,
+            "message": f"This feature is not available in your current plan ({plan.get('name', 'Free')}). Please upgrade to access this feature.",
+            "feature": feature,
+            "plan": plan.get("name", "Free")
+        }
+    return {"allowed": True}
+
 # ==================== UTILITY FUNCTIONS ====================
 
 async def generate_job_number(tenant_id: str) -> str:
