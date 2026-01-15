@@ -183,6 +183,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/customers"
+        element={
+          <ProtectedRoute>
+            <Customers />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Super Admin Routes */}
       <Route path="/super-admin" element={<SuperAdminLogin />} />
