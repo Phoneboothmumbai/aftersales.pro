@@ -538,6 +538,67 @@ async def get_current_tenant(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="Tenant not found")
     return TenantResponse(**tenant)
 
+@api_router.get("/tenants/plan-usage")
+async def get_plan_usage(user: dict = Depends(get_current_user)):
+    """Get current plan limits and usage for the tenant"""
+    tenant_id = user["tenant_id"]
+    plan = await get_tenant_plan(tenant_id)
+    
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    # Get current month start for job count
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    
+    # Get all usage counts
+    user_count = await db.users.count_documents({"tenant_id": tenant_id})
+    branch_count = await db.branches.count_documents({"tenant_id": tenant_id})
+    jobs_this_month = await db.jobs.count_documents({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": month_start}
+    })
+    inventory_count = await db.inventory.count_documents({"tenant_id": tenant_id})
+    
+    return {
+        "plan": {
+            "id": plan.get("id"),
+            "name": plan.get("name"),
+            "description": plan.get("description")
+        },
+        "usage": {
+            "users": {
+                "current": user_count,
+                "limit": plan.get("max_users", 1),
+                "unlimited": plan.get("max_users", 1) == -1
+            },
+            "branches": {
+                "current": branch_count,
+                "limit": plan.get("max_branches", 1),
+                "unlimited": plan.get("max_branches", 1) == -1
+            },
+            "jobs_this_month": {
+                "current": jobs_this_month,
+                "limit": plan.get("max_jobs_per_month", 50),
+                "unlimited": plan.get("max_jobs_per_month", 50) == -1
+            },
+            "inventory_items": {
+                "current": inventory_count,
+                "limit": plan.get("max_inventory_items", 50),
+                "unlimited": plan.get("max_inventory_items", 50) == -1
+            },
+            "photos_per_job": {
+                "limit": plan.get("max_photos_per_job", 3),
+                "unlimited": plan.get("max_photos_per_job", 3) == -1
+            },
+            "storage_mb": {
+                "limit": plan.get("max_storage_mb", 100),
+                "unlimited": plan.get("max_storage_mb", 100) == -1
+            }
+        },
+        "features": plan.get("features", {})
+    }
+
 @api_router.put("/tenants/settings")
 async def update_tenant_settings(settings: SettingsUpdate, user: dict = Depends(require_admin)):
     update_data = {k: v for k, v in settings.model_dump().items() if v is not None}
