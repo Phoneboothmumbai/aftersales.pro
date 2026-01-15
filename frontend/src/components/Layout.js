@@ -25,6 +25,7 @@ import {
   ChevronDown,
   Package,
   BarChart3,
+  UserCircle,
 } from "lucide-react";
 
 export const Layout = ({ children }) => {
@@ -37,6 +38,7 @@ export const Layout = ({ children }) => {
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Jobs", href: "/jobs", icon: ClipboardList },
+    { name: "Customers", href: "/customers", icon: UserCircle },
     { name: "Inventory", href: "/inventory", icon: Package },
     { name: "Analytics", href: "/metrics", icon: BarChart3 },
     ...(isAdmin ? [{ name: "Team", href: "/team", icon: Users }] : []),
