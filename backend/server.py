@@ -1768,6 +1768,8 @@ async def get_all_tenants(
             **tenant,
             "is_active": tenant.get("is_active", True),
             "subscription_status": tenant.get("subscription_status", "trial"),
+            "subscription_plan": tenant.get("subscription_plan", "free"),
+            "subscription_ends_at": tenant.get("subscription_ends_at"),
             "admin_email": admin_user["email"] if admin_user else None,
             "total_jobs": total_jobs,
             "total_users": total_users
