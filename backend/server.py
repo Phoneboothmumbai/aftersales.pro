@@ -1442,6 +1442,203 @@ async def setup_super_admin():
         "note": "Please change the password after first login"
     }
 
+# ==================== CUSTOMER ROUTES ====================
+
+@api_router.get("/customers")
+async def get_customers(
+    search: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Get unique customers with their device count and last visit"""
+    tenant_id = user["tenant_id"]
+    
+    # Aggregate to get unique customers by mobile number
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$sort": {"created_at": -1}},
+        {"$group": {
+            "_id": "$customer.mobile",
+            "name": {"$first": "$customer.name"},
+            "mobile": {"$first": "$customer.mobile"},
+            "email": {"$first": "$customer.email"},
+            "total_jobs": {"$sum": 1},
+            "devices": {"$addToSet": {
+                "device_type": "$device.device_type",
+                "brand": "$device.brand",
+                "model": "$device.model",
+                "serial_imei": "$device.serial_imei"
+            }},
+            "last_visit": {"$first": "$created_at"},
+            "first_visit": {"$last": "$created_at"}
+        }},
+        {"$project": {
+            "_id": 0,
+            "name": 1,
+            "mobile": 1,
+            "email": 1,
+            "total_jobs": 1,
+            "device_count": {"$size": "$devices"},
+            "last_visit": 1,
+            "first_visit": 1
+        }},
+        {"$sort": {"last_visit": -1}}
+    ]
+    
+    # Add search filter if provided
+    if search:
+        pipeline[0]["$match"]["$or"] = [
+            {"customer.name": {"$regex": search, "$options": "i"}},
+            {"customer.mobile": {"$regex": search, "$options": "i"}},
+            {"customer.email": {"$regex": search, "$options": "i"}}
+        ]
+    
+    customers = await db.jobs.aggregate(pipeline).to_list(1000)
+    return {"customers": customers}
+
+@api_router.get("/customers/{mobile}/devices")
+async def get_customer_devices(
+    mobile: str,
+    user: dict = Depends(get_current_user)
+):
+    """Get all devices for a specific customer"""
+    tenant_id = user["tenant_id"]
+    
+    # Aggregate to get unique devices for this customer
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id, "customer.mobile": mobile}},
+        {"$sort": {"created_at": -1}},
+        {"$group": {
+            "_id": "$device.serial_imei",
+            "device_type": {"$first": "$device.device_type"},
+            "brand": {"$first": "$device.brand"},
+            "model": {"$first": "$device.model"},
+            "serial_imei": {"$first": "$device.serial_imei"},
+            "condition": {"$first": "$device.condition"},
+            "total_repairs": {"$sum": 1},
+            "last_repair": {"$first": "$created_at"},
+            "first_repair": {"$last": "$created_at"},
+            "latest_status": {"$first": "$status"},
+            "latest_job_id": {"$first": "$id"},
+            "latest_job_number": {"$first": "$job_number"}
+        }},
+        {"$project": {
+            "_id": 0,
+            "device_type": 1,
+            "brand": 1,
+            "model": 1,
+            "serial_imei": 1,
+            "condition": 1,
+            "total_repairs": 1,
+            "last_repair": 1,
+            "first_repair": 1,
+            "latest_status": 1,
+            "latest_job_id": 1,
+            "latest_job_number": 1
+        }},
+        {"$sort": {"last_repair": -1}}
+    ]
+    
+    devices = await db.jobs.aggregate(pipeline).to_list(100)
+    
+    # Also get customer info
+    customer_job = await db.jobs.find_one(
+        {"tenant_id": tenant_id, "customer.mobile": mobile},
+        {"_id": 0, "customer": 1}
+    )
+    customer = customer_job["customer"] if customer_job else {}
+    
+    return {
+        "customer": customer,
+        "devices": devices
+    }
+
+@api_router.get("/customers/{mobile}/devices/{serial_imei}/history")
+async def get_device_history(
+    mobile: str,
+    serial_imei: str,
+    user: dict = Depends(get_current_user)
+):
+    """Get job history for a specific device"""
+    tenant_id = user["tenant_id"]
+    
+    # Get all jobs for this device
+    jobs = await db.jobs.find(
+        {
+            "tenant_id": tenant_id,
+            "customer.mobile": mobile,
+            "device.serial_imei": serial_imei
+        },
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Get device info from the first job
+    device = jobs[0]["device"] if jobs else {}
+    customer = jobs[0]["customer"] if jobs else {}
+    
+    # Simplify job data for history view
+    history = []
+    for job in jobs:
+        history.append({
+            "id": job["id"],
+            "job_number": job["job_number"],
+            "problem_description": job["problem_description"],
+            "status": job["status"],
+            "diagnosis": job.get("diagnosis"),
+            "repair": job.get("repair"),
+            "created_at": job["created_at"],
+            "updated_at": job["updated_at"],
+            "status_history": job.get("status_history", [])
+        })
+    
+    return {
+        "customer": customer,
+        "device": device,
+        "history": history,
+        "total_repairs": len(history)
+    }
+
+@api_router.get("/customers/stats")
+async def get_customer_stats(user: dict = Depends(get_current_user)):
+    """Get customer statistics"""
+    tenant_id = user["tenant_id"]
+    
+    # Total unique customers
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {"_id": "$customer.mobile"}},
+        {"$count": "total"}
+    ]
+    total_result = await db.jobs.aggregate(pipeline).to_list(1)
+    total_customers = total_result[0]["total"] if total_result else 0
+    
+    # Repeat customers (more than 1 job)
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {"_id": "$customer.mobile", "count": {"$sum": 1}}},
+        {"$match": {"count": {"$gt": 1}}},
+        {"$count": "total"}
+    ]
+    repeat_result = await db.jobs.aggregate(pipeline).to_list(1)
+    repeat_customers = repeat_result[0]["total"] if repeat_result else 0
+    
+    # New customers this month
+    month_start = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {"_id": "$customer.mobile", "first_visit": {"$min": "$created_at"}}},
+        {"$match": {"first_visit": {"$gte": month_start.isoformat()}}},
+        {"$count": "total"}
+    ]
+    new_result = await db.jobs.aggregate(pipeline).to_list(1)
+    new_customers_this_month = new_result[0]["total"] if new_result else 0
+    
+    return {
+        "total_customers": total_customers,
+        "repeat_customers": repeat_customers,
+        "new_customers_this_month": new_customers_this_month,
+        "repeat_rate": round((repeat_customers / total_customers * 100), 1) if total_customers > 0 else 0
+    }
+
 # ==================== INVENTORY ROUTES ====================
 
 @api_router.post("/inventory", response_model=InventoryItemResponse)
