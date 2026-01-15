@@ -164,6 +164,7 @@ class DeviceInfo(BaseModel):
 ### P0 (Verified - Done)
 - [x] Super Admin subscription management
 - [x] Dynamic plan creation with all parameters (users, branches, jobs, inventory, photos, storage, 18 features)
+- [x] Plan limit enforcement on all create endpoints
 
 ### P1 (High Priority)
 - [ ] SSL setup for aftersales.pro
