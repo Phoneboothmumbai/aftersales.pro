@@ -100,6 +100,7 @@ export default function Inventory() {
     fetchInventory();
     fetchStats();
     fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryFilter, lowStockOnly]);
 
   const fetchInventory = async () => {
