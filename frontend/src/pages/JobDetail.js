@@ -8,7 +8,6 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Badge } from "../components/ui/badge";
-import { Checkbox } from "../components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import {
   Dialog,
@@ -39,12 +38,29 @@ import {
   Camera,
   QrCode,
   Copy,
-  Link as LinkIcon,
+  Phone,
+  User,
+  CreditCard,
+  Truck,
+  Timer,
+  ThumbsUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateTime, formatCurrency, getStatusColor, getStatusLabel, PAYMENT_MODES } from "../lib/utils";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Status icons mapping
+const STATUS_ICONS = {
+  received: Clock,
+  diagnosed: AlertCircle,
+  waiting_for_approval: ThumbsUp,
+  in_progress: Wrench,
+  pending_parts: Timer,
+  repaired: CheckCircle,
+  delivered: Truck,
+  closed: Package,
+};
 
 export default function JobDetail() {
   const { id } = useParams();
@@ -56,10 +72,12 @@ export default function JobDetail() {
 
   // Modals
   const [diagnosisModal, setDiagnosisModal] = useState(false);
+  const [approvalModal, setApprovalModal] = useState(false);
   const [repairModal, setRepairModal] = useState(false);
-  const [closeModal, setCloseModal] = useState(false);
+  const [deliveryModal, setDeliveryModal] = useState(false);
   const [whatsappModal, setWhatsappModal] = useState(false);
   const [whatsappData, setWhatsappData] = useState(null);
+  const [whatsappType, setWhatsappType] = useState("received");
 
   // Form states
   const [diagnosisForm, setDiagnosisForm] = useState({
@@ -69,6 +87,12 @@ export default function JobDetail() {
     parts_required: "",
   });
 
+  const [approvalForm, setApprovalForm] = useState({
+    approved_by: "",
+    approved_amount: "",
+    approval_notes: "",
+  });
+
   const [repairForm, setRepairForm] = useState({
     work_done: "",
     parts_replaced: "",
@@ -76,11 +100,12 @@ export default function JobDetail() {
     warranty_info: "",
   });
 
-  const [closeForm, setCloseForm] = useState({
-    device_delivered: true,
-    accessories_returned: [],
+  const [deliveryForm, setDeliveryForm] = useState({
+    delivered_to: "",
+    amount_received: "",
     payment_mode: "",
-    invoice_reference: "",
+    payment_reference: "",
+    delivery_notes: "",
   });
 
   useEffect(() => {
@@ -103,12 +128,28 @@ export default function JobDetail() {
           parts_required: response.data.diagnosis.parts_required || "",
         });
       }
+      if (response.data.approval) {
+        setApprovalForm({
+          approved_by: response.data.approval.approved_by || "",
+          approved_amount: response.data.approval.approved_amount || "",
+          approval_notes: response.data.approval.approval_notes || "",
+        });
+      }
       if (response.data.repair) {
         setRepairForm({
           work_done: response.data.repair.work_done || "",
           parts_replaced: response.data.repair.parts_replaced || "",
           final_amount: response.data.repair.final_amount || "",
           warranty_info: response.data.repair.warranty_info || "",
+        });
+      }
+      if (response.data.delivery) {
+        setDeliveryForm({
+          delivered_to: response.data.delivery.delivered_to || "",
+          amount_received: response.data.delivery.amount_received || "",
+          payment_mode: response.data.delivery.payment_mode || "",
+          payment_reference: response.data.delivery.payment_reference || "",
+          delivery_notes: response.data.delivery.delivery_notes || "",
         });
       }
     } catch (error) {
@@ -136,66 +177,107 @@ export default function JobDetail() {
     if (trackingLink) {
       const fullUrl = `${window.location.origin}${trackingLink.tracking_path}`;
       navigator.clipboard.writeText(fullUrl);
-      toast.success("Tracking link copied to clipboard!");
+      toast.success("Tracking link copied!");
     }
   };
 
+  // Diagnosis
   const handleDiagnosis = async () => {
     if (!diagnosisForm.diagnosis || !diagnosisForm.estimated_cost || !diagnosisForm.estimated_timeline) {
       toast.error("Please fill all required fields");
       return;
     }
-
     setActionLoading(true);
     try {
-      const response = await axios.put(`${API}/jobs/${id}/diagnosis`, {
-        ...diagnosisForm,
-        estimated_cost: parseFloat(diagnosisForm.estimated_cost),
-      });
-      setJob(response.data);
+      await axios.put(`${API}/jobs/${id}/diagnosis`, diagnosisForm);
+      toast.success("Diagnosis added");
       setDiagnosisModal(false);
-      toast.success("Diagnosis saved successfully");
+      fetchJob();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to save diagnosis");
+      toast.error(error.response?.data?.detail || "Failed to add diagnosis");
     } finally {
       setActionLoading(false);
     }
   };
 
+  // Approval
+  const handleApproval = async () => {
+    if (!approvalForm.approved_by || !approvalForm.approved_amount) {
+      toast.error("Please fill required fields");
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await axios.put(`${API}/jobs/${id}/approve`, approvalForm);
+      toast.success("Approval recorded");
+      setApprovalModal(false);
+      fetchJob();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to record approval");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Pending Parts
+  const handlePendingParts = async () => {
+    setActionLoading(true);
+    try {
+      await axios.put(`${API}/jobs/${id}/pending-parts?notes=Waiting for parts to arrive`);
+      toast.success("Marked as pending parts");
+      fetchJob();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update status");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Repair
   const handleRepair = async () => {
     if (!repairForm.work_done || !repairForm.final_amount) {
-      toast.error("Please fill all required fields");
+      toast.error("Please fill required fields");
       return;
     }
-
     setActionLoading(true);
     try {
-      const response = await axios.put(`${API}/jobs/${id}/repair`, {
-        ...repairForm,
-        final_amount: parseFloat(repairForm.final_amount),
-      });
-      setJob(response.data);
+      await axios.put(`${API}/jobs/${id}/repair`, repairForm);
+      toast.success("Repair completed");
       setRepairModal(false);
-      toast.success("Repair details saved successfully");
+      fetchJob();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to save repair details");
+      toast.error(error.response?.data?.detail || "Failed to update repair");
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleClose = async () => {
-    if (!closeForm.payment_mode) {
-      toast.error("Please select payment mode");
+  // Delivery
+  const handleDelivery = async () => {
+    if (!deliveryForm.delivered_to || !deliveryForm.amount_received || !deliveryForm.payment_mode) {
+      toast.error("Please fill required fields");
       return;
     }
-
     setActionLoading(true);
     try {
-      const response = await axios.put(`${API}/jobs/${id}/close`, closeForm);
-      setJob(response.data);
-      setCloseModal(false);
-      toast.success("Job closed successfully");
+      await axios.put(`${API}/jobs/${id}/deliver`, deliveryForm);
+      toast.success("Delivery recorded");
+      setDeliveryModal(false);
+      fetchJob();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to record delivery");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Close Job
+  const handleClose = async () => {
+    setActionLoading(true);
+    try {
+      await axios.put(`${API}/jobs/${id}/close`);
+      toast.success("Job closed");
+      fetchJob();
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to close job");
     } finally {
@@ -203,21 +285,22 @@ export default function JobDetail() {
     }
   };
 
-  const fetchWhatsappMessage = async (type) => {
+  // WhatsApp
+  const openWhatsApp = async (messageType) => {
     try {
-      const response = await axios.get(`${API}/jobs/${id}/whatsapp-message?message_type=${type}`);
+      const response = await axios.get(`${API}/jobs/${id}/whatsapp-message?message_type=${messageType}`);
       setWhatsappData(response.data);
+      setWhatsappType(messageType);
       setWhatsappModal(true);
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to generate message");
     }
   };
 
+  // PDF
   const downloadPDF = async () => {
     try {
-      const response = await axios.get(`${API}/jobs/${id}/pdf`, {
-        responseType: "blob",
-      });
+      const response = await axios.get(`${API}/jobs/${id}/pdf`, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -225,28 +308,16 @@ export default function JobDetail() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success("PDF downloaded");
     } catch (error) {
       toast.error("Failed to download PDF");
     }
-  };
-
-  const getStatusIcon = (status) => {
-    const icons = {
-      received: Clock,
-      diagnosed: AlertCircle,
-      waiting_for_approval: AlertCircle,
-      repaired: CheckCircle,
-      closed: Package,
-    };
-    return icons[status] || Clock;
   };
 
   if (loading) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
-          <div className="spinner w-8 h-8 border-primary" />
+          <Loader2 className="w-8 h-8 animate-spin" />
         </div>
       </Layout>
     );
@@ -254,27 +325,30 @@ export default function JobDetail() {
 
   if (!job) return null;
 
-  const checkedAccessories = job.accessories.filter((a) => a.checked);
-  const isClosed = job.status === "closed";
+  const StatusIcon = STATUS_ICONS[job.status] || Clock;
+
+  // Determine which actions are available based on status
+  const canDiagnose = job.status === "received";
+  const canApprove = job.status === "diagnosed" || job.status === "waiting_for_approval";
+  const canMarkPendingParts = job.status === "in_progress";
+  const canRepair = job.status === "in_progress" || job.status === "pending_parts";
+  const canDeliver = job.status === "repaired";
+  const canClose = job.status === "delivered";
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto space-y-6 animate-in" data-testid="job-detail-page">
+      <div className="space-y-6 animate-in" data-testid="job-detail-page">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/jobs")}
-              data-testid="back-btn"
-            >
+            <Button variant="ghost" size="icon" onClick={() => navigate("/jobs")} data-testid="back-btn">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold font-mono">{job.job_number}</h1>
+                <h1 className="text-2xl font-bold font-mono">{job.job_number}</h1>
                 <Badge className={`${getStatusColor(job.status)} text-sm`}>
+                  <StatusIcon className="w-3 h-3 mr-1" />
                   {getStatusLabel(job.status)}
                 </Badge>
               </div>
@@ -283,18 +357,12 @@ export default function JobDetail() {
               </p>
             </div>
           </div>
-
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={downloadPDF} data-testid="download-pdf-btn">
+            <Button variant="outline" size="sm" onClick={downloadPDF} data-testid="download-pdf-btn">
               <Download className="w-4 h-4 mr-2" />
               PDF
             </Button>
-            <Button
-              variant="outline"
-              className="whatsapp-btn"
-              onClick={() => fetchWhatsappMessage(job.status === "waiting_for_approval" ? "diagnosis" : job.status === "repaired" ? "repaired" : "received")}
-              data-testid="whatsapp-btn"
-            >
+            <Button variant="outline" size="sm" onClick={() => openWhatsApp(job.status)} data-testid="whatsapp-btn">
               <MessageSquare className="w-4 h-4 mr-2" />
               WhatsApp
             </Button>
@@ -302,7 +370,7 @@ export default function JobDetail() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Content */}
+          {/* Main Content - Left 2 columns */}
           <div className="lg:col-span-2 space-y-6">
             {/* Customer & Device */}
             <Card className="card-shadow">
@@ -321,13 +389,9 @@ export default function JobDetail() {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-2">Device</h4>
-                    <p className="font-semibold">
-                      {job.device.brand} {job.device.model}
-                    </p>
+                    <p className="font-semibold">{job.device.brand} {job.device.model}</p>
                     <p className="text-sm font-mono">{job.device.serial_imei}</p>
-                    <p className="text-sm">
-                      {job.device.device_type} • {job.device.condition}
-                    </p>
+                    <p className="text-sm">{job.device.device_type} • {job.device.condition}</p>
                     {job.device.condition_notes && (
                       <p className="text-sm text-muted-foreground">{job.device.condition_notes}</p>
                     )}
@@ -353,43 +417,19 @@ export default function JobDetail() {
               </CardContent>
             </Card>
 
-            {/* Accessories */}
-            <Card className="card-shadow">
-              <CardHeader>
-                <CardTitle>Accessories Collected</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {checkedAccessories.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {checkedAccessories.map((acc, i) => (
-                      <Badge key={i} variant="secondary">
-                        {acc.name}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground">No accessories collected</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Problem & Observation */}
+            {/* Problem */}
             <Card className="card-shadow">
               <CardHeader>
                 <CardTitle>Problem Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                    Customer-Reported Issue
-                  </h4>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Customer-Reported Issue</h4>
                   <p>{job.problem_description}</p>
                 </div>
                 {job.technician_observation && (
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                      Technician Observation
-                    </h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Technician Observation</h4>
                     <p>{job.technician_observation}</p>
                   </div>
                 )}
@@ -405,76 +445,113 @@ export default function JobDetail() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <PhotoUpload 
-                  jobId={id} 
-                  photos={job.photos || []} 
-                  onPhotoChange={handlePhotoChange}
-                />
+                <PhotoUpload jobId={id} photos={job.photos || []} onPhotoChange={handlePhotoChange} />
               </CardContent>
             </Card>
 
             {/* Diagnosis */}
             {job.diagnosis && (
               <Card className="card-shadow border-purple-500/30">
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     <AlertCircle className="w-5 h-5 text-purple-500" />
                     Diagnosis
                   </CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("diagnosis")}>
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    Send to Customer
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Issue Found</h4>
                     <p>{job.diagnosis.diagnosis}</p>
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid sm:grid-cols-3 gap-4">
                     <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                        Estimated Cost
-                      </h4>
-                      <p className="text-xl font-bold text-primary">
-                        {formatCurrency(job.diagnosis.estimated_cost)}
-                      </p>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Estimated Cost</h4>
+                      <p className="text-xl font-bold text-primary">{formatCurrency(job.diagnosis.estimated_cost)}</p>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-muted-foreground mb-1">Timeline</h4>
                       <p>{job.diagnosis.estimated_timeline}</p>
                     </div>
+                    {job.diagnosis.parts_required && (
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Parts Required</h4>
+                        <p>{job.diagnosis.parts_required}</p>
+                      </div>
+                    )}
                   </div>
-                  {job.diagnosis.parts_required && (
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Approval */}
+            {job.approval && (
+              <Card className="card-shadow border-green-500/30">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <ThumbsUp className="w-5 h-5 text-green-500" />
+                    Customer Approval
+                  </CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("approved")}>
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    Send Confirmation
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid sm:grid-cols-3 gap-4">
                     <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                        Parts Required
-                      </h4>
-                      <p>{job.diagnosis.parts_required}</p>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Approved By</h4>
+                      <p className="flex items-center gap-1">
+                        <User className="w-4 h-4" />
+                        {job.approval.approved_by}
+                      </p>
                     </div>
-                  )}
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Approved Amount</h4>
+                      <p className="text-xl font-bold text-green-600">{formatCurrency(job.approval.approved_amount)}</p>
+                    </div>
+                    {job.approval.approval_notes && (
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Notes</h4>
+                        <p>{job.approval.approval_notes}</p>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             )}
 
             {/* Repair */}
             {job.repair && (
-              <Card className="card-shadow border-green-500/30">
-                <CardHeader>
+              <Card className="card-shadow border-blue-500/30">
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    Repair Complete
+                    <Wrench className="w-5 h-5 text-blue-500" />
+                    Repair Details
                   </CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("repaired")}>
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    Send to Customer
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Work Done</h4>
                     <p>{job.repair.work_done}</p>
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    {job.repair.parts_replaced && (
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Parts Replaced</h4>
+                        <p>{job.repair.parts_replaced}</p>
+                      </div>
+                    )}
                     <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                        Final Amount
-                      </h4>
-                      <p className="text-xl font-bold text-green-600">
-                        {formatCurrency(job.repair.final_amount)}
-                      </p>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Final Amount</h4>
+                      <p className="text-xl font-bold text-blue-600">{formatCurrency(job.repair.final_amount)}</p>
                     </div>
                     {job.repair.warranty_info && (
                       <div>
@@ -483,58 +560,48 @@ export default function JobDetail() {
                       </div>
                     )}
                   </div>
-                  {job.repair.parts_replaced && (
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                        Parts Replaced
-                      </h4>
-                      <p>{job.repair.parts_replaced}</p>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             )}
 
-            {/* Closure */}
-            {job.closure && (
-              <Card className="card-shadow border-gray-500/30">
-                <CardHeader>
+            {/* Delivery */}
+            {job.delivery && (
+              <Card className="card-shadow border-emerald-500/30">
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-gray-500" />
-                    Job Closed
+                    <Truck className="w-5 h-5 text-emerald-500" />
+                    Delivery Details
                   </CardTitle>
+                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("delivered")}>
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    Send Receipt
+                  </Button>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
+                <CardContent>
+                  <div className="grid sm:grid-cols-4 gap-4">
                     <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                        Payment Mode
-                      </h4>
-                      <p>{job.closure.payment_mode}</p>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Delivered To</h4>
+                      <p className="flex items-center gap-1">
+                        <User className="w-4 h-4" />
+                        {job.delivery.delivered_to}
+                      </p>
                     </div>
-                    {job.closure.invoice_reference && (
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Amount Received</h4>
+                      <p className="text-xl font-bold text-emerald-600">{formatCurrency(job.delivery.amount_received)}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Payment Mode</h4>
+                      <p className="flex items-center gap-1">
+                        <CreditCard className="w-4 h-4" />
+                        {job.delivery.payment_mode}
+                      </p>
+                    </div>
+                    {job.delivery.payment_reference && (
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                          Invoice Reference
-                        </h4>
-                        <p className="font-mono">{job.closure.invoice_reference}</p>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Reference</h4>
+                        <p className="font-mono text-sm">{job.delivery.payment_reference}</p>
                       </div>
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">
-                      Accessories Returned
-                    </h4>
-                    {job.closure.accessories_returned.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {job.closure.accessories_returned.map((acc, i) => (
-                          <Badge key={i} variant="secondary">
-                            {acc}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-muted-foreground">None specified</p>
                     )}
                   </div>
                 </CardContent>
@@ -542,42 +609,47 @@ export default function JobDetail() {
             )}
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar - Right column */}
           <div className="space-y-6">
-            {/* Actions */}
-            {!isClosed && (
+            {/* Actions Card */}
+            {job.status !== "closed" && (
               <Card className="card-shadow">
                 <CardHeader>
                   <CardTitle>Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {(job.status === "received" || job.status === "diagnosed") && (
-                    <Button
-                      className="w-full"
-                      onClick={() => setDiagnosisModal(true)}
-                      data-testid="diagnosis-btn"
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      {job.diagnosis ? "Update Diagnosis" : "Add Diagnosis"}
+                  {canDiagnose && (
+                    <Button className="w-full" onClick={() => setDiagnosisModal(true)} data-testid="diagnose-btn">
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      Add Diagnosis
                     </Button>
                   )}
-                  {(job.status === "waiting_for_approval" || job.status === "diagnosed") && (
-                    <Button
-                      className="w-full"
-                      onClick={() => setRepairModal(true)}
-                      data-testid="repair-btn"
-                    >
+                  {canApprove && (
+                    <Button className="w-full" onClick={() => setApprovalModal(true)} data-testid="approve-btn">
+                      <ThumbsUp className="w-4 h-4 mr-2" />
+                      Record Approval
+                    </Button>
+                  )}
+                  {canMarkPendingParts && (
+                    <Button className="w-full" variant="outline" onClick={handlePendingParts} data-testid="pending-parts-btn">
+                      <Timer className="w-4 h-4 mr-2" />
+                      Mark Pending Parts
+                    </Button>
+                  )}
+                  {canRepair && (
+                    <Button className="w-full" onClick={() => setRepairModal(true)} data-testid="repair-btn">
                       <Wrench className="w-4 h-4 mr-2" />
                       {job.repair ? "Update Repair" : "Mark Repaired"}
                     </Button>
                   )}
-                  {job.status === "repaired" && (
-                    <Button
-                      className="w-full"
-                      variant="default"
-                      onClick={() => setCloseModal(true)}
-                      data-testid="close-job-btn"
-                    >
+                  {canDeliver && (
+                    <Button className="w-full" onClick={() => setDeliveryModal(true)} data-testid="deliver-btn">
+                      <Truck className="w-4 h-4 mr-2" />
+                      Record Delivery
+                    </Button>
+                  )}
+                  {canClose && (
+                    <Button className="w-full" variant="default" onClick={handleClose} data-testid="close-btn">
                       <Package className="w-4 h-4 mr-2" />
                       Close Job
                     </Button>
@@ -586,7 +658,7 @@ export default function JobDetail() {
               </Card>
             )}
 
-            {/* Customer Tracking Link */}
+            {/* Customer Tracking */}
             {trackingLink && (
               <Card className="card-shadow border-blue-500/30">
                 <CardHeader>
@@ -597,30 +669,18 @@ export default function JobDetail() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Share this link with the customer so they can track their repair status.
+                    Share this with customer to track status.
                   </p>
-                  <div className="bg-muted rounded-lg p-3 font-mono text-xs break-all">
+                  <div className="bg-muted rounded-lg p-3 font-mono text-xs">
                     <p className="text-muted-foreground mb-1">Token:</p>
                     <p className="font-bold text-lg">{trackingLink.tracking_token}</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={copyTrackingLink}
-                      data-testid="copy-tracking-link-btn"
-                    >
+                    <Button variant="outline" size="sm" className="flex-1" onClick={copyTrackingLink}>
                       <Copy className="w-4 h-4 mr-1" />
                       Copy Link
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => window.open(trackingLink.tracking_path, "_blank")}
-                      data-testid="open-tracking-link-btn"
-                    >
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(trackingLink.tracking_path, "_blank")}>
                       <ExternalLink className="w-4 h-4 mr-1" />
                       Preview
                     </Button>
@@ -636,17 +696,13 @@ export default function JobDetail() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {job.status_history.map((entry, index) => {
-                    const StatusIcon = getStatusIcon(entry.status);
+                  {[...job.status_history].reverse().map((entry, index) => {
+                    const EntryIcon = STATUS_ICONS[entry.status] || Clock;
                     return (
                       <div key={index} className="flex gap-3">
                         <div className="flex flex-col items-center">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center ${getStatusColor(
-                              entry.status
-                            )}`}
-                          >
-                            <StatusIcon className="w-4 h-4" />
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getStatusColor(entry.status)}`}>
+                            <EntryIcon className="w-4 h-4" />
                           </div>
                           {index < job.status_history.length - 1 && (
                             <div className="w-0.5 flex-1 bg-border mt-2" />
@@ -677,15 +733,12 @@ export default function JobDetail() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Diagnosis / Issue Found *</Label>
+              <Label>Issue Found *</Label>
               <Textarea
                 value={diagnosisForm.diagnosis}
-                onChange={(e) =>
-                  setDiagnosisForm((prev) => ({ ...prev, diagnosis: e.target.value }))
-                }
+                onChange={(e) => setDiagnosisForm({ ...diagnosisForm, diagnosis: e.target.value })}
                 placeholder="Describe the issue found..."
                 rows={3}
-                data-testid="diagnosis-input"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -694,22 +747,16 @@ export default function JobDetail() {
                 <Input
                   type="number"
                   value={diagnosisForm.estimated_cost}
-                  onChange={(e) =>
-                    setDiagnosisForm((prev) => ({ ...prev, estimated_cost: e.target.value }))
-                  }
-                  placeholder="3500"
-                  data-testid="diagnosis-cost-input"
+                  onChange={(e) => setDiagnosisForm({ ...diagnosisForm, estimated_cost: e.target.value })}
+                  placeholder="0"
                 />
               </div>
               <div className="space-y-2">
                 <Label>Timeline *</Label>
                 <Input
                   value={diagnosisForm.estimated_timeline}
-                  onChange={(e) =>
-                    setDiagnosisForm((prev) => ({ ...prev, estimated_timeline: e.target.value }))
-                  }
-                  placeholder="2-3 working days"
-                  data-testid="diagnosis-timeline-input"
+                  onChange={(e) => setDiagnosisForm({ ...diagnosisForm, estimated_timeline: e.target.value })}
+                  placeholder="e.g., 2-3 days"
                 />
               </div>
             </div>
@@ -717,20 +764,62 @@ export default function JobDetail() {
               <Label>Parts Required</Label>
               <Input
                 value={diagnosisForm.parts_required}
-                onChange={(e) =>
-                  setDiagnosisForm((prev) => ({ ...prev, parts_required: e.target.value }))
-                }
-                placeholder="Power IC, Battery..."
-                data-testid="diagnosis-parts-input"
+                onChange={(e) => setDiagnosisForm({ ...diagnosisForm, parts_required: e.target.value })}
+                placeholder="e.g., Screen, Battery"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDiagnosisModal(false)}>
-              Cancel
+            <Button variant="outline" onClick={() => setDiagnosisModal(false)}>Cancel</Button>
+            <Button onClick={handleDiagnosis} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save & Send WhatsApp"}
             </Button>
-            <Button onClick={handleDiagnosis} disabled={actionLoading} data-testid="save-diagnosis-btn">
-              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Diagnosis"}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Approval Modal */}
+      <Dialog open={approvalModal} onOpenChange={setApprovalModal}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Record Customer Approval</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-muted rounded-lg p-3">
+              <p className="text-sm text-muted-foreground">Estimated cost from diagnosis:</p>
+              <p className="text-xl font-bold">{formatCurrency(job.diagnosis?.estimated_cost || 0)}</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Approved By (Customer Name) *</Label>
+              <Input
+                value={approvalForm.approved_by}
+                onChange={(e) => setApprovalForm({ ...approvalForm, approved_by: e.target.value })}
+                placeholder="Customer name who approved"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Approved Amount (₹) *</Label>
+              <Input
+                type="number"
+                value={approvalForm.approved_amount}
+                onChange={(e) => setApprovalForm({ ...approvalForm, approved_amount: e.target.value })}
+                placeholder="0"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Notes</Label>
+              <Textarea
+                value={approvalForm.approval_notes}
+                onChange={(e) => setApprovalForm({ ...approvalForm, approval_notes: e.target.value })}
+                placeholder="Any additional notes..."
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setApprovalModal(false)}>Cancel</Button>
+            <Button onClick={handleApproval} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Record Approval"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -740,19 +829,24 @@ export default function JobDetail() {
       <Dialog open={repairModal} onOpenChange={setRepairModal}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Mark as Repaired</DialogTitle>
+            <DialogTitle>Repair Details</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Work Done *</Label>
               <Textarea
                 value={repairForm.work_done}
-                onChange={(e) =>
-                  setRepairForm((prev) => ({ ...prev, work_done: e.target.value }))
-                }
-                placeholder="Describe the work done..."
+                onChange={(e) => setRepairForm({ ...repairForm, work_done: e.target.value })}
+                placeholder="Describe the repair work..."
                 rows={3}
-                data-testid="repair-work-input"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Parts Replaced</Label>
+              <Input
+                value={repairForm.parts_replaced}
+                onChange={(e) => setRepairForm({ ...repairForm, parts_replaced: e.target.value })}
+                placeholder="e.g., Screen, Battery"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -761,129 +855,97 @@ export default function JobDetail() {
                 <Input
                   type="number"
                   value={repairForm.final_amount}
-                  onChange={(e) =>
-                    setRepairForm((prev) => ({ ...prev, final_amount: e.target.value }))
-                  }
-                  placeholder="3500"
-                  data-testid="repair-amount-input"
+                  onChange={(e) => setRepairForm({ ...repairForm, final_amount: e.target.value })}
+                  placeholder="0"
                 />
               </div>
               <div className="space-y-2">
                 <Label>Warranty</Label>
                 <Input
                   value={repairForm.warranty_info}
-                  onChange={(e) =>
-                    setRepairForm((prev) => ({ ...prev, warranty_info: e.target.value }))
-                  }
-                  placeholder="30 days"
-                  data-testid="repair-warranty-input"
+                  onChange={(e) => setRepairForm({ ...repairForm, warranty_info: e.target.value })}
+                  placeholder="e.g., 3 months"
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>Parts Replaced</Label>
-              <Input
-                value={repairForm.parts_replaced}
-                onChange={(e) =>
-                  setRepairForm((prev) => ({ ...prev, parts_replaced: e.target.value }))
-                }
-                placeholder="Power IC, Battery..."
-                data-testid="repair-parts-input"
-              />
-            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRepairModal(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleRepair} disabled={actionLoading} data-testid="save-repair-btn">
-              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save & Mark Repaired"}
+            <Button variant="outline" onClick={() => setRepairModal(false)}>Cancel</Button>
+            <Button onClick={handleRepair} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Mark Repaired"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Close Job Modal */}
-      <Dialog open={closeModal} onOpenChange={setCloseModal}>
+      {/* Delivery Modal */}
+      <Dialog open={deliveryModal} onOpenChange={setDeliveryModal}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Close Job</DialogTitle>
+            <DialogTitle>Record Delivery</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="device-delivered"
-                checked={closeForm.device_delivered}
-                onCheckedChange={(checked) =>
-                  setCloseForm((prev) => ({ ...prev, device_delivered: checked }))
-                }
-                data-testid="device-delivered-checkbox"
-              />
-              <Label htmlFor="device-delivered">Device delivered to customer</Label>
+            <div className="bg-muted rounded-lg p-3">
+              <p className="text-sm text-muted-foreground">Final amount from repair:</p>
+              <p className="text-xl font-bold">{formatCurrency(job.repair?.final_amount || 0)}</p>
             </div>
-
             <div className="space-y-2">
-              <Label>Accessories Returned</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {checkedAccessories.map((acc, i) => (
-                  <div key={i} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`return-${i}`}
-                      checked={closeForm.accessories_returned.includes(acc.name)}
-                      onCheckedChange={(checked) => {
-                        setCloseForm((prev) => ({
-                          ...prev,
-                          accessories_returned: checked
-                            ? [...prev.accessories_returned, acc.name]
-                            : prev.accessories_returned.filter((a) => a !== acc.name),
-                        }));
-                      }}
-                    />
-                    <Label htmlFor={`return-${i}`} className="text-sm">
-                      {acc.name}
-                    </Label>
-                  </div>
-                ))}
+              <Label>Delivered To (Name) *</Label>
+              <Input
+                value={deliveryForm.delivered_to}
+                onChange={(e) => setDeliveryForm({ ...deliveryForm, delivered_to: e.target.value })}
+                placeholder="Person who received the device"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Amount Received (₹) *</Label>
+                <Input
+                  type="number"
+                  value={deliveryForm.amount_received}
+                  onChange={(e) => setDeliveryForm({ ...deliveryForm, amount_received: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Payment Mode *</Label>
+                <Select
+                  value={deliveryForm.payment_mode}
+                  onValueChange={(v) => setDeliveryForm({ ...deliveryForm, payment_mode: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAYMENT_MODES.map((mode) => (
+                      <SelectItem key={mode} value={mode}>{mode}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-
             <div className="space-y-2">
-              <Label>Payment Mode *</Label>
-              <Select
-                value={closeForm.payment_mode}
-                onValueChange={(v) => setCloseForm((prev) => ({ ...prev, payment_mode: v }))}
-              >
-                <SelectTrigger data-testid="payment-mode-select">
-                  <SelectValue placeholder="Select payment mode" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_MODES.map((mode) => (
-                    <SelectItem key={mode} value={mode}>
-                      {mode}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Invoice Reference</Label>
+              <Label>Payment Reference</Label>
               <Input
-                value={closeForm.invoice_reference}
-                onChange={(e) =>
-                  setCloseForm((prev) => ({ ...prev, invoice_reference: e.target.value }))
-                }
-                placeholder="INV-001"
-                data-testid="invoice-reference-input"
+                value={deliveryForm.payment_reference}
+                onChange={(e) => setDeliveryForm({ ...deliveryForm, payment_reference: e.target.value })}
+                placeholder="UPI ID, Transaction ID, etc."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Notes</Label>
+              <Textarea
+                value={deliveryForm.delivery_notes}
+                onChange={(e) => setDeliveryForm({ ...deliveryForm, delivery_notes: e.target.value })}
+                placeholder="Any delivery notes..."
+                rows={2}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCloseModal(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleClose} disabled={actionLoading} data-testid="close-job-confirm-btn">
-              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Close Job"}
+            <Button variant="outline" onClick={() => setDeliveryModal(false)}>Cancel</Button>
+            <Button onClick={handleDelivery} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Record Delivery"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -893,31 +955,31 @@ export default function JobDetail() {
       <Dialog open={whatsappModal} onOpenChange={setWhatsappModal}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Send WhatsApp Message</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-green-500" />
+              Send WhatsApp Message
+            </DialogTitle>
           </DialogHeader>
           {whatsappData && (
             <div className="space-y-4">
-              <div className="bg-muted rounded-lg p-4">
-                <pre className="whitespace-pre-wrap text-sm">{whatsappData.message}</pre>
+              <div className="bg-muted rounded-lg p-4 max-h-80 overflow-y-auto">
+                <pre className="whitespace-pre-wrap text-sm font-sans">{whatsappData.message}</pre>
               </div>
               <p className="text-sm text-muted-foreground">
-                This will open WhatsApp with the pre-filled message. You&apos;ll need to click send manually.
+                This will open WhatsApp with the pre-filled message.
               </p>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setWhatsappModal(false)}>
-              Cancel
-            </Button>
+            <Button variant="outline" onClick={() => setWhatsappModal(false)}>Cancel</Button>
             <Button
-              className="whatsapp-btn"
+              className="bg-green-600 hover:bg-green-700"
               onClick={() => {
                 window.open(whatsappData.whatsapp_url, "_blank");
                 setWhatsappModal(false);
               }}
-              data-testid="open-whatsapp-btn"
             >
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <Phone className="w-4 h-4 mr-2" />
               Open WhatsApp
             </Button>
           </DialogFooter>
