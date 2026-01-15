@@ -1725,7 +1725,7 @@ async def get_technician_metrics(user: dict = Depends(get_current_user)):
             if user_id not in avg_time_by_user:
                 avg_time_by_user[user_id] = []
             avg_time_by_user[user_id].append(duration_hours)
-        except:
+        except (KeyError, ValueError, TypeError):
             continue
     
     # Build response
