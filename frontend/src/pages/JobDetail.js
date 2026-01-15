@@ -883,7 +883,7 @@ export default function JobDetail() {
                 <pre className="whitespace-pre-wrap text-sm">{whatsappData.message}</pre>
               </div>
               <p className="text-sm text-muted-foreground">
-                This will open WhatsApp with the pre-filled message. You'll need to click send manually.
+                This will open WhatsApp with the pre-filled message. You&apos;ll need to click send manually.
               </p>
             </div>
           )}
