@@ -1383,54 +1383,148 @@ async def get_whatsapp_message(job_id: str, message_type: str = "received", user
     customer = job["customer"]
     device = job["device"]
     
+    # Device details string (always included)
+    device_details = f"""📱 *Device Details:*
+• Type: {device['device_type']}
+• Brand: {device['brand']}
+• Model: {device['model']}
+• Serial/IMEI: {device['serial_imei']}
+• Condition: {device['condition']}"""
+    
     checked_accessories = [a["name"] for a in job["accessories"] if a["checked"]]
     accessories_text = ", ".join(checked_accessories) if checked_accessories else "None"
     
     if message_type == "received":
         message = f"""Hello {customer['name']},
 
-Your device has been received.
+Your device has been received at *{company}*.
 
-Job Sheet No: {job['job_number']}
-Device: {device['brand']} {device['model']}
-Issue: {job['problem_description']}
-Accessories: {accessories_text}
+🎫 *Job Sheet No:* {job['job_number']}
 
-We will update you shortly.
-– {company}"""
+{device_details}
+
+📋 *Problem:* {job['problem_description']}
+🎒 *Accessories:* {accessories_text}
+
+We will diagnose and update you shortly.
+
+– *{company}*"""
     
     elif message_type == "diagnosis":
         if not job.get("diagnosis"):
             raise HTTPException(status_code=400, detail="No diagnosis available")
         diag = job["diagnosis"]
-        message = f"""Diagnosis complete for Job: {job['job_number']}
+        message = f"""Hello {customer['name']},
 
-Issue: {diag['diagnosis']}
-Estimated Cost: ₹{diag['estimated_cost']}
-Timeline: {diag['estimated_timeline']}
+Diagnosis is complete for your device.
 
-Please reply YES to approve.
-– {company}"""
+🎫 *Job Sheet No:* {job['job_number']}
+
+{device_details}
+
+🔍 *Diagnosis Report:*
+• Issue Found: {diag['diagnosis']}
+• Estimated Cost: *₹{diag['estimated_cost']}*
+• Timeline: {diag['estimated_timeline']}
+{f"• Parts Required: {diag['parts_required']}" if diag.get('parts_required') else ""}
+
+📞 *Please call us or reply to approve the repair.*
+
+– *{company}*"""
+    
+    elif message_type == "approved":
+        if not job.get("approval"):
+            raise HTTPException(status_code=400, detail="No approval details available")
+        approval = job["approval"]
+        message = f"""Hello {customer['name']},
+
+Thank you for approving the repair!
+
+🎫 *Job Sheet No:* {job['job_number']}
+
+{device_details}
+
+✅ *Approval Details:*
+• Approved By: {approval['approved_by']}
+• Approved Amount: *₹{approval['approved_amount']}*
+
+🔧 Your device repair is now *in progress*. We will update you once it's ready.
+
+– *{company}*"""
+
+    elif message_type == "pending_parts":
+        message = f"""Hello {customer['name']},
+
+Update on your repair job.
+
+🎫 *Job Sheet No:* {job['job_number']}
+
+{device_details}
+
+⏳ *Status:* Waiting for Parts
+
+We are waiting for required parts to arrive. We will update you once the repair resumes.
+
+– *{company}*"""
     
     elif message_type == "repaired":
         if not job.get("repair"):
             raise HTTPException(status_code=400, detail="No repair details available")
         repair = job["repair"]
-        message = f"""Good news!
-Your device (Job: {job['job_number']}) has been repaired.
+        message = f"""Hello {customer['name']},
 
-Final Amount: ₹{repair['final_amount']}
-Please visit to collect your device.
+Great news! 🎉 Your device has been *repaired* successfully.
 
-Thank you.
-– {company}"""
+🎫 *Job Sheet No:* {job['job_number']}
+
+{device_details}
+
+✅ *Repair Details:*
+• Work Done: {repair['work_done']}
+{f"• Parts Replaced: {repair['parts_replaced']}" if repair.get('parts_replaced') else ""}
+• Final Amount: *₹{repair['final_amount']}*
+{f"• Warranty: {repair['warranty_info']}" if repair.get('warranty_info') else ""}
+
+📍 Please visit our shop to collect your device.
+
+– *{company}*"""
+
+    elif message_type == "delivered":
+        if not job.get("delivery"):
+            raise HTTPException(status_code=400, detail="No delivery details available")
+        delivery = job["delivery"]
+        message = f"""Hello {customer['name']},
+
+Thank you for your business! 🙏
+
+🎫 *Job Sheet No:* {job['job_number']}
+
+{device_details}
+
+✅ *Delivery Receipt:*
+• Delivered To: {delivery['delivered_to']}
+• Amount Received: *₹{delivery['amount_received']}*
+• Payment Mode: {delivery['payment_mode']}
+{f"• Reference: {delivery['payment_reference']}" if delivery.get('payment_reference') else ""}
+
+Thank you for choosing *{company}*. We hope to serve you again!
+
+– *{company}*"""
     
     else:
-        message = f"""Update for Job: {job['job_number']}
+        # Generic status update
+        status_display = job['status'].replace('_', ' ').title()
+        message = f"""Hello {customer['name']},
 
-Status: {job['status'].replace('_', ' ').title()}
+Update on your device.
 
-– {company}"""
+🎫 *Job Sheet No:* {job['job_number']}
+
+{device_details}
+
+📋 *Status:* {status_display}
+
+– *{company}*"""
     
     # Generate WhatsApp URL
     import urllib.parse
