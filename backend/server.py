@@ -477,6 +477,7 @@ async def create_job(data: JobCreate, user: dict = Depends(get_current_user)):
     now = datetime.now(timezone.utc).isoformat()
     job_id = str(uuid.uuid4())
     job_number = await generate_job_number(user["tenant_id"])
+    tracking_token = str(uuid.uuid4())[:8].upper()  # Short token for public tracking
     
     job = {
         "id": job_id,
@@ -492,6 +493,8 @@ async def create_job(data: JobCreate, user: dict = Depends(get_current_user)):
         "diagnosis": None,
         "repair": None,
         "closure": None,
+        "photos": [],  # Initialize empty photos array
+        "tracking_token": tracking_token,  # For public tracking
         "status_history": [{
             "status": "received",
             "timestamp": now,
