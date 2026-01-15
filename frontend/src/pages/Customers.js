@@ -333,7 +333,9 @@ export default function Customers() {
                                 <p className="text-muted-foreground text-sm">No devices found</p>
                               ) : (
                                 <div className="grid gap-3">
-                                  {customerDevices.map((device) => (
+                                  {customerDevices.map((device) => {
+                                    const DeviceIconComponent = getDeviceIcon(device.device_type);
+                                    return (
                                     <div
                                       key={device.serial_imei}
                                       className="flex items-center justify-between p-3 bg-background rounded-lg border cursor-pointer hover:border-primary/50 transition-colors"
@@ -345,7 +347,7 @@ export default function Customers() {
                                     >
                                       <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                                          <DeviceIcon type={device.device_type} />
+                                          <DeviceIconComponent className="w-4 h-4" />
                                         </div>
                                         <div>
                                           <p className="font-medium">
