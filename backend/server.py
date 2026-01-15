@@ -37,8 +37,15 @@ JWT_SECRET = os.environ.get('JWT_SECRET', 'aftersales-pro-secret-key-change-in-p
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 24
 
+# Upload directory for photos
+UPLOAD_DIR = ROOT_DIR / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
+
 # Create the main app
 app = FastAPI(title="AfterSales.pro API")
+
+# Mount static files for uploads
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
