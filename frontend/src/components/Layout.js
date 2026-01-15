@@ -135,8 +135,8 @@ export const Layout = ({ children }) => {
       {/* Main content */}
       <div className="md:pl-64">
         {/* Top bar */}
-        <header className="glass sticky top-0 z-30 h-16 flex items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-4">
+        <header className="glass sticky top-0 z-30 h-16 flex items-center justify-between px-4 md:px-6 gap-4">
+          <div className="flex items-center gap-4 flex-shrink-0">
             <button
               className="md:hidden p-2 hover:bg-muted rounded-lg"
               onClick={() => setSidebarOpen(true)}
@@ -144,13 +144,18 @@ export const Layout = ({ children }) => {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="hidden sm:block">
+            <div className="hidden lg:block">
               <p className="text-sm font-medium">{tenant?.company_name}</p>
               <p className="text-xs text-muted-foreground">{tenant?.subdomain}.aftersales.pro</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Universal Search Bar */}
+          <div className="flex-1 max-w-xl">
+            <UniversalSearch />
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Button
               variant="ghost"
               size="icon"
