@@ -148,11 +148,23 @@ class DiagnosisUpdate(BaseModel):
     estimated_timeline: str
     parts_required: Optional[str] = None
 
+class ApprovalUpdate(BaseModel):
+    approved_by: str  # Customer name who approved
+    approved_amount: float
+    approval_notes: Optional[str] = None
+
 class RepairUpdate(BaseModel):
     work_done: str
     parts_replaced: Optional[str] = None
     final_amount: float
     warranty_info: Optional[str] = None
+
+class DeliveryUpdate(BaseModel):
+    delivered_to: str  # Who received the device
+    amount_received: float
+    payment_mode: str  # Cash, UPI, Card, etc.
+    payment_reference: Optional[str] = None
+    delivery_notes: Optional[str] = None
 
 class CloseJobRequest(BaseModel):
     device_delivered: bool = True
