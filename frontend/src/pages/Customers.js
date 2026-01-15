@@ -71,6 +71,7 @@ export default function Customers() {
   useEffect(() => {
     fetchCustomers();
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCustomers = async () => {
