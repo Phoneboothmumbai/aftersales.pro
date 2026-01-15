@@ -145,7 +145,7 @@ export default function UniversalSearch() {
                 Type at least 2 characters to search...
               </div>
             ) : results.length === 0 && !loading ? (
-              <CommandEmpty>No results found for "{query}"</CommandEmpty>
+              <CommandEmpty>No results found for &quot;{query}&quot;</CommandEmpty>
             ) : (
               <>
                 {/* Jobs */}
