@@ -86,6 +86,7 @@ export default function JobDetail() {
   useEffect(() => {
     fetchJob();
     fetchTrackingLink();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchJob = async () => {
