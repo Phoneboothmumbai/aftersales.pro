@@ -2391,10 +2391,9 @@ async def record_offline_payment(
     await db.payments.insert_one(payment)
     
     # If a plan is specified, automatically assign it
-    if data.plan and data.plan in SUBSCRIPTION_PLANS:
-        plan_info = SUBSCRIPTION_PLANS[data.plan]
-        
-        if data.plan != "free":
+    if data.plan:
+        plan_info = await db.subscription_plans.find_one({"id": data.plan, "is_active": True}, {"_id": 0})
+        if plan_info and plan_info["price"] > 0:
             duration_days = plan_info["duration_days"] * data.duration_months
             
             # Get current subscription end or use now
