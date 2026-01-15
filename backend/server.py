@@ -553,7 +553,9 @@ async def create_job(data: JobCreate, user: dict = Depends(get_current_user)):
         "technician_observation": data.technician_observation,
         "status": "received",
         "diagnosis": None,
+        "approval": None,  # Customer approval data
         "repair": None,
+        "delivery": None,  # Delivery data
         "closure": None,
         "photos": [],  # Initialize empty photos array
         "tracking_token": tracking_token,  # For public tracking
