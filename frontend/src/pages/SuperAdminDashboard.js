@@ -7,6 +7,7 @@ import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
+import { Switch } from "../components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -48,12 +49,22 @@ import {
   Crown,
   Zap,
   Star,
+  Settings,
+  Edit,
+  Trash2,
+  Package,
+  Database,
+  Image,
+  HardDrive,
+  X,
+  Check,
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const PLAN_ICONS = {
   free: <Star className="w-4 h-4" />,
+  starter: <Zap className="w-4 h-4" />,
   basic: <Zap className="w-4 h-4" />,
   pro: <Crown className="w-4 h-4" />,
   enterprise: <Shield className="w-4 h-4" />,
@@ -61,9 +72,52 @@ const PLAN_ICONS = {
 
 const PLAN_COLORS = {
   free: "bg-slate-600/20 text-slate-400 border-slate-600/30",
+  starter: "bg-green-600/20 text-green-400 border-green-600/30",
   basic: "bg-blue-600/20 text-blue-400 border-blue-600/30",
   pro: "bg-purple-600/20 text-purple-400 border-purple-600/30",
   enterprise: "bg-amber-600/20 text-amber-400 border-amber-600/30",
+};
+
+const FEATURE_LABELS = {
+  job_management: "Job Management",
+  basic_reports: "Basic Reports",
+  pdf_job_sheet: "PDF Job Sheet",
+  qr_tracking: "QR Tracking",
+  whatsapp_messages: "WhatsApp Messages",
+  photo_upload: "Photo Upload",
+  inventory_management: "Inventory Management",
+  advanced_analytics: "Advanced Analytics",
+  technician_metrics: "Technician Metrics",
+  customer_management: "Customer Management",
+  email_notifications: "Email Notifications",
+  sms_notifications: "SMS Notifications",
+  custom_branding: "Custom Branding",
+  api_access: "API Access",
+  priority_support: "Priority Support",
+  dedicated_account_manager: "Dedicated Account Manager",
+  data_export: "Data Export",
+  multi_branch: "Multi-Branch",
+};
+
+const DEFAULT_FEATURES = {
+  job_management: true,
+  basic_reports: true,
+  pdf_job_sheet: true,
+  qr_tracking: true,
+  whatsapp_messages: true,
+  photo_upload: true,
+  inventory_management: false,
+  advanced_analytics: false,
+  technician_metrics: false,
+  customer_management: false,
+  email_notifications: false,
+  sms_notifications: false,
+  custom_branding: false,
+  api_access: false,
+  priority_support: false,
+  dedicated_account_manager: false,
+  data_export: false,
+  multi_branch: false,
 };
 
 export default function SuperAdminDashboard() {
@@ -77,14 +131,38 @@ export default function SuperAdminDashboard() {
   const [tenantDetails, setTenantDetails] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [plans, setPlans] = useState({});
+  const [plans, setPlans] = useState([]);
+  const [activeTab, setActiveTab] = useState("tenants");
   
-  // Modal states
+  // Plan management modals
+  const [showCreatePlan, setShowCreatePlan] = useState(false);
+  const [showEditPlan, setShowEditPlan] = useState(false);
+  const [editingPlan, setEditingPlan] = useState(null);
+  
+  // Tenant action modals
   const [showAssignPlan, setShowAssignPlan] = useState(false);
   const [showExtendValidity, setShowExtendValidity] = useState(false);
   const [showRecordPayment, setShowRecordPayment] = useState(false);
   
   // Form states
+  const [planForm, setPlanForm] = useState({
+    id: "",
+    name: "",
+    description: "",
+    price: 0,
+    billing_cycle: "monthly",
+    duration_days: 30,
+    max_users: 1,
+    max_branches: 1,
+    max_jobs_per_month: 100,
+    max_inventory_items: 100,
+    max_photos_per_job: 5,
+    max_storage_mb: 500,
+    features: { ...DEFAULT_FEATURES },
+    sort_order: 99,
+    is_active: true
+  });
+  
   const [assignPlanForm, setAssignPlanForm] = useState({ plan: "", duration_months: 1, notes: "" });
   const [extendForm, setExtendForm] = useState({ days: 30, reason: "" });
   const [paymentForm, setPaymentForm] = useState({
@@ -127,7 +205,7 @@ export default function SuperAdminDashboard() {
 
   const fetchPlans = async () => {
     try {
-      const response = await axios.get(`${API}/super-admin/plans`);
+      const response = await axios.get(`${API}/super-admin/plans?include_inactive=true`);
       setPlans(response.data);
     } catch (error) {
       console.error("Failed to fetch plans:", error);
@@ -168,6 +246,98 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  // Plan Management Functions
+  const handleCreatePlan = async () => {
+    if (!planForm.id || !planForm.name) return;
+    setActionLoading(true);
+    try {
+      await axios.post(`${API}/super-admin/plans`, planForm);
+      fetchPlans();
+      setShowCreatePlan(false);
+      resetPlanForm();
+    } catch (error) {
+      console.error("Failed to create plan:", error);
+      alert(error.response?.data?.detail || "Failed to create plan");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdatePlan = async () => {
+    if (!editingPlan) return;
+    setActionLoading(true);
+    try {
+      const { id, tenant_count, created_at, is_default, ...updateData } = planForm;
+      await axios.put(`${API}/super-admin/plans/${editingPlan.id}`, updateData);
+      fetchPlans();
+      setShowEditPlan(false);
+      setEditingPlan(null);
+      resetPlanForm();
+    } catch (error) {
+      console.error("Failed to update plan:", error);
+      alert(error.response?.data?.detail || "Failed to update plan");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeletePlan = async (planId) => {
+    if (!window.confirm("Are you sure you want to delete this plan?")) return;
+    setActionLoading(true);
+    try {
+      await axios.delete(`${API}/super-admin/plans/${planId}`);
+      fetchPlans();
+    } catch (error) {
+      console.error("Failed to delete plan:", error);
+      alert(error.response?.data?.detail || "Failed to delete plan");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const openEditPlan = (plan) => {
+    setEditingPlan(plan);
+    setPlanForm({
+      id: plan.id,
+      name: plan.name,
+      description: plan.description || "",
+      price: plan.price,
+      billing_cycle: plan.billing_cycle,
+      duration_days: plan.duration_days,
+      max_users: plan.max_users,
+      max_branches: plan.max_branches,
+      max_jobs_per_month: plan.max_jobs_per_month,
+      max_inventory_items: plan.max_inventory_items,
+      max_photos_per_job: plan.max_photos_per_job,
+      max_storage_mb: plan.max_storage_mb,
+      features: { ...DEFAULT_FEATURES, ...plan.features },
+      sort_order: plan.sort_order,
+      is_active: plan.is_active
+    });
+    setShowEditPlan(true);
+  };
+
+  const resetPlanForm = () => {
+    setPlanForm({
+      id: "",
+      name: "",
+      description: "",
+      price: 0,
+      billing_cycle: "monthly",
+      duration_days: 30,
+      max_users: 1,
+      max_branches: 1,
+      max_jobs_per_month: 100,
+      max_inventory_items: 100,
+      max_photos_per_job: 5,
+      max_storage_mb: 500,
+      features: { ...DEFAULT_FEATURES },
+      sort_order: 99,
+      is_active: true
+    });
+  };
+
+  // Tenant action functions
   const handleAssignPlan = async () => {
     if (!assignPlanForm.plan) return;
     setActionLoading(true);
@@ -206,7 +376,8 @@ export default function SuperAdminDashboard() {
     try {
       await axios.post(`${API}/super-admin/tenants/${selectedTenant.id}/record-payment`, {
         ...paymentForm,
-        amount: parseFloat(paymentForm.amount)
+        amount: parseFloat(paymentForm.amount),
+        plan: paymentForm.plan === "none" ? "" : paymentForm.plan
       });
       fetchData();
       fetchTenantDetails(selectedTenant.id);
@@ -242,10 +413,8 @@ export default function SuperAdminDashboard() {
     if (statusFilter === "all") return matchesSearch;
     if (statusFilter === "active") return matchesSearch && tenant.is_active;
     if (statusFilter === "inactive") return matchesSearch && !tenant.is_active;
-    if (statusFilter === "trial")
-      return matchesSearch && tenant.subscription_status === "trial";
-    if (statusFilter === "paid")
-      return matchesSearch && tenant.subscription_status === "paid";
+    if (statusFilter === "trial") return matchesSearch && tenant.subscription_status === "trial";
+    if (statusFilter === "paid") return matchesSearch && tenant.subscription_status === "paid";
     return matchesSearch;
   });
 
@@ -265,6 +434,13 @@ export default function SuperAdminDashboard() {
       maximumFractionDigits: 0,
     }).format(amount);
   };
+
+  const formatLimit = (value) => {
+    return value === -1 ? "Unlimited" : value.toLocaleString();
+  };
+
+  const getPlanIcon = (planId) => PLAN_ICONS[planId] || <Package className="w-4 h-4" />;
+  const getPlanColor = (planId) => PLAN_COLORS[planId] || "bg-slate-600/20 text-slate-400 border-slate-600/30";
 
   if (loading) {
     return (
@@ -289,233 +465,589 @@ export default function SuperAdminDashboard() {
                 <p className="text-xs text-slate-400">aftersales.pro</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              className="text-slate-400 hover:text-white hover:bg-slate-700"
-              onClick={handleLogout}
-              data-testid="super-admin-logout-btn"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-4">
+              <div className="flex bg-slate-700 rounded-lg p-1">
+                <Button
+                  variant={activeTab === "tenants" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab("tenants")}
+                  className={activeTab === "tenants" ? "bg-slate-600" : "text-slate-400"}
+                >
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Tenants
+                </Button>
+                <Button
+                  variant={activeTab === "plans" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab("plans")}
+                  className={activeTab === "plans" ? "bg-slate-600" : "text-slate-400"}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Plans
+                </Button>
+              </div>
+              <Button
+                variant="ghost"
+                className="text-slate-400 hover:text-white hover:bg-slate-700"
+                onClick={handleLogout}
+                data-testid="super-admin-logout-btn"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {/* Stats Grid - Only show on tenants tab */}
+        {activeTab === "tenants" && (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <Card className="bg-slate-800 border-slate-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats?.total_tenants || 0}</p>
+                      <p className="text-sm text-slate-400">Total Shops</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800 border-slate-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats?.active_tenants || 0}</p>
+                      <p className="text-sm text-slate-400">Active</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800 border-slate-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats?.total_users || 0}</p>
+                      <p className="text-sm text-slate-400">Total Users</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800 border-slate-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
+                      <ClipboardList className="w-5 h-5 text-orange-400" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats?.total_jobs || 0}</p>
+                      <p className="text-sm text-slate-400">Total Jobs</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-4 text-center">
+                  <p className="text-xl font-bold text-yellow-400">{stats?.trial_tenants || 0}</p>
+                  <p className="text-sm text-slate-400">On Trial</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-4 text-center">
+                  <p className="text-xl font-bold text-green-400">{stats?.paid_tenants || 0}</p>
+                  <p className="text-sm text-slate-400">Paid</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-4 text-center">
+                  <p className="text-xl font-bold text-red-400">{stats?.inactive_tenants || 0}</p>
+                  <p className="text-sm text-slate-400">Inactive</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-4 text-center">
+                  <p className="text-xl font-bold text-blue-400">{stats?.recent_signups || 0}</p>
+                  <p className="text-sm text-slate-400">This Week</p>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
+
+        {/* Tenants Tab */}
+        {activeTab === "tenants" && (
           <Card className="bg-slate-800 border-slate-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-blue-400" />
+            <CardHeader className="border-b border-slate-700">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <CardTitle className="text-white">All Shops</CardTitle>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:flex-none">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <Input
+                      placeholder="Search shops..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 w-full sm:w-64"
+                      data-testid="search-tenants-input"
+                    />
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-32 bg-slate-700 border-slate-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="trial">Trial</SelectItem>
+                      <SelectItem value="paid">Paid</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">{stats?.total_tenants || 0}</p>
-                  <p className="text-sm text-slate-400">Total Shops</p>
-                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-700">
+                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Shop</th>
+                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Admin</th>
+                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Status</th>
+                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Plan</th>
+                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Jobs</th>
+                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Validity</th>
+                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTenants.map((tenant) => (
+                      <tr key={tenant.id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                        <td className="px-4 py-3">
+                          <div>
+                            <p className="font-medium text-white">{tenant.company_name}</p>
+                            <p className="text-sm text-slate-400">{tenant.subdomain}.aftersales.pro</p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-sm text-slate-300">{tenant.admin_email || "N/A"}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          {tenant.is_active ? (
+                            <Badge className="bg-green-600/20 text-green-400 border-green-600/30">Active</Badge>
+                          ) : (
+                            <Badge className="bg-red-600/20 text-red-400 border-red-600/30">Inactive</Badge>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge className={getPlanColor(tenant.subscription_plan || "free")}>
+                            <span className="mr-1">{getPlanIcon(tenant.subscription_plan || "free")}</span>
+                            {(tenant.subscription_plan || "free").charAt(0).toUpperCase() + (tenant.subscription_plan || "free").slice(1)}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-slate-300">{tenant.total_jobs}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-sm text-slate-400">
+                            {tenant.subscription_status === "paid" 
+                              ? formatDate(tenant.subscription_ends_at) 
+                              : formatDate(tenant.trial_ends_at)}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-slate-400 hover:text-white hover:bg-slate-700"
+                              onClick={() => handleViewTenant(tenant)}
+                              data-testid={`view-tenant-${tenant.subdomain}`}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className={
+                                tenant.is_active
+                                  ? "text-red-400 hover:text-red-300 hover:bg-red-900/30"
+                                  : "text-green-400 hover:text-green-300 hover:bg-green-900/30"
+                              }
+                              onClick={() => handleToggleActive(tenant.id, tenant.is_active)}
+                              data-testid={`toggle-tenant-${tenant.subdomain}`}
+                            >
+                              <Power className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredTenants.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-slate-400">No shops found</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
+        )}
 
-          <Card className="bg-slate-800 border-slate-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">{stats?.active_tenants || 0}</p>
-                  <p className="text-sm text-slate-400">Active</p>
-                </div>
+        {/* Plans Tab */}
+        {activeTab === "plans" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Subscription Plans</h2>
+                <p className="text-slate-400">Manage subscription plans and their features</p>
               </div>
-            </CardContent>
-          </Card>
+              <Button
+                onClick={() => { resetPlanForm(); setShowCreatePlan(true); }}
+                className="bg-blue-600 hover:bg-blue-700"
+                data-testid="create-plan-btn"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Create Plan
+              </Button>
+            </div>
 
-          <Card className="bg-slate-800 border-slate-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-purple-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">{stats?.total_users || 0}</p>
-                  <p className="text-sm text-slate-400">Total Users</p>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {plans.map((plan) => (
+                <Card key={plan.id} className={`bg-slate-800 border-slate-700 ${!plan.is_active ? 'opacity-50' : ''}`}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <Badge className={getPlanColor(plan.id)}>
+                          {getPlanIcon(plan.id)}
+                          <span className="ml-1">{plan.name}</span>
+                        </Badge>
+                        {plan.is_default && (
+                          <Badge variant="outline" className="ml-2 text-xs">Default</Badge>
+                        )}
+                        {!plan.is_active && (
+                          <Badge className="ml-2 bg-red-600/20 text-red-400">Inactive</Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => openEditPlan(plan)}
+                          className="text-slate-400 hover:text-white"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        {!plan.is_default && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeletePlan(plan.id)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <span className="text-3xl font-bold text-white">
+                        {plan.price === 0 ? "Free" : formatCurrency(plan.price)}
+                      </span>
+                      {plan.price > 0 && (
+                        <span className="text-slate-400 text-sm">/{plan.billing_cycle}</span>
+                      )}
+                    </div>
+                    {plan.description && (
+                      <p className="text-sm text-slate-400 mt-1">{plan.description}</p>
+                    )}
+                  </CardHeader>
+                  <CardContent className="pt-2">
+                    <div className="space-y-3">
+                      {/* Limits */}
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <Users className="w-4 h-4 text-slate-500" />
+                          <span>{formatLimit(plan.max_users)} users</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <Building2 className="w-4 h-4 text-slate-500" />
+                          <span>{formatLimit(plan.max_branches)} branches</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <ClipboardList className="w-4 h-4 text-slate-500" />
+                          <span>{formatLimit(plan.max_jobs_per_month)} jobs/mo</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <Package className="w-4 h-4 text-slate-500" />
+                          <span>{formatLimit(plan.max_inventory_items)} items</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <Image className="w-4 h-4 text-slate-500" />
+                          <span>{formatLimit(plan.max_photos_per_job)} photos/job</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <HardDrive className="w-4 h-4 text-slate-500" />
+                          <span>{plan.max_storage_mb === -1 ? "Unlimited" : `${plan.max_storage_mb} MB`}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Features */}
+                      <div className="border-t border-slate-700 pt-3">
+                        <p className="text-xs text-slate-500 mb-2">Features</p>
+                        <div className="flex flex-wrap gap-1">
+                          {Object.entries(plan.features || {}).filter(([_, v]) => v).slice(0, 6).map(([key]) => (
+                            <Badge key={key} variant="outline" className="text-xs text-slate-400">
+                              {FEATURE_LABELS[key] || key}
+                            </Badge>
+                          ))}
+                          {Object.values(plan.features || {}).filter(v => v).length > 6 && (
+                            <Badge variant="outline" className="text-xs text-slate-400">
+                              +{Object.values(plan.features || {}).filter(v => v).length - 6} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Tenant count */}
+                      <div className="border-t border-slate-700 pt-3 flex items-center justify-between">
+                        <span className="text-sm text-slate-400">Active tenants</span>
+                        <span className="text-white font-medium">{plan.tenant_count || 0}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Create/Edit Plan Modal */}
+      <Dialog open={showCreatePlan || showEditPlan} onOpenChange={() => { setShowCreatePlan(false); setShowEditPlan(false); setEditingPlan(null); }}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingPlan ? "Edit Plan" : "Create New Plan"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {/* Basic Info */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Plan ID (slug)</Label>
+                <Input
+                  value={planForm.id}
+                  onChange={(e) => setPlanForm({ ...planForm, id: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
+                  placeholder="e.g., starter, growth"
+                  className="bg-slate-700 border-slate-600"
+                  disabled={!!editingPlan}
+                />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-slate-800 border-slate-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
-                  <ClipboardList className="w-5 h-5 text-orange-400" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">{stats?.total_jobs || 0}</p>
-                  <p className="text-sm text-slate-400">Total Jobs</p>
-                </div>
+              <div className="space-y-2">
+                <Label>Plan Name</Label>
+                <Input
+                  value={planForm.name}
+                  onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
+                  placeholder="e.g., Starter Plan"
+                  className="bg-slate-700 border-slate-600"
+                />
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
 
-        {/* Secondary Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardContent className="p-4 text-center">
-              <p className="text-xl font-bold text-yellow-400">{stats?.trial_tenants || 0}</p>
-              <p className="text-sm text-slate-400">On Trial</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardContent className="p-4 text-center">
-              <p className="text-xl font-bold text-green-400">{stats?.paid_tenants || 0}</p>
-              <p className="text-sm text-slate-400">Paid</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardContent className="p-4 text-center">
-              <p className="text-xl font-bold text-red-400">{stats?.inactive_tenants || 0}</p>
-              <p className="text-sm text-slate-400">Inactive</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardContent className="p-4 text-center">
-              <p className="text-xl font-bold text-blue-400">{stats?.recent_signups || 0}</p>
-              <p className="text-sm text-slate-400">This Week</p>
-            </CardContent>
-          </Card>
-        </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea
+                value={planForm.description}
+                onChange={(e) => setPlanForm({ ...planForm, description: e.target.value })}
+                placeholder="Brief description of this plan..."
+                className="bg-slate-700 border-slate-600"
+              />
+            </div>
 
-        {/* Tenants Table */}
-        <Card className="bg-slate-800 border-slate-700">
-          <CardHeader className="border-b border-slate-700">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle className="text-white">All Shops</CardTitle>
-              <div className="flex gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:flex-none">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                  <Input
-                    placeholder="Search shops..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 w-full sm:w-64"
-                    data-testid="search-tenants-input"
-                  />
-                </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32 bg-slate-700 border-slate-600 text-white">
+            {/* Pricing */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Price (₹)</Label>
+                <Input
+                  type="number"
+                  value={planForm.price}
+                  onChange={(e) => setPlanForm({ ...planForm, price: parseFloat(e.target.value) || 0 })}
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Billing Cycle</Label>
+                <Select
+                  value={planForm.billing_cycle}
+                  onValueChange={(value) => setPlanForm({ ...planForm, billing_cycle: value })}
+                >
+                  <SelectTrigger className="bg-slate-700 border-slate-600">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                    <SelectItem value="trial">Trial</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="forever">Forever (Free)</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="yearly">Yearly</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label>Duration (days)</Label>
+                <Input
+                  type="number"
+                  value={planForm.duration_days}
+                  onChange={(e) => setPlanForm({ ...planForm, duration_days: parseInt(e.target.value) || 30 })}
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-700">
-                    <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Shop</th>
-                    <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Admin</th>
-                    <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Status</th>
-                    <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Plan</th>
-                    <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Jobs</th>
-                    <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Validity</th>
-                    <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTenants.map((tenant) => (
-                    <tr
-                      key={tenant.id}
-                      className="border-b border-slate-700/50 hover:bg-slate-700/30"
-                    >
-                      <td className="px-4 py-3">
-                        <div>
-                          <p className="font-medium text-white">{tenant.company_name}</p>
-                          <p className="text-sm text-slate-400">{tenant.subdomain}.aftersales.pro</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-sm text-slate-300">{tenant.admin_email || "N/A"}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        {tenant.is_active ? (
-                          <Badge className="bg-green-600/20 text-green-400 border-green-600/30">
-                            Active
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-red-600/20 text-red-400 border-red-600/30">
-                            Inactive
-                          </Badge>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge className={PLAN_COLORS[tenant.subscription_plan || "free"]}>
-                          <span className="mr-1">{PLAN_ICONS[tenant.subscription_plan || "free"]}</span>
-                          {(tenant.subscription_plan || "free").charAt(0).toUpperCase() + (tenant.subscription_plan || "free").slice(1)}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-slate-300">{tenant.total_jobs}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-sm text-slate-400">
-                          {tenant.subscription_status === "paid" 
-                            ? formatDate(tenant.subscription_ends_at) 
-                            : formatDate(tenant.trial_ends_at)}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-slate-400 hover:text-white hover:bg-slate-700"
-                            onClick={() => handleViewTenant(tenant)}
-                            data-testid={`view-tenant-${tenant.subdomain}`}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className={
-                              tenant.is_active
-                                ? "text-red-400 hover:text-red-300 hover:bg-red-900/30"
-                                : "text-green-400 hover:text-green-300 hover:bg-green-900/30"
-                            }
-                            onClick={() => handleToggleActive(tenant.id, tenant.is_active)}
-                            data-testid={`toggle-tenant-${tenant.subdomain}`}
-                          >
-                            <Power className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredTenants.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-slate-400">No shops found</p>
+
+            {/* Limits */}
+            <div>
+              <Label className="text-lg">Limits</Label>
+              <p className="text-sm text-slate-400 mb-3">Set -1 for unlimited</p>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Users className="w-4 h-4" /> Max Users
+                  </Label>
+                  <Input
+                    type="number"
+                    value={planForm.max_users}
+                    onChange={(e) => setPlanForm({ ...planForm, max_users: parseInt(e.target.value) })}
+                    className="bg-slate-700 border-slate-600"
+                  />
                 </div>
-              )}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4" /> Max Branches
+                  </Label>
+                  <Input
+                    type="number"
+                    value={planForm.max_branches}
+                    onChange={(e) => setPlanForm({ ...planForm, max_branches: parseInt(e.target.value) })}
+                    className="bg-slate-700 border-slate-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <ClipboardList className="w-4 h-4" /> Jobs/Month
+                  </Label>
+                  <Input
+                    type="number"
+                    value={planForm.max_jobs_per_month}
+                    onChange={(e) => setPlanForm({ ...planForm, max_jobs_per_month: parseInt(e.target.value) })}
+                    className="bg-slate-700 border-slate-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Package className="w-4 h-4" /> Inventory Items
+                  </Label>
+                  <Input
+                    type="number"
+                    value={planForm.max_inventory_items}
+                    onChange={(e) => setPlanForm({ ...planForm, max_inventory_items: parseInt(e.target.value) })}
+                    className="bg-slate-700 border-slate-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Image className="w-4 h-4" /> Photos/Job
+                  </Label>
+                  <Input
+                    type="number"
+                    value={planForm.max_photos_per_job}
+                    onChange={(e) => setPlanForm({ ...planForm, max_photos_per_job: parseInt(e.target.value) })}
+                    className="bg-slate-700 border-slate-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <HardDrive className="w-4 h-4" /> Storage (MB)
+                  </Label>
+                  <Input
+                    type="number"
+                    value={planForm.max_storage_mb}
+                    onChange={(e) => setPlanForm({ ...planForm, max_storage_mb: parseInt(e.target.value) })}
+                    className="bg-slate-700 border-slate-600"
+                  />
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </main>
+
+            {/* Features */}
+            <div>
+              <Label className="text-lg">Features</Label>
+              <p className="text-sm text-slate-400 mb-3">Toggle features available in this plan</p>
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(FEATURE_LABELS).map(([key, label]) => (
+                  <div key={key} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
+                    <Label className="cursor-pointer">{label}</Label>
+                    <Switch
+                      checked={planForm.features[key] || false}
+                      onCheckedChange={(checked) => setPlanForm({
+                        ...planForm,
+                        features: { ...planForm.features, [key]: checked }
+                      })}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Meta */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Sort Order</Label>
+                <Input
+                  type="number"
+                  value={planForm.sort_order}
+                  onChange={(e) => setPlanForm({ ...planForm, sort_order: parseInt(e.target.value) || 99 })}
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
+              <div className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
+                <Label>Plan Active</Label>
+                <Switch
+                  checked={planForm.is_active}
+                  onCheckedChange={(checked) => setPlanForm({ ...planForm, is_active: checked })}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => { setShowCreatePlan(false); setShowEditPlan(false); setEditingPlan(null); }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={editingPlan ? handleUpdatePlan : handleCreatePlan}
+              disabled={!planForm.id || !planForm.name || actionLoading}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              {editingPlan ? "Save Changes" : "Create Plan"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Tenant Details Modal */}
       <Dialog open={!!selectedTenant} onOpenChange={() => setSelectedTenant(null)}>
@@ -523,8 +1055,8 @@ export default function SuperAdminDashboard() {
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
               {selectedTenant?.company_name}
-              <Badge className={PLAN_COLORS[tenantDetails?.tenant?.subscription_plan || "free"]}>
-                {PLAN_ICONS[tenantDetails?.tenant?.subscription_plan || "free"]}
+              <Badge className={getPlanColor(tenantDetails?.tenant?.subscription_plan || "free")}>
+                {getPlanIcon(tenantDetails?.tenant?.subscription_plan || "free")}
                 <span className="ml-1">
                   {(tenantDetails?.tenant?.subscription_plan || "free").charAt(0).toUpperCase() + 
                    (tenantDetails?.tenant?.subscription_plan || "free").slice(1)}
@@ -547,7 +1079,6 @@ export default function SuperAdminDashboard() {
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6 mt-4">
-                {/* Shop Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-slate-400">Subdomain</p>
@@ -579,7 +1110,6 @@ export default function SuperAdminDashboard() {
                   </div>
                 </div>
 
-                {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
                     <p className="text-2xl font-bold">{tenantDetails.stats.total_jobs}</p>
@@ -595,58 +1125,44 @@ export default function SuperAdminDashboard() {
                   </div>
                 </div>
 
-                {/* Users */}
                 <div>
                   <p className="text-sm font-medium text-slate-400 mb-2">Team Members</p>
                   <div className="space-y-2">
                     {tenantDetails.users.map((user) => (
-                      <div
-                        key={user.id}
-                        className="flex items-center justify-between bg-slate-700/30 rounded-lg p-2"
-                      >
+                      <div key={user.id} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-2">
                         <div className="flex items-center gap-2">
                           <Mail className="w-4 h-4 text-slate-500" />
                           <span className="text-sm">{user.email}</span>
                         </div>
-                        <Badge variant="outline" className="text-xs">
-                          {user.role}
-                        </Badge>
+                        <Badge variant="outline" className="text-xs">{user.role}</Badge>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Quick Actions */}
                 <div className="flex gap-2 pt-4 border-t border-slate-700">
                   <Button
                     variant={tenantDetails.tenant.is_active ? "destructive" : "default"}
-                    onClick={() =>
-                      handleToggleActive(tenantDetails.tenant.id, tenantDetails.tenant.is_active)
-                    }
+                    onClick={() => handleToggleActive(tenantDetails.tenant.id, tenantDetails.tenant.is_active)}
                     disabled={actionLoading}
                     className={!tenantDetails.tenant.is_active ? "bg-green-600 hover:bg-green-700" : ""}
                   >
-                    {actionLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : (
-                      <Power className="w-4 h-4 mr-2" />
-                    )}
+                    {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Power className="w-4 h-4 mr-2" />}
                     {tenantDetails.tenant.is_active ? "Deactivate" : "Activate"}
                   </Button>
                 </div>
               </TabsContent>
 
               <TabsContent value="subscription" className="space-y-6 mt-4">
-                {/* Current Plan */}
                 <div className="bg-slate-700/30 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <p className="text-sm text-slate-400">Current Plan</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge className={`${PLAN_COLORS[tenantDetails.tenant.subscription_plan || "free"]} text-lg px-3 py-1`}>
-                          {PLAN_ICONS[tenantDetails.tenant.subscription_plan || "free"]}
+                        <Badge className={`${getPlanColor(tenantDetails.tenant.subscription_plan || "free")} text-lg px-3 py-1`}>
+                          {getPlanIcon(tenantDetails.tenant.subscription_plan || "free")}
                           <span className="ml-2">
-                            {plans[tenantDetails.tenant.subscription_plan || "free"]?.name || "Free"}
+                            {plans.find(p => p.id === (tenantDetails.tenant.subscription_plan || "free"))?.name || "Free"}
                           </span>
                         </Badge>
                         {tenantDetails.tenant.subscription_status === "trial" && (
@@ -665,78 +1181,18 @@ export default function SuperAdminDashboard() {
                       </p>
                     </div>
                   </div>
-                  
-                  {plans[tenantDetails.tenant.subscription_plan || "free"] && (
-                    <div>
-                      <p className="text-sm text-slate-400 mb-2">Plan Features:</p>
-                      <ul className="grid grid-cols-2 gap-1">
-                        {plans[tenantDetails.tenant.subscription_plan || "free"].features.map((feature, idx) => (
-                          <li key={idx} className="text-sm flex items-center gap-1">
-                            <CheckCircle className="w-3 h-3 text-green-400" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
                 </div>
 
-                {/* Available Plans */}
-                <div>
-                  <p className="text-sm font-medium text-slate-400 mb-3">Available Plans</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {Object.entries(plans).map(([key, plan]) => (
-                      <div
-                        key={key}
-                        className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                          key === (tenantDetails.tenant.subscription_plan || "free")
-                            ? "border-blue-500 bg-blue-500/10"
-                            : "border-slate-600 hover:border-slate-500"
-                        }`}
-                        onClick={() => {
-                          setAssignPlanForm({ ...assignPlanForm, plan: key });
-                          setShowAssignPlan(true);
-                        }}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge className={PLAN_COLORS[key]}>
-                            {PLAN_ICONS[key]}
-                            <span className="ml-1">{plan.name}</span>
-                          </Badge>
-                          <span className="text-lg font-bold">
-                            {plan.price === 0 ? "Free" : formatCurrency(plan.price)}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-400">
-                          {plan.price > 0 ? `/month` : "Forever"}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Actions */}
                 <div className="flex gap-2 pt-4 border-t border-slate-700">
-                  <Button
-                    onClick={() => setShowAssignPlan(true)}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
+                  <Button onClick={() => setShowAssignPlan(true)} className="bg-blue-600 hover:bg-blue-700">
                     <Crown className="w-4 h-4 mr-2" />
                     Assign Plan
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowExtendValidity(true)}
-                    className="border-slate-600"
-                  >
+                  <Button variant="outline" onClick={() => setShowExtendValidity(true)} className="border-slate-600">
                     <Calendar className="w-4 h-4 mr-2" />
                     Extend Validity
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowRecordPayment(true)}
-                    className="border-slate-600"
-                  >
+                  <Button variant="outline" onClick={() => setShowRecordPayment(true)} className="border-slate-600">
                     <IndianRupee className="w-4 h-4 mr-2" />
                     Record Payment
                   </Button>
@@ -746,11 +1202,7 @@ export default function SuperAdminDashboard() {
               <TabsContent value="payments" className="space-y-4 mt-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-slate-400">Payment History</p>
-                  <Button
-                    size="sm"
-                    onClick={() => setShowRecordPayment(true)}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
+                  <Button size="sm" onClick={() => setShowRecordPayment(true)} className="bg-green-600 hover:bg-green-700">
                     <Plus className="w-4 h-4 mr-1" />
                     Record Payment
                   </Button>
@@ -759,10 +1211,7 @@ export default function SuperAdminDashboard() {
                 {tenantDetails.payments && tenantDetails.payments.length > 0 ? (
                   <div className="space-y-2">
                     {tenantDetails.payments.map((payment) => (
-                      <div
-                        key={payment.id}
-                        className="bg-slate-700/30 rounded-lg p-3 flex items-center justify-between"
-                      >
+                      <div key={payment.id} className="bg-slate-700/30 rounded-lg p-3 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
                             <IndianRupee className="w-5 h-5 text-green-400" />
@@ -777,13 +1226,11 @@ export default function SuperAdminDashboard() {
                         </div>
                         <div className="text-right">
                           {payment.plan && (
-                            <Badge className={PLAN_COLORS[payment.plan]}>
+                            <Badge className={getPlanColor(payment.plan)}>
                               {payment.plan.charAt(0).toUpperCase() + payment.plan.slice(1)}
                             </Badge>
                           )}
-                          <p className="text-xs text-slate-400 mt-1">
-                            {formatDate(payment.created_at)}
-                          </p>
+                          <p className="text-xs text-slate-400 mt-1">{formatDate(payment.created_at)}</p>
                         </div>
                       </div>
                     ))}
@@ -802,10 +1249,7 @@ export default function SuperAdminDashboard() {
                 {tenantDetails.action_logs && tenantDetails.action_logs.length > 0 ? (
                   <div className="space-y-2">
                     {tenantDetails.action_logs.map((log) => (
-                      <div
-                        key={log.id}
-                        className="bg-slate-700/30 rounded-lg p-3 flex items-start gap-3"
-                      >
+                      <div key={log.id} className="bg-slate-700/30 rounded-lg p-3 flex items-start gap-3">
                         <div className="w-8 h-8 bg-slate-600/50 rounded-lg flex items-center justify-center flex-shrink-0">
                           {log.action === "plan_assigned" && <Crown className="w-4 h-4 text-purple-400" />}
                           {log.action === "validity_extended" && <Clock className="w-4 h-4 text-blue-400" />}
@@ -858,13 +1302,13 @@ export default function SuperAdminDashboard() {
                   <SelectValue placeholder="Choose a plan" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(plans).map(([key, plan]) => (
-                    <SelectItem key={key} value={key}>
+                  {plans.filter(p => p.is_active).map((plan) => (
+                    <SelectItem key={plan.id} value={plan.id}>
                       <div className="flex items-center gap-2">
-                        {PLAN_ICONS[key]}
+                        {getPlanIcon(plan.id)}
                         <span>{plan.name}</span>
                         <span className="text-slate-400">
-                          {plan.price === 0 ? "(Free)" : `(${formatCurrency(plan.price)}/mo)`}
+                          {plan.price === 0 ? "(Free)" : `(${formatCurrency(plan.price)}/${plan.billing_cycle})`}
                         </span>
                       </div>
                     </SelectItem>
@@ -873,7 +1317,7 @@ export default function SuperAdminDashboard() {
               </Select>
             </div>
 
-            {assignPlanForm.plan && assignPlanForm.plan !== "free" && (
+            {assignPlanForm.plan && plans.find(p => p.id === assignPlanForm.plan)?.price > 0 && (
               <div className="space-y-2">
                 <Label>Duration (Months)</Label>
                 <Select
@@ -904,9 +1348,7 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setShowAssignPlan(false)}>
-              Cancel
-            </Button>
+            <Button variant="ghost" onClick={() => setShowAssignPlan(false)}>Cancel</Button>
             <Button
               onClick={handleAssignPlan}
               disabled={!assignPlanForm.plan || actionLoading}
@@ -958,14 +1400,8 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setShowExtendValidity(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleExtendValidity}
-              disabled={actionLoading}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
+            <Button variant="ghost" onClick={() => setShowExtendValidity(false)}>Cancel</Button>
+            <Button onClick={handleExtendValidity} disabled={actionLoading} className="bg-blue-600 hover:bg-blue-700">
               {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Extend Validity
             </Button>
@@ -1033,9 +1469,9 @@ export default function SuperAdminDashboard() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">No plan change</SelectItem>
-                    {Object.entries(plans).filter(([key]) => key !== "free").map(([key, plan]) => (
-                      <SelectItem key={key} value={key}>
-                        {plan.name} ({formatCurrency(plan.price)}/mo)
+                    {plans.filter(p => p.is_active && p.price > 0).map((plan) => (
+                      <SelectItem key={plan.id} value={plan.id}>
+                        {plan.name} ({formatCurrency(plan.price)}/{plan.billing_cycle})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1073,9 +1509,7 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setShowRecordPayment(false)}>
-              Cancel
-            </Button>
+            <Button variant="ghost" onClick={() => setShowRecordPayment(false)}>Cancel</Button>
             <Button
               onClick={handleRecordPayment}
               disabled={!paymentForm.amount || actionLoading}
