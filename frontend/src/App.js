@@ -16,6 +16,8 @@ import JobDetail from "./pages/JobDetail";
 import Team from "./pages/Team";
 import Branches from "./pages/Branches";
 import Settings from "./pages/Settings";
+import Inventory from "./pages/Inventory";
+import Metrics from "./pages/Metrics";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import PublicTrack from "./pages/PublicTrack";
