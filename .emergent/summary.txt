@@ -2,149 +2,178 @@
 The user wants to build a multi-tenant SaaS platform named aftersales.pro to manage the lifecycle of repair jobs for repair shops.
 
 PRODUCT REQUIREMENTS:
-- **Core Flow**: Job Sheet Creation (Customer Info, Device Info, Accessories, Problem Details), Auto-generated Job Number, Status Tracking (Received, Diagnosed, Waiting for Approval, Repaired, Closed).
-- **Job Sheet**: A printable, PDF version of the job sheet is required.
-- **WhatsApp Integration**: A button to open WhatsApp Desktop/Web with a pre-filled message containing job details. This avoids using the WhatsApp API.
-- **Job Status History**: Every status change must be timestamped and logged against a user. No silent edits.
-- **Multi-tenancy**: The platform must support multiple repair shops, each with its own subdomain (e.g., ).
-- **User Roles**: At least Admin and Technician roles for each shop.
-- **Super Admin Panel**: A separate interface for the platform owner to manage all tenants (shops). This includes:
-    - Viewing all registered shops and their stats.
-    - Activating/deactivating tenants.
-    - Managing subscriptions (Trial/Paid), extending trials, and setting prices.
-    - Viewing detailed analytics (MRR, Churn, Growth).
-    - Manually creating and deleting tenants.
-    - Sending email notifications to tenants.
+- **Core Flow**: A detailed job status workflow: Received -> Diagnosed -> Waiting for Approval -> In Progress / Pending for Parts -> Repaired -> Delivered -> Closed.
+- **Data Capture**:
+    - Capture approval details (who approved, estimated amount).
+    - Capture repair details (work done).
+    - Capture delivery details (amount received, payment mode).
+- **Job Sheet**: A printable, PDF version of the job sheet with a QR code for public status tracking.
+- **WhatsApp Integration**: A button to open WhatsApp with pre-filled messages for different job stages (e.g., diagnosis details, ready for delivery), including full device information (brand, model, serial number).
+- **Photo Upload**: Ability to upload photos of the device's condition.
+- **Customers Page**: A dedicated page to view all customers, their devices, and the repair history for each device.
+- **Inventory Management**: A system to track parts/spares stock, including stock levels and value.
+- **Analytics**: Dashboards for job trends, status breakdowns, and technician performance metrics.
+- **Universal Search**: A global search bar to find jobs, customers, or inventory items by any criteria (name, number, serial, etc.).
+- **Multi-tenancy & Super Admin**: Support for multiple shops with a super admin panel to manage tenants, subscriptions, and view platform analytics.
+- **Custom Domain & SSL**: The application should run on  with SSL enabled for all subdomains.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack SaaS application (FastAPI + React + MongoDB) has been developed and manually deployed to the user's server at . The application includes multi-tenancy, JWT-based authentication, and the core job management features for individual shops.
+A full-stack application (FastAPI + React + MongoDB) with a significant number of features developed locally. The application includes multi-tenancy, JWT auth, a super admin panel, and numerous features like photo uploads, a public tracking page with QR codes, inventory management, customer management, technician analytics, a universal search bar, and a detailed job status workflow.
 
-A Super Admin panel has also been implemented with a separate login (). The agent has provided code for a comprehensive set of features for this panel, including a dashboard with analytics, shop management (create, view, update, delete), subscription management, and email logging. The code for these features has been added directly to the user's server.
+The code has recently been pulled to the user's live server (), but the deployment is in an unverified state. The backend is running via  and the frontend was rebuilt, but the user reported not seeing the updates.
 
 **Last working item**:
--   **Last item agent was working:** The agent finished providing the code for an enhanced Super Admin dashboard that includes all the requested features (Subscription Management, Tenant Details, Analytics, etc.). The final step was instructing the user to build the frontend and copy the files to the web server directory.
+-   **Last item agent was working:** Troubleshooting the deployment of all new features to the user's live server (). The user's  failed due to local changes, which the agent resolved by having the user Saved working directory and index state WIP on main: d69009b Auto-generated changes. The agent then provided commands to reinstall dependencies, restart the backend, and rebuild/redeploy the frontend. The user reported the site was not updated.
 -   **Status:** USER VERIFICATION PENDING
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** Manual testing by the user on their server. The next agent must guide the user to test the URL () and, if issues arise, ask the user to provide logs (,  from the backend) and command outputs to debug the live environment.
+-   **Agent Testing Done:** N (Testing was done in the local sandbox, not on the user's live server post-deployment).
+-   **Which testing method agent to use?** Manual testing by the user. The agent must guide the user to perform a hard refresh (Ctrl+Shift+R) and check the application. If issues persist, the agent needs to debug the live environment by asking for Nginx logs (, ), browser console logs, and backend logs ().
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** The user's GitHub repository is out of sync with the code deployed on their server. The agent implemented the Super Admin features by directly adding code to the server files via  and  instead of pushing to Git and having the user pull the changes. This is a critical divergence that needs to be corrected.
+-   **Issue 1:** (P0) Deployment on the live server () is not verified. The user reported that the application was not updated after the latest deployment commands were run. This is a critical blocker.
+-   **Issue 2:** (P1) The frontend build process is unstable.  fails without the  flag, and the build process generates multiple warnings for missing  dependencies.
+-   **Issue 3:** (P2) The backend service on the live server is not managed by . It was started manually with . The original  unit was not found, indicating a fragile deployment setup.
+
+**Issues Detail:**
+-   **Issue 1: Live Deployment Not Verified**
+    -   **Attempted fixes:** The agent provided a sequence of commands: Saved working directory and index state WIP on main: d69009b Auto-generated changes, , , / for the backend, and , ,  for the frontend.
+    -   **Next debug checklist:**
+        1.  Ask the user to perform a hard refresh ( or ) or use an incognito window to rule out browser caching.
+        2.  If it still fails, check the Nginx service status: .
+        3.  Check the Nginx error log: .
+        4.  Check the backend log: .
+        5.  Ask the user for a screenshot of the browser and the developer console (F12) to see any frontend errors.
+    -   **Why fix this issue and what will be achieved with the fix?** To confirm that all the recently developed features are live and functional for the user. All future work is blocked until the deployment is stable.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** Y (Deployment has been a consistent problem).
+    -   **Should Test frontend/backend/both after fix?** Both (via user).
+    -   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   **Task 1:** Verify the complete Super Admin panel functionality (P0)
-    -   **Where to resume:** The user has just run the final  and  commands for the frontend. The next step is to ask the user to do a hard refresh (Ctrl+Shift+R) and test all the new features in the Super Admin panel at .
-    -   **What will be achieved with this?** Confirmation that the full suite of Super Admin features is deployed and working correctly on the user's server.
-    -   **Status:** USER VERIFICATION PENDING
-    -   **Should Test frontend/backend/both after fix?** User will test frontend manually. Agent will guide debugging for both if needed.
-    -   **Blocked on something:** Waiting for user feedback.
+-   **Task 1: Set up Custom Domain and SSL (P1)**
+    -   **Where to resume:** The user has already configured the A records for  to point to . The next step is to verify DNS propagation on the server using .
+    -   **What will be achieved with this?** The application will be accessible via the custom domain  with a valid SSL certificate for the main domain and all subdomains.
+    -   **Status:** BLOCKED
+    -   **Should Test frontend/backend/both after fix?** Frontend (accessibility via URL).
+    -   **Blocked on something:** Issue 1: Live Deployment Not Verified. The site must be working correctly before configuring SSL.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P0) Synchronize the user's GitHub repository () with the latest code running on their server. This involves getting the code from the server, committing it, and pushing it to the main branch.
+    -   (P0) Enhance Super Admin Portal: Implement features to manually assign subscription plans, extend validity for offline payments, and add other requested admin functionalities. This was the user's last request.
 -   **Future Tasks:**
-    -   (P1) Photo upload for device condition proof.
-    -   (P2) Barcode / QR code generation on job sheets.
-    -   (P2) A public, read-only status page for customers.
+    -   (P1) Email notifications for job status changes.
+    -   (P2) AMC (Annual Maintenance Contract)/repeat customer tagging.
+    -   (P3) Refactor the monolithic  into a modular structure (e.g., using FastAPI routers for different features like , , ).
+    -   (P3) Containerize the application using Docker to simplify deployments.
 
 **Completed work in this session**
--   Initial MVP of the  SaaS application built.
--   Guided user through manual deployment to a custom Ubuntu server ().
--   Installed and configured the entire stack on the user's server: Nginx, MongoDB, Node.js, Python.
--   Debugged numerous deployment issues related to package versions, file permissions, and Nginx configuration.
--   Implemented a basic Super Admin login and dashboard.
--   Implemented a full-featured Super Admin panel with backend endpoints and a comprehensive frontend dashboard for managing tenants, subscriptions, and viewing analytics.
+*Note: The following features were implemented and tested in the agent's local sandbox. They are pending final verification on the user's live server.*
+-   **Photo Upload**: Implemented backend storage and frontend components for uploading device photos.
+-   **QR Code & Public Tracking**: Added a QR code to the job sheet PDF that links to a public, unauthenticated page for customers to track job status.
+-   **Inventory Management**: Created backend CRUD and a frontend page to manage stock of parts/spares.
+-   **Technician & Job Analytics**: Implemented backend endpoints and a frontend Analytics page to display job trends and technician performance.
+-   **Date Range Filter**: Added date pickers to the Jobs page to filter jobs by creation date.
+-   **Customers Page**: Developed a new page to list all customers, with a drill-down view to see their devices and repair history.
+-   **Universal Search Bar**: Added a global search component to the header for finding jobs, customers, etc., from any page.
+-   **Expanded Workflow**: Overhauled the job status system to a more detailed workflow (, , , etc.) and updated the UI/API accordingly.
+-   **Enhanced WhatsApp Messages**: Updated the WhatsApp integration to include full device details in pre-filled messages.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1:** The frontend build process has shown several warnings related to missing dependencies in React hooks ().
-    -   **Debug checklist:**
-        -   Files: , , , .
-        -   Check the  calls and add the missing dependencies to the dependency arrays as suggested by the ESLint warnings.
-    -   **Why to solve this issue and what will be achieved with this?** This will prevent potential bugs related to stale state and ensure the UI updates correctly when data changes.
+-   **Issue 1: React Hook Dependency Warnings**
+    -   **Debug checklist:** Review all files with  hooks (e.g., , , ) and add the missing dependencies to the dependency arrays as suggested by ESLint warnings.
+    -   **Why to solve this issue and what will be achieved with this?** Prevents bugs caused by stale state and ensures components re-render correctly when their data dependencies change.
     -   **Should Test frontend/backend/both after fix:** Frontend.
     -   **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
--   None.
+- The user's GitHub repository being out of sync with the code on the live server. This was the primary issue from the last handoff and it re-occurred, causing a  conflict that had to be resolved with No local changes to save.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, MongoDB (via ), Pydantic, JWT Authentication.
--   **Frontend**: React, React Router, Axios, Tailwind CSS, Shadcn UI components.
--   **Deployment**: Manual deployment to a live Ubuntu server, Nginx as a reverse proxy,  for process management,  for firewall configuration.
+-   **Backend**: FastAPI, Motor (async MongoDB), Pydantic, JWT,  for file uploads,  for QR generation,  for PDFs.
+-   **Frontend**: React, React Router, Axios, Tailwind CSS, Shadcn UI, .
+-   **Deployment**: Manual deployment to an Ubuntu server, Nginx reverse proxy,  for process management. Git for version control.
 
 **key DB schema**
--   **tenants**: 
--   **users**: 
--   **super_admins**: 
--   **jobs**: 
--   **email_logs**: 
-
-**changes in tech stack**
--   None.
+-   **jobs**: has been updated to include , , , , , .
+-   **inventory**: 
+-   *Note: Customers are not a separate collection; they are derived from the  collection.*
 
 **All files of reference**
--   : The main FastAPI application file. Contains all API logic, including the newly added Super Admin endpoints.
--   : The new, all-in-one dashboard for platform management.
--   : The main React router, updated to include Super Admin routes.
--   : Nginx configuration file on the user's server.
--   : The service file that ensures the backend runs automatically.
+-   : The single, massive backend file containing all logic.
+-   : Completely rewritten to support the new multi-stage job workflow.
+-   : New page for customer relationship management.
+-   : New page for inventory management.
+-   : New page for analytics.
+-   : New global search component.
+-   : Updated with navigation links for all new pages and the universal search bar.
+-   : Updated with routes for all new pages.
 
 **Areas that need refactoring**:
--    is a monolithic file containing all models, helper functions, and routes for both the main app and the super admin panel. It should be broken down into a more modular structure (e.g., routers for each feature set, a dedicated models file).
--   The manual deployment process is error-prone. The project should be containerized using Docker to ensure consistency and simplify future updates.
+-    is critically oversized and needs to be broken down into multiple files using FastAPI's .
+-   The frontend deployment process is brittle, relying on . The dependency conflicts should be properly resolved.
+-   The backend process on the server should be managed by a  service for robustness instead of a manual  command.
 
 **key api endpoints**
--   **/api/super-admin/login**: Super admin authentication.
--   **/api/super-admin/stats**: Get platform-wide statistics.
--   **/api/super-admin/analytics**: Get financial and growth analytics (MRR, Churn).
--   **/api/super-admin/tenants**: CRUD operations for managing tenants.
--   **/api/super-admin/tenants/{tenant_id}/subscription**: Update a tenant's subscription status.
+-   : Universal search endpoint.
+-   : Lists unique customers.
+-   : Full CRUD for inventory items.
+-   : Endpoint for technician metrics.
+-   : New endpoint to record customer approval.
+-   : New endpoint to record device delivery.
+-   : Public page for job tracking.
 
 **Critical Info for New Agent**
--   You are acting as a **deployment assistant** for a live server, not developing in the local sandbox. All commands you provide will be executed by the user on their server ().
--   Do not use local testing tools (, screenshots). Debugging must be done by asking the user for logs and command outputs from their server.
--   The user's GitHub repository is out of sync. The latest code (Super Admin panel) exists only on their server. Prioritize helping the user get this code into their Git repository after verifying it works.
--   The deployment has been fragile. Be mindful of potential issues with package versions, file permissions, and service restarts on the user's Ubuntu environment.
+-   You are again acting as a **deployment assistant** for a live server. Your primary goal is to ensure the application is running correctly on the user's server (). Do not start new feature development until the live site is verified.
+-   The user is on a live server. Do not use local sandbox testing tools like  or . Debugging must be done by requesting logs and outputs from the user's server.
+-   The user has a tendency to ignore verification steps and immediately ask for new features. You must gently guide them to verify the current state first, as the deployment is fragile.
 
 **documents and test reports created in this job**
--   /app/memory/PRD.md
--   /app/design_guidelines.json
--   /app/test_reports/iteration_1.json
+-    (updated multiple times)
+-   
+-   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**:  - Reports the super admin route is not working.
-2.  **User**:  - Confirms the issue persists after a fix attempt.
-3.  **User**:  - Confirms the issue persists after another fix.
-4.  **User**:  - Asks for the login credentials, implying the page is now loading.
-5.  **User**:  - After logging in, misunderstands the status and asks to start building the panel features.
-6.  **User**:  - Confirms the list of required features for the super admin panel.
-7.  **User**:  - Acknowledges running a command provided by the agent. (Repeated multiple times).
-8.  **User**:  - Confirms a command or deployment step was successful.
-9.  **User**:  - A repeat of the request to build the features, showing a bit of confusion about the process.
-10. **User**:  - The final message, confirming they have run the command to create the enhanced Super Admin Dashboard file on their server.
+1.  **User**:  - Request to configure custom domain.
+2.  **User**:  - Asking for confirmation on DNS setup.
+3.  **User**: (Shares screenshot of  failing) - Reporting DNS is not yet propagated.
+4.  **User**:  - Asks to work on other features while waiting for DNS.
+5.  **User**:  - Selects next features to build.
+6.  **User**:  - Request to build the Customers page.
+7.  **User**:  - Request to build search and new device fields.
+8.  **User**:  - Requests a major overhaul of the job workflow and WhatsApp messages.
+9.  **User**:  - Asks how to deploy all the changes to the live server.
+10. **User**:  - Latest feature request, made after the deployment attempt.
 
 **Project Health Check:**
--   **Broken**: The Git repository is out of sync with the live production code.
--   **Mocked**: None.
+-   **Broken**: The state of the live deployment at  is unknown and likely broken, as the user reported not updated. The frontend dependency tree is unstable.
 
 **3rd Party Integrations**
 -   None implemented.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES (early in development, before manual deployment).
+-   **Testing agent used after significant changes**: YES (Used extensively for local sandbox development).
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: []
--   **Known regressions**: None in code, but the manual deployment process itself has been a recurring source of issues.
+-   **Test files created**:
+    -   
+    -   
+    -   
+    -   
+-   **Known regressions**: The manual deployment process itself.
 
 **Credentials to test flow:**
 -   **Super Admin URL**: 
--   **Email**: 
--   **Password**: 
+-   **Super Admin Email**: 
+-   **Super Admin Password**: 
+-   **Tenant Login URL**:  (Requires a subdomain created by Super Admin)
 
 **What agent forgot to execute**
--   The agent did not push the latest Super Admin feature code to the user's GitHub repository. It was applied directly to the user's server, creating a divergence between the repository and the live application.</analysis>
+-   The agent did not address the root cause of the frontend dependency issues ( errors), opting for a workaround ().
+-   The agent did not create a robust  service for the backend on the live server, falling back to the less reliable  method.
+-   The agent did not prioritize verifying the live deployment after the user reported it was not working, and instead ended the session.</analysis>
