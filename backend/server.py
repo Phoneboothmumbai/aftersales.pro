@@ -701,6 +701,11 @@ async def delete_branch(branch_id: str, admin: dict = Depends(require_admin)):
 
 @api_router.post("/jobs", response_model=JobResponse)
 async def create_job(data: JobCreate, user: dict = Depends(get_current_user)):
+    # Check plan limit
+    limit_check = await check_job_limit(user["tenant_id"])
+    if not limit_check["allowed"]:
+        raise HTTPException(status_code=403, detail=limit_check["message"])
+    
     now = datetime.now(timezone.utc).isoformat()
     job_id = str(uuid.uuid4())
     job_number = await generate_job_number(user["tenant_id"])
