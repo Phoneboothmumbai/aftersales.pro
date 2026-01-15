@@ -2059,10 +2059,170 @@ async def update_tenant_by_admin(
 
 # ==================== SUBSCRIPTION MANAGEMENT ROUTES ====================
 
+async def get_plans_from_db() -> dict:
+    """Helper to get plans from database or seed defaults"""
+    plans = await db.subscription_plans.find({"is_active": True}, {"_id": 0}).sort("sort_order", 1).to_list(100)
+    if not plans:
+        # Seed default plans if none exist
+        now = datetime.now(timezone.utc).isoformat()
+        for plan in DEFAULT_SUBSCRIPTION_PLANS:
+            plan["created_at"] = now
+            plan["updated_at"] = now
+            await db.subscription_plans.insert_one(plan)
+        plans = DEFAULT_SUBSCRIPTION_PLANS
+    return {p["id"]: p for p in plans}
+
+async def get_all_plans_from_db(include_inactive: bool = False) -> list:
+    """Get all plans including inactive ones"""
+    query = {} if include_inactive else {"is_active": True}
+    plans = await db.subscription_plans.find(query, {"_id": 0}).sort("sort_order", 1).to_list(100)
+    if not plans:
+        now = datetime.now(timezone.utc).isoformat()
+        for plan in DEFAULT_SUBSCRIPTION_PLANS:
+            plan["created_at"] = now
+            plan["updated_at"] = now
+            await db.subscription_plans.insert_one(plan)
+        plans = DEFAULT_SUBSCRIPTION_PLANS
+    
+    # Add tenant count for each plan
+    for plan in plans:
+        plan["tenant_count"] = await db.tenants.count_documents({"subscription_plan": plan["id"]})
+    
+    return plans
+
 @api_router.get("/super-admin/plans")
-async def get_subscription_plans(admin: dict = Depends(get_super_admin)):
-    """Get all available subscription plans"""
-    return SUBSCRIPTION_PLANS
+async def get_subscription_plans(
+    include_inactive: bool = False,
+    admin: dict = Depends(get_super_admin)
+):
+    """Get all subscription plans"""
+    plans = await get_all_plans_from_db(include_inactive)
+    return plans
+
+@api_router.get("/super-admin/plans/{plan_id}")
+async def get_subscription_plan(
+    plan_id: str,
+    admin: dict = Depends(get_super_admin)
+):
+    """Get a specific subscription plan"""
+    plan = await db.subscription_plans.find_one({"id": plan_id}, {"_id": 0})
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    plan["tenant_count"] = await db.tenants.count_documents({"subscription_plan": plan_id})
+    return plan
+
+@api_router.post("/super-admin/plans")
+async def create_subscription_plan(
+    data: SubscriptionPlanCreate,
+    admin: dict = Depends(get_super_admin)
+):
+    """Create a new subscription plan"""
+    # Check if plan ID already exists
+    existing = await db.subscription_plans.find_one({"id": data.id})
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Plan with ID '{data.id}' already exists")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    plan = data.model_dump()
+    plan["is_default"] = False
+    plan["created_at"] = now
+    plan["updated_at"] = now
+    
+    await db.subscription_plans.insert_one(plan)
+    
+    # Log the action
+    action_log = {
+        "id": str(uuid.uuid4()),
+        "action": "plan_created",
+        "plan_id": data.id,
+        "plan_name": data.name,
+        "performed_by": admin["id"],
+        "performed_by_name": admin["name"],
+        "created_at": now
+    }
+    await db.admin_action_logs.insert_one(action_log)
+    
+    return {"message": f"Plan '{data.name}' created successfully", "plan": {k: v for k, v in plan.items() if k != "_id"}}
+
+@api_router.put("/super-admin/plans/{plan_id}")
+async def update_subscription_plan(
+    plan_id: str,
+    data: SubscriptionPlanUpdate,
+    admin: dict = Depends(get_super_admin)
+):
+    """Update an existing subscription plan"""
+    plan = await db.subscription_plans.find_one({"id": plan_id})
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No update data provided")
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.subscription_plans.update_one({"id": plan_id}, {"$set": update_data})
+    
+    # Log the action
+    action_log = {
+        "id": str(uuid.uuid4()),
+        "action": "plan_updated",
+        "plan_id": plan_id,
+        "changes": list(update_data.keys()),
+        "performed_by": admin["id"],
+        "performed_by_name": admin["name"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.admin_action_logs.insert_one(action_log)
+    
+    updated_plan = await db.subscription_plans.find_one({"id": plan_id}, {"_id": 0})
+    return {"message": "Plan updated successfully", "plan": updated_plan}
+
+@api_router.delete("/super-admin/plans/{plan_id}")
+async def delete_subscription_plan(
+    plan_id: str,
+    admin: dict = Depends(get_super_admin)
+):
+    """Delete a subscription plan (soft delete by setting is_active=False)"""
+    plan = await db.subscription_plans.find_one({"id": plan_id})
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    if plan.get("is_default"):
+        raise HTTPException(status_code=400, detail="Cannot delete default plans")
+    
+    # Check if any tenants are using this plan
+    tenant_count = await db.tenants.count_documents({"subscription_plan": plan_id})
+    if tenant_count > 0:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Cannot delete plan. {tenant_count} tenant(s) are currently using this plan. Reassign them first."
+        )
+    
+    # Soft delete
+    await db.subscription_plans.update_one(
+        {"id": plan_id}, 
+        {"$set": {"is_active": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    # Log the action
+    action_log = {
+        "id": str(uuid.uuid4()),
+        "action": "plan_deleted",
+        "plan_id": plan_id,
+        "plan_name": plan.get("name"),
+        "performed_by": admin["id"],
+        "performed_by_name": admin["name"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.admin_action_logs.insert_one(action_log)
+    
+    return {"message": f"Plan '{plan.get('name')}' deleted successfully"}
+
+@api_router.get("/super-admin/feature-options")
+async def get_feature_options(admin: dict = Depends(get_super_admin)):
+    """Get all available feature options with descriptions"""
+    return FEATURE_DESCRIPTIONS
 
 @api_router.post("/super-admin/tenants/{tenant_id}/assign-plan")
 async def assign_plan_to_tenant(
@@ -2075,14 +2235,15 @@ async def assign_plan_to_tenant(
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant not found")
     
-    if data.plan not in SUBSCRIPTION_PLANS:
-        raise HTTPException(status_code=400, detail=f"Invalid plan. Must be one of: {list(SUBSCRIPTION_PLANS.keys())}")
+    # Get plan from database
+    plan_info = await db.subscription_plans.find_one({"id": data.plan, "is_active": True}, {"_id": 0})
+    if not plan_info:
+        raise HTTPException(status_code=400, detail=f"Invalid plan: '{data.plan}' not found or inactive")
     
-    plan_info = SUBSCRIPTION_PLANS[data.plan]
     now = datetime.now(timezone.utc)
     
     # Calculate subscription end date based on plan duration
-    if data.plan == "free":
+    if plan_info["price"] == 0:
         subscription_ends_at = None
         subscription_status = "free"
     else:
