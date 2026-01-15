@@ -194,6 +194,52 @@ class SettingsUpdate(BaseModel):
     email: Optional[str] = None
     footer_text: Optional[str] = None
 
+# ==================== INVENTORY MODELS ====================
+
+class InventoryItemCreate(BaseModel):
+    name: str
+    sku: Optional[str] = None
+    category: Optional[str] = None
+    quantity: int = 0
+    min_stock_level: int = 5
+    cost_price: float = 0
+    selling_price: float = 0
+    supplier: Optional[str] = None
+    description: Optional[str] = None
+
+class InventoryItemUpdate(BaseModel):
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    category: Optional[str] = None
+    quantity: Optional[int] = None
+    min_stock_level: Optional[int] = None
+    cost_price: Optional[float] = None
+    selling_price: Optional[float] = None
+    supplier: Optional[str] = None
+    description: Optional[str] = None
+
+class InventoryItemResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    tenant_id: str
+    name: str
+    sku: Optional[str] = None
+    category: Optional[str] = None
+    quantity: int
+    min_stock_level: int
+    cost_price: float
+    selling_price: float
+    supplier: Optional[str] = None
+    description: Optional[str] = None
+    is_low_stock: bool = False
+    created_at: str
+    updated_at: str
+
+class StockAdjustment(BaseModel):
+    quantity_change: int  # Positive for add, negative for remove
+    reason: str
+    job_id: Optional[str] = None  # Link to job if used in repair
+
 # ==================== AUTH HELPERS ====================
 
 def hash_password(password: str) -> str:
