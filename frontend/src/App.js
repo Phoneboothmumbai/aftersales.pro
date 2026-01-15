@@ -165,6 +165,24 @@ function AppRoutes() {
         }
       />
 
+      {/* Inventory & Metrics */}
+      <Route
+        path="/inventory"
+        element={
+          <ProtectedRoute>
+            <Inventory />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/metrics"
+        element={
+          <ProtectedRoute>
+            <Metrics />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Super Admin Routes */}
       <Route path="/super-admin" element={<SuperAdminLogin />} />
       <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
