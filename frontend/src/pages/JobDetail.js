@@ -378,6 +378,23 @@ export default function JobDetail() {
               </CardContent>
             </Card>
 
+            {/* Device Photos */}
+            <Card className="card-shadow">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="w-5 h-5" />
+                  Device Photos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PhotoUpload 
+                  jobId={id} 
+                  photos={job.photos || []} 
+                  onPhotoChange={handlePhotoChange}
+                />
+              </CardContent>
+            </Card>
+
             {/* Diagnosis */}
             {job.diagnosis && (
               <Card className="card-shadow border-purple-500/30">
