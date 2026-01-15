@@ -1035,7 +1035,7 @@ async def close_job(job_id: str, user: dict = Depends(get_current_user)):
 async def update_job_status(job_id: str, data: StatusUpdate, user: dict = Depends(get_current_user)):
     now = datetime.now(timezone.utc).isoformat()
     
-    valid_statuses = ["received", "diagnosed", "waiting_for_approval", "repaired", "closed"]
+    valid_statuses = ["received", "diagnosed", "waiting_for_approval", "in_progress", "pending_parts", "repaired", "delivered", "closed"]
     if data.status not in valid_statuses:
         raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
     
