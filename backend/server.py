@@ -1584,43 +1584,237 @@ class TenantUpdateByAdmin(BaseModel):
 
 # ==================== SUBSCRIPTION PLAN MODELS ====================
 
-SUBSCRIPTION_PLANS = {
-    "free": {
+# Default plans (used for seeding)
+DEFAULT_SUBSCRIPTION_PLANS = [
+    {
+        "id": "free",
         "name": "Free",
+        "description": "Perfect for trying out the platform",
         "price": 0,
+        "billing_cycle": "forever",
         "duration_days": 0,
-        "features": ["Up to 50 jobs/month", "1 user", "Basic reports"],
+        "max_users": 1,
+        "max_branches": 1,
         "max_jobs_per_month": 50,
-        "max_users": 1
+        "max_inventory_items": 50,
+        "max_photos_per_job": 3,
+        "max_storage_mb": 100,
+        "features": {
+            "job_management": True,
+            "basic_reports": True,
+            "pdf_job_sheet": True,
+            "qr_tracking": True,
+            "whatsapp_messages": True,
+            "photo_upload": True,
+            "inventory_management": False,
+            "advanced_analytics": False,
+            "technician_metrics": False,
+            "customer_management": False,
+            "email_notifications": False,
+            "sms_notifications": False,
+            "custom_branding": False,
+            "api_access": False,
+            "priority_support": False,
+            "dedicated_account_manager": False,
+            "data_export": False,
+            "multi_branch": False
+        },
+        "is_active": True,
+        "is_default": True,
+        "sort_order": 1
     },
-    "basic": {
+    {
+        "id": "basic",
         "name": "Basic",
+        "description": "For small repair shops",
         "price": 499,
+        "billing_cycle": "monthly",
         "duration_days": 30,
-        "features": ["Unlimited jobs", "Up to 3 users", "Standard reports", "Email notifications"],
-        "max_jobs_per_month": -1,
-        "max_users": 3
+        "max_users": 3,
+        "max_branches": 1,
+        "max_jobs_per_month": 200,
+        "max_inventory_items": 200,
+        "max_photos_per_job": 5,
+        "max_storage_mb": 500,
+        "features": {
+            "job_management": True,
+            "basic_reports": True,
+            "pdf_job_sheet": True,
+            "qr_tracking": True,
+            "whatsapp_messages": True,
+            "photo_upload": True,
+            "inventory_management": True,
+            "advanced_analytics": False,
+            "technician_metrics": True,
+            "customer_management": True,
+            "email_notifications": True,
+            "sms_notifications": False,
+            "custom_branding": False,
+            "api_access": False,
+            "priority_support": False,
+            "dedicated_account_manager": False,
+            "data_export": True,
+            "multi_branch": False
+        },
+        "is_active": True,
+        "is_default": True,
+        "sort_order": 2
     },
-    "pro": {
+    {
+        "id": "pro",
         "name": "Pro",
+        "description": "For growing businesses",
         "price": 999,
+        "billing_cycle": "monthly",
         "duration_days": 30,
-        "features": ["Unlimited jobs", "Up to 10 users", "Advanced analytics", "Priority support", "Inventory management"],
+        "max_users": 10,
+        "max_branches": 3,
         "max_jobs_per_month": -1,
-        "max_users": 10
+        "max_inventory_items": 1000,
+        "max_photos_per_job": 10,
+        "max_storage_mb": 2000,
+        "features": {
+            "job_management": True,
+            "basic_reports": True,
+            "pdf_job_sheet": True,
+            "qr_tracking": True,
+            "whatsapp_messages": True,
+            "photo_upload": True,
+            "inventory_management": True,
+            "advanced_analytics": True,
+            "technician_metrics": True,
+            "customer_management": True,
+            "email_notifications": True,
+            "sms_notifications": True,
+            "custom_branding": True,
+            "api_access": False,
+            "priority_support": True,
+            "dedicated_account_manager": False,
+            "data_export": True,
+            "multi_branch": True
+        },
+        "is_active": True,
+        "is_default": True,
+        "sort_order": 3
     },
-    "enterprise": {
+    {
+        "id": "enterprise",
         "name": "Enterprise",
+        "description": "For large organizations",
         "price": 2499,
+        "billing_cycle": "monthly",
         "duration_days": 30,
-        "features": ["Unlimited everything", "Unlimited users", "Custom branding", "API access", "Dedicated support"],
+        "max_users": -1,
+        "max_branches": -1,
         "max_jobs_per_month": -1,
-        "max_users": -1
+        "max_inventory_items": -1,
+        "max_photos_per_job": -1,
+        "max_storage_mb": -1,
+        "features": {
+            "job_management": True,
+            "basic_reports": True,
+            "pdf_job_sheet": True,
+            "qr_tracking": True,
+            "whatsapp_messages": True,
+            "photo_upload": True,
+            "inventory_management": True,
+            "advanced_analytics": True,
+            "technician_metrics": True,
+            "customer_management": True,
+            "email_notifications": True,
+            "sms_notifications": True,
+            "custom_branding": True,
+            "api_access": True,
+            "priority_support": True,
+            "dedicated_account_manager": True,
+            "data_export": True,
+            "multi_branch": True
+        },
+        "is_active": True,
+        "is_default": True,
+        "sort_order": 4
     }
+]
+
+# Feature descriptions for UI
+FEATURE_DESCRIPTIONS = {
+    "job_management": "Create and manage repair jobs",
+    "basic_reports": "View basic job and revenue reports",
+    "pdf_job_sheet": "Generate PDF job sheets",
+    "qr_tracking": "QR code for customer tracking",
+    "whatsapp_messages": "Send WhatsApp messages to customers",
+    "photo_upload": "Upload device photos",
+    "inventory_management": "Track parts and spares inventory",
+    "advanced_analytics": "Detailed analytics and charts",
+    "technician_metrics": "Technician performance tracking",
+    "customer_management": "Customer history and CRM",
+    "email_notifications": "Email alerts for job updates",
+    "sms_notifications": "SMS alerts for job updates",
+    "custom_branding": "Custom logo and branding",
+    "api_access": "REST API access for integrations",
+    "priority_support": "Priority customer support",
+    "dedicated_account_manager": "Dedicated account manager",
+    "data_export": "Export data to CSV/Excel",
+    "multi_branch": "Multi-branch support"
 }
 
+class SubscriptionPlanCreate(BaseModel):
+    id: str  # Unique slug (e.g., "starter", "growth")
+    name: str
+    description: Optional[str] = None
+    price: float
+    billing_cycle: str = "monthly"  # monthly, yearly, forever
+    duration_days: int = 30
+    max_users: int = 1  # -1 for unlimited
+    max_branches: int = 1  # -1 for unlimited
+    max_jobs_per_month: int = 100  # -1 for unlimited
+    max_inventory_items: int = 100  # -1 for unlimited
+    max_photos_per_job: int = 5  # -1 for unlimited
+    max_storage_mb: int = 500  # -1 for unlimited
+    features: dict = {}
+    is_active: bool = True
+    sort_order: int = 99
+
+class SubscriptionPlanUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    billing_cycle: Optional[str] = None
+    duration_days: Optional[int] = None
+    max_users: Optional[int] = None
+    max_branches: Optional[int] = None
+    max_jobs_per_month: Optional[int] = None
+    max_inventory_items: Optional[int] = None
+    max_photos_per_job: Optional[int] = None
+    max_storage_mb: Optional[int] = None
+    features: Optional[dict] = None
+    is_active: Optional[bool] = None
+    sort_order: Optional[int] = None
+
+class SubscriptionPlanResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    name: str
+    description: Optional[str] = None
+    price: float
+    billing_cycle: str
+    duration_days: int
+    max_users: int
+    max_branches: int
+    max_jobs_per_month: int
+    max_inventory_items: int
+    max_photos_per_job: int
+    max_storage_mb: int
+    features: dict
+    is_active: bool
+    is_default: bool = False
+    sort_order: int
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+    tenant_count: int = 0
+
 class AssignPlanRequest(BaseModel):
-    plan: str  # free, basic, pro, enterprise
+    plan: str  # plan id
     duration_months: int = 1
     notes: Optional[str] = None
 
