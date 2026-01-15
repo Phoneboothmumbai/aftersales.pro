@@ -1841,8 +1841,309 @@ async def update_tenant_by_admin(
     return {
         **updated_tenant,
         "is_active": updated_tenant.get("is_active", True),
-        "subscription_status": updated_tenant.get("subscription_status", "trial")
+        "subscription_status": updated_tenant.get("subscription_status", "trial"),
+        "subscription_plan": updated_tenant.get("subscription_plan", "free")
     }
+
+# ==================== SUBSCRIPTION MANAGEMENT ROUTES ====================
+
+@api_router.get("/super-admin/plans")
+async def get_subscription_plans(admin: dict = Depends(get_super_admin)):
+    """Get all available subscription plans"""
+    return SUBSCRIPTION_PLANS
+
+@api_router.post("/super-admin/tenants/{tenant_id}/assign-plan")
+async def assign_plan_to_tenant(
+    tenant_id: str,
+    data: AssignPlanRequest,
+    admin: dict = Depends(get_super_admin)
+):
+    """Manually assign a subscription plan to a tenant"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    if data.plan not in SUBSCRIPTION_PLANS:
+        raise HTTPException(status_code=400, detail=f"Invalid plan. Must be one of: {list(SUBSCRIPTION_PLANS.keys())}")
+    
+    plan_info = SUBSCRIPTION_PLANS[data.plan]
+    now = datetime.now(timezone.utc)
+    
+    # Calculate subscription end date based on plan duration
+    if data.plan == "free":
+        subscription_ends_at = None
+        subscription_status = "free"
+    else:
+        duration_days = plan_info["duration_days"] * data.duration_months
+        subscription_ends_at = (now + timedelta(days=duration_days)).isoformat()
+        subscription_status = "paid"
+    
+    update_data = {
+        "subscription_plan": data.plan,
+        "subscription_status": subscription_status,
+        "subscription_ends_at": subscription_ends_at,
+        "updated_at": now.isoformat()
+    }
+    
+    await db.tenants.update_one({"id": tenant_id}, {"$set": update_data})
+    
+    # Log the action
+    action_log = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": tenant_id,
+        "action": "plan_assigned",
+        "plan": data.plan,
+        "duration_months": data.duration_months,
+        "notes": data.notes,
+        "performed_by": admin["id"],
+        "performed_by_name": admin["name"],
+        "created_at": now.isoformat()
+    }
+    await db.admin_action_logs.insert_one(action_log)
+    
+    updated_tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    return {
+        "message": f"Plan '{plan_info['name']}' assigned successfully",
+        "tenant": {
+            **updated_tenant,
+            "subscription_plan": updated_tenant.get("subscription_plan", "free"),
+            "subscription_status": updated_tenant.get("subscription_status", "trial")
+        }
+    }
+
+@api_router.post("/super-admin/tenants/{tenant_id}/extend-validity")
+async def extend_tenant_validity(
+    tenant_id: str,
+    data: ExtendValidityRequest,
+    admin: dict = Depends(get_super_admin)
+):
+    """Extend trial or subscription validity for a tenant"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    now = datetime.now(timezone.utc)
+    
+    # Extend trial_ends_at if in trial
+    if tenant.get("subscription_status", "trial") == "trial":
+        current_end = tenant.get("trial_ends_at")
+        if current_end:
+            try:
+                end_date = datetime.fromisoformat(current_end.replace('Z', '+00:00'))
+            except:
+                end_date = now
+        else:
+            end_date = now
+        
+        # If already expired, start from now
+        if end_date < now:
+            end_date = now
+        
+        new_end = (end_date + timedelta(days=data.days)).isoformat()
+        await db.tenants.update_one(
+            {"id": tenant_id},
+            {"$set": {"trial_ends_at": new_end, "updated_at": now.isoformat()}}
+        )
+        field_extended = "trial_ends_at"
+    else:
+        # Extend subscription_ends_at for paid plans
+        current_end = tenant.get("subscription_ends_at")
+        if current_end:
+            try:
+                end_date = datetime.fromisoformat(current_end.replace('Z', '+00:00'))
+            except:
+                end_date = now
+        else:
+            end_date = now
+        
+        if end_date < now:
+            end_date = now
+        
+        new_end = (end_date + timedelta(days=data.days)).isoformat()
+        await db.tenants.update_one(
+            {"id": tenant_id},
+            {"$set": {"subscription_ends_at": new_end, "updated_at": now.isoformat()}}
+        )
+        field_extended = "subscription_ends_at"
+    
+    # Log the action
+    action_log = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": tenant_id,
+        "action": "validity_extended",
+        "days": data.days,
+        "field_extended": field_extended,
+        "new_end_date": new_end,
+        "reason": data.reason,
+        "performed_by": admin["id"],
+        "performed_by_name": admin["name"],
+        "created_at": now.isoformat()
+    }
+    await db.admin_action_logs.insert_one(action_log)
+    
+    updated_tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    return {
+        "message": f"Validity extended by {data.days} days",
+        "new_end_date": new_end,
+        "tenant": updated_tenant
+    }
+
+@api_router.post("/super-admin/tenants/{tenant_id}/record-payment")
+async def record_offline_payment(
+    tenant_id: str,
+    data: RecordPaymentRequest,
+    admin: dict = Depends(get_super_admin)
+):
+    """Record an offline payment for a tenant"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    now = datetime.now(timezone.utc)
+    
+    # Create payment record
+    payment = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": tenant_id,
+        "amount": data.amount,
+        "payment_mode": data.payment_mode,
+        "reference_number": data.reference_number,
+        "plan": data.plan,
+        "duration_months": data.duration_months,
+        "notes": data.notes,
+        "recorded_by": admin["id"],
+        "recorded_by_name": admin["name"],
+        "created_at": now.isoformat()
+    }
+    await db.payments.insert_one(payment)
+    
+    # If a plan is specified, automatically assign it
+    if data.plan and data.plan in SUBSCRIPTION_PLANS:
+        plan_info = SUBSCRIPTION_PLANS[data.plan]
+        
+        if data.plan != "free":
+            duration_days = plan_info["duration_days"] * data.duration_months
+            
+            # Get current subscription end or use now
+            current_end = tenant.get("subscription_ends_at")
+            if current_end:
+                try:
+                    end_date = datetime.fromisoformat(current_end.replace('Z', '+00:00'))
+                    if end_date < now:
+                        end_date = now
+                except:
+                    end_date = now
+            else:
+                end_date = now
+            
+            subscription_ends_at = (end_date + timedelta(days=duration_days)).isoformat()
+            
+            await db.tenants.update_one(
+                {"id": tenant_id},
+                {"$set": {
+                    "subscription_plan": data.plan,
+                    "subscription_status": "paid",
+                    "subscription_ends_at": subscription_ends_at,
+                    "updated_at": now.isoformat()
+                }}
+            )
+    
+    # Log the action
+    action_log = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": tenant_id,
+        "action": "payment_recorded",
+        "payment_id": payment["id"],
+        "amount": data.amount,
+        "payment_mode": data.payment_mode,
+        "plan": data.plan,
+        "performed_by": admin["id"],
+        "performed_by_name": admin["name"],
+        "created_at": now.isoformat()
+    }
+    await db.admin_action_logs.insert_one(action_log)
+    
+    updated_tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    
+    return {
+        "message": "Payment recorded successfully",
+        "payment": {k: v for k, v in payment.items() if k != "_id"},
+        "tenant": {
+            **updated_tenant,
+            "subscription_plan": updated_tenant.get("subscription_plan", "free"),
+            "subscription_status": updated_tenant.get("subscription_status", "trial")
+        }
+    }
+
+@api_router.get("/super-admin/tenants/{tenant_id}/payments")
+async def get_tenant_payments(
+    tenant_id: str,
+    admin: dict = Depends(get_super_admin)
+):
+    """Get all payments for a tenant"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    payments = await db.payments.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return payments
+
+@api_router.get("/super-admin/tenants/{tenant_id}/action-logs")
+async def get_tenant_action_logs(
+    tenant_id: str,
+    admin: dict = Depends(get_super_admin)
+):
+    """Get all admin action logs for a tenant"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    logs = await db.admin_action_logs.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return logs
+
+@api_router.get("/super-admin/payments")
+async def get_all_payments(
+    admin: dict = Depends(get_super_admin),
+    limit: int = 50
+):
+    """Get all recent payments across all tenants"""
+    pipeline = [
+        {"$sort": {"created_at": -1}},
+        {"$limit": limit},
+        {"$lookup": {
+            "from": "tenants",
+            "localField": "tenant_id",
+            "foreignField": "id",
+            "as": "tenant_info"
+        }},
+        {"$unwind": {"path": "$tenant_info", "preserveNullAndEmptyArrays": True}},
+        {"$project": {
+            "_id": 0,
+            "id": 1,
+            "tenant_id": 1,
+            "amount": 1,
+            "payment_mode": 1,
+            "reference_number": 1,
+            "plan": 1,
+            "duration_months": 1,
+            "notes": 1,
+            "recorded_by_name": 1,
+            "created_at": 1,
+            "tenant_name": "$tenant_info.company_name",
+            "tenant_subdomain": "$tenant_info.subdomain"
+        }}
+    ]
+    
+    payments = await db.payments.aggregate(pipeline).to_list(limit)
+    return payments
 
 @api_router.post("/super-admin/setup")
 async def setup_super_admin():
