@@ -1025,14 +1025,14 @@ export default function SuperAdminDashboard() {
               <div className="space-y-2">
                 <Label>Activate Plan (Optional)</Label>
                 <Select
-                  value={paymentForm.plan}
-                  onValueChange={(value) => setPaymentForm({ ...paymentForm, plan: value })}
+                  value={paymentForm.plan || "none"}
+                  onValueChange={(value) => setPaymentForm({ ...paymentForm, plan: value === "none" ? "" : value })}
                 >
                   <SelectTrigger className="bg-slate-700 border-slate-600">
                     <SelectValue placeholder="No plan change" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No plan change</SelectItem>
+                    <SelectItem value="none">No plan change</SelectItem>
                     {Object.entries(plans).filter(([key]) => key !== "free").map(([key, plan]) => (
                       <SelectItem key={key} value={key}>
                         {plan.name} ({formatCurrency(plan.price)}/mo)
@@ -1041,7 +1041,7 @@ export default function SuperAdminDashboard() {
                   </SelectContent>
                 </Select>
               </div>
-              {paymentForm.plan && (
+              {paymentForm.plan && paymentForm.plan !== "none" && (
                 <div className="space-y-2">
                   <Label>Duration</Label>
                   <Select
