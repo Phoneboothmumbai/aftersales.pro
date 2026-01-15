@@ -189,7 +189,9 @@ class JobResponse(BaseModel):
     technician_observation: Optional[str]
     status: str
     diagnosis: Optional[dict] = None
+    approval: Optional[dict] = None  # Who approved, amount approved
     repair: Optional[dict] = None
+    delivery: Optional[dict] = None  # Delivery details, amount received
     closure: Optional[dict] = None
     photos: List[dict] = []  # List of photo objects {id, url, type, uploaded_at}
     status_history: List[dict]
