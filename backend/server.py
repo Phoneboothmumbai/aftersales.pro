@@ -1241,7 +1241,7 @@ async def get_platform_stats(admin: dict = Depends(get_super_admin)):
 @api_router.get("/super-admin/tenants", response_model=List[TenantAdminResponse])
 async def get_all_tenants(
     search: Optional[str] = None,
-    status: Optional[str] = None,
+    status_filter: Optional[str] = None,
     admin: dict = Depends(get_super_admin)
 ):
     query = {}
@@ -1252,11 +1252,11 @@ async def get_all_tenants(
             {"subdomain": {"$regex": search, "$options": "i"}}
         ]
     
-    if status == "active":
+    if status_filter == "active":
         query["is_active"] = {"$ne": False}
-    elif status == "inactive":
+    elif status_filter == "inactive":
         query["is_active"] = False
-    elif status == "trial":
+    elif status_filter == "trial":
         query["subscription_status"] = {"$in": ["trial", None]}
     elif status == "paid":
         query["subscription_status"] = "paid"
