@@ -829,6 +829,80 @@ async def update_diagnosis(job_id: str, data: DiagnosisUpdate, user: dict = Depe
     updated_job = await db.jobs.find_one({"id": job_id}, {"_id": 0})
     return JobResponse(**updated_job)
 
+@api_router.put("/jobs/{job_id}/approve")
+async def approve_job(job_id: str, data: ApprovalUpdate, user: dict = Depends(get_current_user)):
+    """Customer approves the diagnosis and estimated cost"""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    if job["status"] == "closed":
+        raise HTTPException(status_code=400, detail="Cannot update closed job")
+    
+    approval = {
+        "approved_by": data.approved_by,
+        "approved_amount": data.approved_amount,
+        "approval_notes": data.approval_notes,
+        "approved_at": now,
+        "recorded_by": user["id"]
+    }
+    
+    status_entry = {
+        "status": "in_progress",
+        "timestamp": now,
+        "user_id": user["id"],
+        "user_name": user["name"],
+        "notes": f"Approved by {data.approved_by}. Amount: ₹{data.approved_amount}"
+    }
+    
+    await db.jobs.update_one(
+        {"id": job_id},
+        {
+            "$set": {
+                "approval": approval,
+                "status": "in_progress",
+                "updated_at": now
+            },
+            "$push": {"status_history": status_entry}
+        }
+    )
+    
+    updated_job = await db.jobs.find_one({"id": job_id}, {"_id": 0})
+    return JobResponse(**updated_job)
+
+@api_router.put("/jobs/{job_id}/pending-parts")
+async def mark_pending_parts(job_id: str, notes: Optional[str] = None, user: dict = Depends(get_current_user)):
+    """Mark job as waiting for parts"""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    if job["status"] == "closed":
+        raise HTTPException(status_code=400, detail="Cannot update closed job")
+    
+    status_entry = {
+        "status": "pending_parts",
+        "timestamp": now,
+        "user_id": user["id"],
+        "user_name": user["name"],
+        "notes": notes or "Waiting for parts"
+    }
+    
+    await db.jobs.update_one(
+        {"id": job_id},
+        {
+            "$set": {"status": "pending_parts", "updated_at": now},
+            "$push": {"status_history": status_entry}
+        }
+    )
+    
+    updated_job = await db.jobs.find_one({"id": job_id}, {"_id": 0})
+    return JobResponse(**updated_job)
+
 @api_router.put("/jobs/{job_id}/repair")
 async def update_repair(job_id: str, data: RepairUpdate, user: dict = Depends(get_current_user)):
     now = datetime.now(timezone.utc).isoformat()
@@ -872,8 +946,54 @@ async def update_repair(job_id: str, data: RepairUpdate, user: dict = Depends(ge
     updated_job = await db.jobs.find_one({"id": job_id}, {"_id": 0})
     return JobResponse(**updated_job)
 
+@api_router.put("/jobs/{job_id}/deliver")
+async def deliver_job(job_id: str, data: DeliveryUpdate, user: dict = Depends(get_current_user)):
+    """Record device delivery and payment"""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    if job["status"] == "closed":
+        raise HTTPException(status_code=400, detail="Job already closed")
+    
+    delivery = {
+        "delivered_to": data.delivered_to,
+        "amount_received": data.amount_received,
+        "payment_mode": data.payment_mode,
+        "payment_reference": data.payment_reference,
+        "delivery_notes": data.delivery_notes,
+        "delivered_at": now,
+        "delivered_by": user["id"]
+    }
+    
+    status_entry = {
+        "status": "delivered",
+        "timestamp": now,
+        "user_id": user["id"],
+        "user_name": user["name"],
+        "notes": f"Delivered to {data.delivered_to}. Received ₹{data.amount_received} via {data.payment_mode}"
+    }
+    
+    await db.jobs.update_one(
+        {"id": job_id},
+        {
+            "$set": {
+                "delivery": delivery,
+                "status": "delivered",
+                "updated_at": now
+            },
+            "$push": {"status_history": status_entry}
+        }
+    )
+    
+    updated_job = await db.jobs.find_one({"id": job_id}, {"_id": 0})
+    return JobResponse(**updated_job)
+
 @api_router.put("/jobs/{job_id}/close")
-async def close_job(job_id: str, data: CloseJobRequest, user: dict = Depends(get_current_user)):
+async def close_job(job_id: str, user: dict = Depends(get_current_user)):
+    """Final close of the job after delivery"""
     now = datetime.now(timezone.utc).isoformat()
     
     job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]})
@@ -884,10 +1004,6 @@ async def close_job(job_id: str, data: CloseJobRequest, user: dict = Depends(get
         raise HTTPException(status_code=400, detail="Job already closed")
     
     closure = {
-        "device_delivered": data.device_delivered,
-        "accessories_returned": data.accessories_returned,
-        "payment_mode": data.payment_mode,
-        "invoice_reference": data.invoice_reference,
         "closed_at": now,
         "closed_by": user["id"]
     }
@@ -897,7 +1013,7 @@ async def close_job(job_id: str, data: CloseJobRequest, user: dict = Depends(get
         "timestamp": now,
         "user_id": user["id"],
         "user_name": user["name"],
-        "notes": f"Job closed. Payment: {data.payment_mode}"
+        "notes": "Job closed"
     }
     
     await db.jobs.update_one(
