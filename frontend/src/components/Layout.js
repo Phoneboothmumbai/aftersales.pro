@@ -23,6 +23,8 @@ import {
   Moon,
   Building,
   ChevronDown,
+  Package,
+  BarChart3,
 } from "lucide-react";
 
 export const Layout = ({ children }) => {
@@ -35,6 +37,8 @@ export const Layout = ({ children }) => {
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Jobs", href: "/jobs", icon: ClipboardList },
+    { name: "Inventory", href: "/inventory", icon: Package },
+    { name: "Analytics", href: "/metrics", icon: BarChart3 },
     ...(isAdmin ? [{ name: "Team", href: "/team", icon: Users }] : []),
     ...(isAdmin ? [{ name: "Branches", href: "/branches", icon: Building }] : []),
     { name: "Settings", href: "/settings", icon: Settings },
