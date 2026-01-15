@@ -1442,6 +1442,399 @@ async def setup_super_admin():
         "note": "Please change the password after first login"
     }
 
+# ==================== INVENTORY ROUTES ====================
+
+@api_router.post("/inventory", response_model=InventoryItemResponse)
+async def create_inventory_item(data: InventoryItemCreate, user: dict = Depends(require_admin)):
+    now = datetime.now(timezone.utc).isoformat()
+    item_id = str(uuid.uuid4())
+    
+    # Generate SKU if not provided
+    sku = data.sku
+    if not sku:
+        count = await db.inventory.count_documents({"tenant_id": user["tenant_id"]})
+        sku = f"PART-{str(count + 1).zfill(4)}"
+    
+    item = {
+        "id": item_id,
+        "tenant_id": user["tenant_id"],
+        "name": data.name,
+        "sku": sku,
+        "category": data.category,
+        "quantity": data.quantity,
+        "min_stock_level": data.min_stock_level,
+        "cost_price": data.cost_price,
+        "selling_price": data.selling_price,
+        "supplier": data.supplier,
+        "description": data.description,
+        "stock_history": [{
+            "change": data.quantity,
+            "reason": "Initial stock",
+            "timestamp": now,
+            "user_id": user["id"]
+        }],
+        "created_at": now,
+        "updated_at": now
+    }
+    await db.inventory.insert_one(item)
+    
+    item["is_low_stock"] = item["quantity"] <= item["min_stock_level"]
+    return InventoryItemResponse(**item)
+
+@api_router.get("/inventory", response_model=List[InventoryItemResponse])
+async def list_inventory(
+    category: Optional[str] = None,
+    low_stock_only: bool = False,
+    search: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    query = {"tenant_id": user["tenant_id"]}
+    
+    if category:
+        query["category"] = category
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"sku": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}}
+        ]
+    
+    items = await db.inventory.find(query, {"_id": 0}).sort("name", 1).to_list(1000)
+    
+    result = []
+    for item in items:
+        item["is_low_stock"] = item["quantity"] <= item["min_stock_level"]
+        if low_stock_only and not item["is_low_stock"]:
+            continue
+        result.append(InventoryItemResponse(**item))
+    
+    return result
+
+@api_router.get("/inventory/categories")
+async def get_inventory_categories(user: dict = Depends(get_current_user)):
+    """Get distinct categories for the tenant"""
+    categories = await db.inventory.distinct("category", {"tenant_id": user["tenant_id"]})
+    return [c for c in categories if c]
+
+@api_router.get("/inventory/stats")
+async def get_inventory_stats(user: dict = Depends(get_current_user)):
+    """Get inventory statistics"""
+    tenant_id = user["tenant_id"]
+    
+    total_items = await db.inventory.count_documents({"tenant_id": tenant_id})
+    
+    # Low stock items
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$match": {"$expr": {"$lte": ["$quantity", "$min_stock_level"]}}},
+        {"$count": "count"}
+    ]
+    low_stock_result = await db.inventory.aggregate(pipeline).to_list(1)
+    low_stock_count = low_stock_result[0]["count"] if low_stock_result else 0
+    
+    # Out of stock
+    out_of_stock = await db.inventory.count_documents({"tenant_id": tenant_id, "quantity": 0})
+    
+    # Total value
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {
+            "_id": None,
+            "total_cost_value": {"$sum": {"$multiply": ["$quantity", "$cost_price"]}},
+            "total_selling_value": {"$sum": {"$multiply": ["$quantity", "$selling_price"]}}
+        }}
+    ]
+    value_result = await db.inventory.aggregate(pipeline).to_list(1)
+    values = value_result[0] if value_result else {"total_cost_value": 0, "total_selling_value": 0}
+    
+    return {
+        "total_items": total_items,
+        "low_stock_count": low_stock_count,
+        "out_of_stock": out_of_stock,
+        "total_cost_value": values.get("total_cost_value", 0),
+        "total_selling_value": values.get("total_selling_value", 0)
+    }
+
+@api_router.get("/inventory/{item_id}", response_model=InventoryItemResponse)
+async def get_inventory_item(item_id: str, user: dict = Depends(get_current_user)):
+    item = await db.inventory.find_one({"id": item_id, "tenant_id": user["tenant_id"]}, {"_id": 0})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    item["is_low_stock"] = item["quantity"] <= item["min_stock_level"]
+    return InventoryItemResponse(**item)
+
+@api_router.put("/inventory/{item_id}", response_model=InventoryItemResponse)
+async def update_inventory_item(item_id: str, data: InventoryItemUpdate, user: dict = Depends(require_admin)):
+    item = await db.inventory.find_one({"id": item_id, "tenant_id": user["tenant_id"]})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    update_data["updated_at"] = now
+    
+    await db.inventory.update_one({"id": item_id}, {"$set": update_data})
+    
+    updated_item = await db.inventory.find_one({"id": item_id}, {"_id": 0})
+    updated_item["is_low_stock"] = updated_item["quantity"] <= updated_item["min_stock_level"]
+    return InventoryItemResponse(**updated_item)
+
+@api_router.post("/inventory/{item_id}/adjust")
+async def adjust_stock(item_id: str, data: StockAdjustment, user: dict = Depends(get_current_user)):
+    """Adjust stock quantity (add or remove)"""
+    item = await db.inventory.find_one({"id": item_id, "tenant_id": user["tenant_id"]})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    new_quantity = item["quantity"] + data.quantity_change
+    if new_quantity < 0:
+        raise HTTPException(status_code=400, detail="Cannot reduce stock below 0")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    stock_entry = {
+        "change": data.quantity_change,
+        "reason": data.reason,
+        "job_id": data.job_id,
+        "timestamp": now,
+        "user_id": user["id"]
+    }
+    
+    await db.inventory.update_one(
+        {"id": item_id},
+        {
+            "$set": {"quantity": new_quantity, "updated_at": now},
+            "$push": {"stock_history": stock_entry}
+        }
+    )
+    
+    updated_item = await db.inventory.find_one({"id": item_id}, {"_id": 0})
+    updated_item["is_low_stock"] = updated_item["quantity"] <= updated_item["min_stock_level"]
+    return InventoryItemResponse(**updated_item)
+
+@api_router.delete("/inventory/{item_id}")
+async def delete_inventory_item(item_id: str, user: dict = Depends(require_admin)):
+    result = await db.inventory.delete_one({"id": item_id, "tenant_id": user["tenant_id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"message": "Item deleted"}
+
+# ==================== TECHNICIAN METRICS ROUTES ====================
+
+@api_router.get("/metrics/technicians")
+async def get_technician_metrics(user: dict = Depends(get_current_user)):
+    """Get performance metrics for all technicians"""
+    tenant_id = user["tenant_id"]
+    
+    # Get all users (technicians and admins)
+    users = await db.users.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0, "id": 1, "name": 1, "role": 1}
+    ).to_list(100)
+    
+    user_map = {u["id"]: u for u in users}
+    
+    # Jobs created by each user
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {
+            "_id": "$created_by",
+            "total_jobs": {"$sum": 1}
+        }}
+    ]
+    jobs_created = await db.jobs.aggregate(pipeline).to_list(100)
+    jobs_created_map = {item["_id"]: item["total_jobs"] for item in jobs_created}
+    
+    # Closed jobs by user (from status_history where status=closed)
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id, "status": "closed"}},
+        {"$project": {
+            "closed_entry": {
+                "$filter": {
+                    "input": "$status_history",
+                    "cond": {"$eq": ["$$this.status", "closed"]}
+                }
+            },
+            "created_at": 1
+        }},
+        {"$unwind": "$closed_entry"},
+        {"$group": {
+            "_id": "$closed_entry.user_id",
+            "jobs_closed": {"$sum": 1}
+        }}
+    ]
+    jobs_closed = await db.jobs.aggregate(pipeline).to_list(100)
+    jobs_closed_map = {item["_id"]: item["jobs_closed"] for item in jobs_closed}
+    
+    # Jobs by status for each creator
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {
+            "_id": {"user": "$created_by", "status": "$status"},
+            "count": {"$sum": 1}
+        }}
+    ]
+    jobs_by_status = await db.jobs.aggregate(pipeline).to_list(500)
+    
+    status_by_user = {}
+    for item in jobs_by_status:
+        user_id = item["_id"]["user"]
+        status = item["_id"]["status"]
+        if user_id not in status_by_user:
+            status_by_user[user_id] = {}
+        status_by_user[user_id][status] = item["count"]
+    
+    # Average repair time (received to closed)
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id, "status": "closed"}},
+        {"$project": {
+            "created_by": 1,
+            "received_time": {
+                "$arrayElemAt": [
+                    {"$filter": {
+                        "input": "$status_history",
+                        "cond": {"$eq": ["$$this.status", "received"]}
+                    }},
+                    0
+                ]
+            },
+            "closed_time": {
+                "$arrayElemAt": [
+                    {"$filter": {
+                        "input": "$status_history",
+                        "cond": {"$eq": ["$$this.status", "closed"]}
+                    }},
+                    0
+                ]
+            }
+        }},
+        {"$match": {"received_time": {"$ne": None}, "closed_time": {"$ne": None}}}
+    ]
+    time_data = await db.jobs.aggregate(pipeline).to_list(1000)
+    
+    # Calculate average time per user
+    avg_time_by_user = {}
+    for job in time_data:
+        try:
+            received = datetime.fromisoformat(job["received_time"]["timestamp"].replace("Z", "+00:00"))
+            closed = datetime.fromisoformat(job["closed_time"]["timestamp"].replace("Z", "+00:00"))
+            duration_hours = (closed - received).total_seconds() / 3600
+            
+            user_id = job["created_by"]
+            if user_id not in avg_time_by_user:
+                avg_time_by_user[user_id] = []
+            avg_time_by_user[user_id].append(duration_hours)
+        except:
+            continue
+    
+    # Build response
+    technicians = []
+    for user_id, user_info in user_map.items():
+        times = avg_time_by_user.get(user_id, [])
+        avg_hours = sum(times) / len(times) if times else 0
+        
+        technicians.append({
+            "id": user_id,
+            "name": user_info["name"],
+            "role": user_info["role"],
+            "jobs_created": jobs_created_map.get(user_id, 0),
+            "jobs_closed": jobs_closed_map.get(user_id, 0),
+            "jobs_by_status": status_by_user.get(user_id, {}),
+            "avg_repair_time_hours": round(avg_hours, 1),
+            "avg_repair_time_display": f"{int(avg_hours // 24)}d {int(avg_hours % 24)}h" if avg_hours > 0 else "N/A"
+        })
+    
+    # Sort by jobs closed
+    technicians.sort(key=lambda x: x["jobs_closed"], reverse=True)
+    
+    return {"technicians": technicians}
+
+@api_router.get("/metrics/overview")
+async def get_metrics_overview(user: dict = Depends(get_current_user)):
+    """Get overall shop performance metrics"""
+    tenant_id = user["tenant_id"]
+    
+    # Date ranges
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = today_start - timedelta(days=today_start.weekday())
+    month_start = today_start.replace(day=1)
+    
+    # Jobs this week
+    jobs_this_week = await db.jobs.count_documents({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": week_start.isoformat()}
+    })
+    
+    # Jobs this month
+    jobs_this_month = await db.jobs.count_documents({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": month_start.isoformat()}
+    })
+    
+    # Completed this week
+    completed_this_week = await db.jobs.count_documents({
+        "tenant_id": tenant_id,
+        "status": "closed",
+        "updated_at": {"$gte": week_start.isoformat()}
+    })
+    
+    # Average jobs per day this month
+    days_in_month = (now - month_start).days + 1
+    avg_jobs_per_day = jobs_this_month / days_in_month if days_in_month > 0 else 0
+    
+    # Revenue this month (from closed jobs)
+    pipeline = [
+        {"$match": {
+            "tenant_id": tenant_id,
+            "status": "closed",
+            "updated_at": {"$gte": month_start.isoformat()}
+        }},
+        {"$group": {
+            "_id": None,
+            "total_revenue": {"$sum": "$repair.final_amount"}
+        }}
+    ]
+    revenue_result = await db.jobs.aggregate(pipeline).to_list(1)
+    monthly_revenue = revenue_result[0]["total_revenue"] if revenue_result else 0
+    
+    # Jobs by status
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+    ]
+    status_counts = await db.jobs.aggregate(pipeline).to_list(10)
+    jobs_by_status = {item["_id"]: item["count"] for item in status_counts}
+    
+    # Jobs trend (last 7 days)
+    trend = []
+    for i in range(6, -1, -1):
+        day = today_start - timedelta(days=i)
+        day_end = day + timedelta(days=1)
+        count = await db.jobs.count_documents({
+            "tenant_id": tenant_id,
+            "created_at": {
+                "$gte": day.isoformat(),
+                "$lt": day_end.isoformat()
+            }
+        })
+        trend.append({
+            "date": day.strftime("%Y-%m-%d"),
+            "day": day.strftime("%a"),
+            "jobs": count
+        })
+    
+    return {
+        "jobs_this_week": jobs_this_week,
+        "jobs_this_month": jobs_this_month,
+        "completed_this_week": completed_this_week,
+        "avg_jobs_per_day": round(avg_jobs_per_day, 1),
+        "monthly_revenue": monthly_revenue,
+        "jobs_by_status": jobs_by_status,
+        "trend": trend
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
