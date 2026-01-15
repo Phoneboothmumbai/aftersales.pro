@@ -18,6 +18,7 @@ import Branches from "./pages/Branches";
 import Settings from "./pages/Settings";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import PublicTrack from "./pages/PublicTrack";
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
