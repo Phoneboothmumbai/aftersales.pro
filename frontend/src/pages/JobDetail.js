@@ -568,6 +568,49 @@ export default function JobDetail() {
               </Card>
             )}
 
+            {/* Customer Tracking Link */}
+            {trackingLink && (
+              <Card className="card-shadow border-blue-500/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <QrCode className="w-5 h-5 text-blue-500" />
+                    Customer Tracking
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Share this link with the customer so they can track their repair status.
+                  </p>
+                  <div className="bg-muted rounded-lg p-3 font-mono text-xs break-all">
+                    <p className="text-muted-foreground mb-1">Token:</p>
+                    <p className="font-bold text-lg">{trackingLink.tracking_token}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={copyTrackingLink}
+                      data-testid="copy-tracking-link-btn"
+                    >
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copy Link
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => window.open(trackingLink.tracking_path, "_blank")}
+                      data-testid="open-tracking-link-btn"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-1" />
+                      Preview
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Status Timeline */}
             <Card className="card-shadow">
               <CardHeader>
