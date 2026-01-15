@@ -1807,11 +1807,25 @@ async def get_tenant_details(tenant_id: str, admin: dict = Depends(get_super_adm
         {"_id": 0, "job_number": 1, "customer": 1, "status": 1, "created_at": 1}
     ).sort("created_at", -1).limit(10).to_list(10)
     
+    # Get payment history
+    payments = await db.payments.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    # Get action logs
+    action_logs = await db.admin_action_logs.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
     return {
         "tenant": {
             **tenant,
             "is_active": tenant.get("is_active", True),
-            "subscription_status": tenant.get("subscription_status", "trial")
+            "subscription_status": tenant.get("subscription_status", "trial"),
+            "subscription_plan": tenant.get("subscription_plan", "free"),
+            "subscription_ends_at": tenant.get("subscription_ends_at")
         },
         "users": users,
         "branches": branches,
@@ -1819,7 +1833,9 @@ async def get_tenant_details(tenant_id: str, admin: dict = Depends(get_super_adm
             "total_jobs": total_jobs,
             "jobs_by_status": jobs_by_status
         },
-        "recent_jobs": recent_jobs
+        "recent_jobs": recent_jobs,
+        "payments": payments,
+        "action_logs": action_logs
     }
 
 @api_router.put("/super-admin/tenants/{tenant_id}")
