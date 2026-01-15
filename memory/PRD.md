@@ -44,15 +44,17 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Device Password field** - Store device PIN/password for diagnosis
 - ✅ **Device Notes field** - Additional notes about the device
 
-### Super Admin Portal (NEW - January 15, 2026)
-- ✅ **Subscription Plans** - 4 plans: Free (₹0), Basic (₹499/mo), Pro (₹999/mo), Enterprise (₹2499/mo)
-- ✅ **Manual Plan Assignment** - Super Admin can assign any plan with custom duration
+### Super Admin Portal (January 15, 2026)
+- ✅ **Dynamic Subscription Plans** - Plans stored in MongoDB, fully CRUD-able
+- ✅ **Plan Limits**: max_users, max_branches, max_jobs_per_month, max_inventory_items, max_photos_per_job, max_storage_mb
+- ✅ **18 Feature Toggles**: job_management, basic_reports, pdf_job_sheet, qr_tracking, whatsapp_messages, photo_upload, inventory_management, advanced_analytics, technician_metrics, customer_management, email_notifications, sms_notifications, custom_branding, api_access, priority_support, dedicated_account_manager, data_export, multi_branch
+- ✅ **Create/Edit/Delete Plans** - Super Admin can manage all plan parameters
+- ✅ **Manual Plan Assignment** - Assign any plan with custom duration
 - ✅ **Extend Validity** - Manually extend trial or subscription by days
 - ✅ **Record Offline Payments** - Cash, UPI, Bank Transfer, Cheque, Card
 - ✅ **Payment History** - Track all payments per tenant
 - ✅ **Admin Action Logs** - Audit trail of all plan changes and extensions
-- ✅ **Plan Features** - Each plan has max users, max jobs/month limits
-- ✅ **Tabbed Tenant Modal** - Overview, Subscription, Payments, History tabs
+- ✅ **Plans Tab UI** - Dedicated tab with plan cards showing all details
 
 ## Navigation Structure
 - Dashboard - Overview stats
