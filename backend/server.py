@@ -644,6 +644,17 @@ async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
 
 @api_router.post("/branches", response_model=BranchResponse)
 async def create_branch(data: BranchCreate, admin: dict = Depends(require_admin)):
+    # Check plan limit
+    limit_check = await check_branch_limit(admin["tenant_id"])
+    if not limit_check["allowed"]:
+        raise HTTPException(status_code=403, detail=limit_check["message"])
+    
+    # Check feature access
+    feature_check = await check_feature_access(admin["tenant_id"], "multi_branch")
+    current_branches = await db.branches.count_documents({"tenant_id": admin["tenant_id"]})
+    if current_branches >= 1 and not feature_check["allowed"]:
+        raise HTTPException(status_code=403, detail="Multi-branch feature is not available in your current plan. Please upgrade to add more branches.")
+    
     now = datetime.now(timezone.utc).isoformat()
     branch_id = str(uuid.uuid4())
     
