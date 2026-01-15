@@ -1680,10 +1680,10 @@ async def get_technician_metrics(user: dict = Depends(get_current_user)):
     status_by_user = {}
     for item in jobs_by_status:
         user_id = item["_id"]["user"]
-        status = item["_id"]["status"]
+        job_status = item["_id"]["status"]
         if user_id not in status_by_user:
             status_by_user[user_id] = {}
-        status_by_user[user_id][status] = item["count"]
+        status_by_user[user_id][job_status] = item["count"]
     
     # Average repair time (received to closed)
     pipeline = [
