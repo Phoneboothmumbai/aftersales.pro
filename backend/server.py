@@ -587,6 +587,11 @@ async def get_me(user: dict = Depends(get_current_user)):
 
 @api_router.post("/users", response_model=UserResponse)
 async def create_user(data: UserCreate, admin: dict = Depends(require_admin)):
+    # Check plan limit
+    limit_check = await check_user_limit(admin["tenant_id"])
+    if not limit_check["allowed"]:
+        raise HTTPException(status_code=403, detail=limit_check["message"])
+    
     existing = await db.users.find_one({
         "email": data.email.lower(),
         "tenant_id": admin["tenant_id"]
