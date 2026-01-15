@@ -596,6 +596,137 @@ async def list_jobs(
     jobs = await db.jobs.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     return [JobResponse(**j) for j in jobs]
 
+# ==================== UNIVERSAL SEARCH ====================
+
+@api_router.get("/search")
+async def universal_search(
+    q: str,
+    limit: int = 20,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Universal search across jobs - searches:
+    - Job number
+    - Customer name, mobile, email
+    - Device brand, model, serial/IMEI
+    - Problem description
+    """
+    tenant_id = user["tenant_id"]
+    
+    if not q or len(q) < 2:
+        return {"results": [], "total": 0}
+    
+    # Build comprehensive search query
+    search_regex = {"$regex": q, "$options": "i"}
+    
+    query = {
+        "tenant_id": tenant_id,
+        "$or": [
+            {"job_number": search_regex},
+            {"customer.name": search_regex},
+            {"customer.mobile": search_regex},
+            {"customer.email": search_regex},
+            {"device.brand": search_regex},
+            {"device.model": search_regex},
+            {"device.serial_imei": search_regex},
+            {"problem_description": search_regex},
+            {"technician_observation": search_regex},
+            {"device.notes": search_regex},
+        ]
+    }
+    
+    # Get matching jobs
+    jobs = await db.jobs.find(
+        query,
+        {
+            "_id": 0,
+            "id": 1,
+            "job_number": 1,
+            "customer": 1,
+            "device": 1,
+            "status": 1,
+            "problem_description": 1,
+            "created_at": 1
+        }
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    # Format results for easy display
+    results = []
+    for job in jobs:
+        results.append({
+            "id": job["id"],
+            "job_number": job["job_number"],
+            "customer_name": job["customer"]["name"],
+            "customer_mobile": job["customer"]["mobile"],
+            "device": f"{job['device']['brand']} {job['device']['model']}",
+            "device_serial": job["device"]["serial_imei"],
+            "status": job["status"],
+            "problem": job["problem_description"][:100] + "..." if len(job["problem_description"]) > 100 else job["problem_description"],
+            "created_at": job["created_at"],
+            "type": "job"
+        })
+    
+    # Also search customers (unique by mobile)
+    customer_pipeline = [
+        {"$match": {
+            "tenant_id": tenant_id,
+            "$or": [
+                {"customer.name": search_regex},
+                {"customer.mobile": search_regex},
+                {"customer.email": search_regex},
+            ]
+        }},
+        {"$group": {
+            "_id": "$customer.mobile",
+            "name": {"$first": "$customer.name"},
+            "mobile": {"$first": "$customer.mobile"},
+            "email": {"$first": "$customer.email"},
+            "job_count": {"$sum": 1}
+        }},
+        {"$limit": 5}
+    ]
+    
+    customers = await db.jobs.aggregate(customer_pipeline).to_list(5)
+    
+    for cust in customers:
+        results.append({
+            "id": cust["mobile"],
+            "customer_name": cust["name"],
+            "customer_mobile": cust["mobile"],
+            "customer_email": cust.get("email"),
+            "job_count": cust["job_count"],
+            "type": "customer"
+        })
+    
+    # Also search inventory
+    inventory_items = await db.inventory.find(
+        {
+            "tenant_id": tenant_id,
+            "$or": [
+                {"name": search_regex},
+                {"sku": search_regex},
+                {"description": search_regex},
+            ]
+        },
+        {"_id": 0, "id": 1, "name": 1, "sku": 1, "quantity": 1, "category": 1}
+    ).limit(5).to_list(5)
+    
+    for item in inventory_items:
+        results.append({
+            "id": item["id"],
+            "name": item["name"],
+            "sku": item["sku"],
+            "quantity": item["quantity"],
+            "category": item.get("category"),
+            "type": "inventory"
+        })
+    
+    return {
+        "results": results,
+        "total": len(results),
+        "query": q
+    }
+
 @api_router.get("/jobs/stats")
 async def get_job_stats(user: dict = Depends(get_current_user)):
     tenant_id = user["tenant_id"]
