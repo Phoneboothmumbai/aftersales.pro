@@ -56,6 +56,14 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Admin Action Logs** - Audit trail of all plan changes and extensions
 - ✅ **Plans Tab UI** - Dedicated tab with plan cards showing all details
 
+### Plan Limit Enforcement (January 15, 2026)
+- ✅ **User Limit Check** - Block adding users beyond plan limit
+- ✅ **Branch Limit Check** - Block adding branches beyond plan limit (+ multi_branch feature check)
+- ✅ **Job Limit Check** - Block creating jobs beyond monthly limit
+- ✅ **Inventory Limit Check** - Block adding inventory items beyond limit (+ inventory_management feature check)
+- ✅ **Photo Limit Check** - Block uploading photos beyond per-job limit (+ photo_upload feature check)
+- ✅ **Plan Usage API** - GET /api/tenants/plan-usage returns current usage vs limits
+
 ## Navigation Structure
 - Dashboard - Overview stats
 - Jobs - All repair jobs with date range filter
