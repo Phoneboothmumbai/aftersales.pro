@@ -131,7 +131,10 @@ export default function Jobs() {
     { value: "received", label: "Received" },
     { value: "diagnosed", label: "Diagnosed" },
     { value: "waiting_for_approval", label: "Waiting for Approval" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "pending_parts", label: "Pending Parts" },
     { value: "repaired", label: "Repaired" },
+    { value: "delivered", label: "Delivered" },
     { value: "closed", label: "Closed" },
   ];
 
