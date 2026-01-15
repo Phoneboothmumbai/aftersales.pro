@@ -162,6 +162,10 @@ function AppRoutes() {
         }
       />
 
+      {/* Super Admin Routes */}
+      <Route path="/super-admin" element={<SuperAdminLogin />} />
+      <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
