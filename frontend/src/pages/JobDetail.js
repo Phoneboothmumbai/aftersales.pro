@@ -85,6 +85,7 @@ export default function JobDetail() {
 
   useEffect(() => {
     fetchJob();
+    fetchTrackingLink();
   }, [id]);
 
   const fetchJob = async () => {
@@ -114,6 +115,27 @@ export default function JobDetail() {
       navigate("/jobs");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTrackingLink = async () => {
+    try {
+      const response = await axios.get(`${API}/jobs/${id}/tracking-link`);
+      setTrackingLink(response.data);
+    } catch (error) {
+      console.error("Failed to fetch tracking link");
+    }
+  };
+
+  const handlePhotoChange = (newPhotos) => {
+    setJob((prev) => ({ ...prev, photos: newPhotos }));
+  };
+
+  const copyTrackingLink = () => {
+    if (trackingLink) {
+      const fullUrl = `${window.location.origin}${trackingLink.tracking_path}`;
+      navigator.clipboard.writeText(fullUrl);
+      toast.success("Tracking link copied to clipboard!");
     }
   };
 
