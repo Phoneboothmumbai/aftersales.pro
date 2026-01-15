@@ -515,6 +515,8 @@ async def list_jobs(
     status_filter: Optional[str] = None,
     branch_id: Optional[str] = None,
     search: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
     limit: int = 100,
     skip: int = 0,
     user: dict = Depends(get_current_user)
@@ -532,6 +534,16 @@ async def list_jobs(
             {"customer.mobile": {"$regex": search, "$options": "i"}},
             {"device.serial_imei": {"$regex": search, "$options": "i"}}
         ]
+    
+    # Date range filter
+    if date_from or date_to:
+        date_query = {}
+        if date_from:
+            date_query["$gte"] = date_from
+        if date_to:
+            # Add time to include the entire end day
+            date_query["$lte"] = date_to + "T23:59:59"
+        query["created_at"] = date_query
     
     jobs = await db.jobs.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     return [JobResponse(**j) for j in jobs]
