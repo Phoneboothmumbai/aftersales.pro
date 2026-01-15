@@ -2926,6 +2926,16 @@ async def get_customer_stats(user: dict = Depends(get_current_user)):
 
 @api_router.post("/inventory", response_model=InventoryItemResponse)
 async def create_inventory_item(data: InventoryItemCreate, user: dict = Depends(require_admin)):
+    # Check plan limit
+    limit_check = await check_inventory_limit(user["tenant_id"])
+    if not limit_check["allowed"]:
+        raise HTTPException(status_code=403, detail=limit_check["message"])
+    
+    # Check feature access
+    feature_check = await check_feature_access(user["tenant_id"], "inventory_management")
+    if not feature_check["allowed"]:
+        raise HTTPException(status_code=403, detail=feature_check["message"])
+    
     now = datetime.now(timezone.utc).isoformat()
     item_id = str(uuid.uuid4())
     
