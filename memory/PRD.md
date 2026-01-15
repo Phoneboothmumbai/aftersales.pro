@@ -103,7 +103,12 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `POST /api/super-admin/login` - Super admin login
 - `GET /api/super-admin/me` - Get current super admin
 - `GET /api/super-admin/stats` - Platform-wide statistics
-- `GET /api/super-admin/plans` - Get subscription plans
+- `GET /api/super-admin/plans` - Get all subscription plans
+- `GET /api/super-admin/plans/{id}` - Get single plan with tenant count
+- `POST /api/super-admin/plans` - Create new subscription plan
+- `PUT /api/super-admin/plans/{id}` - Update subscription plan
+- `DELETE /api/super-admin/plans/{id}` - Delete subscription plan (soft delete)
+- `GET /api/super-admin/feature-options` - Get all feature descriptions
 - `GET /api/super-admin/tenants` - List all tenants with plan info
 - `GET /api/super-admin/tenants/{id}` - Tenant details with payments/logs
 - `PUT /api/super-admin/tenants/{id}` - Update tenant status
