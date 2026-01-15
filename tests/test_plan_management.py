@@ -223,7 +223,10 @@ class TestCreatePlan:
             headers=auth_headers,
             json={
                 "id": "free",  # Already exists
-                "name": "Duplicate Free"
+                "name": "Duplicate Free",
+                "price": 0,
+                "billing_cycle": "forever",
+                "duration_days": 0
             }
         )
         assert response.status_code == 400, f"Expected 400, got {response.status_code}"
