@@ -38,11 +38,21 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ Customer → Devices → Job History view
 - ✅ Repeat customer identification
 
-### Search & UX (NEW)
+### Search & UX
 - ✅ **Universal Search Bar** - Searches jobs, customers, inventory across all fields
 - ✅ **Keyboard shortcut** - Cmd/Ctrl+K opens search
 - ✅ **Device Password field** - Store device PIN/password for diagnosis
 - ✅ **Device Notes field** - Additional notes about the device
+
+### Super Admin Portal (NEW - January 15, 2026)
+- ✅ **Subscription Plans** - 4 plans: Free (₹0), Basic (₹499/mo), Pro (₹999/mo), Enterprise (₹2499/mo)
+- ✅ **Manual Plan Assignment** - Super Admin can assign any plan with custom duration
+- ✅ **Extend Validity** - Manually extend trial or subscription by days
+- ✅ **Record Offline Payments** - Cash, UPI, Bank Transfer, Cheque, Card
+- ✅ **Payment History** - Track all payments per tenant
+- ✅ **Admin Action Logs** - Audit trail of all plan changes and extensions
+- ✅ **Plan Features** - Each plan has max users, max jobs/month limits
+- ✅ **Tabbed Tenant Modal** - Overview, Subscription, Payments, History tabs
 
 ## Navigation Structure
 - Dashboard - Overview stats
