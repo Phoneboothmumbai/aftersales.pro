@@ -371,7 +371,8 @@ export default function Customers() {
                                         <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                       </div>
                                     </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               )}
                             </div>
