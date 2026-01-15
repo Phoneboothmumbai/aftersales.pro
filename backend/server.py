@@ -512,7 +512,7 @@ async def create_job(data: JobCreate, user: dict = Depends(get_current_user)):
 
 @api_router.get("/jobs", response_model=List[JobResponse])
 async def list_jobs(
-    status: Optional[str] = None,
+    status_filter: Optional[str] = None,
     branch_id: Optional[str] = None,
     search: Optional[str] = None,
     limit: int = 100,
@@ -521,8 +521,8 @@ async def list_jobs(
 ):
     query = {"tenant_id": user["tenant_id"]}
     
-    if status:
-        query["status"] = status
+    if status_filter:
+        query["status"] = status_filter
     if branch_id:
         query["branch_id"] = branch_id
     if search:
