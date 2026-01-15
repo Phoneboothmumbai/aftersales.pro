@@ -127,6 +127,8 @@ class DeviceInfo(BaseModel):
     serial_imei: str
     condition: str  # Fresh, Active, Physical Damage, Dead, Liquid
     condition_notes: Optional[str] = None
+    notes: Optional[str] = None  # Additional notes about the device
+    password: Optional[str] = None  # Device password/PIN
 
 class AccessoryItem(BaseModel):
     name: str
