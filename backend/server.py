@@ -177,10 +177,12 @@ class JobResponse(BaseModel):
     diagnosis: Optional[dict] = None
     repair: Optional[dict] = None
     closure: Optional[dict] = None
+    photos: List[dict] = []  # List of photo objects {id, url, type, uploaded_at}
     status_history: List[dict]
     created_by: str
     created_at: str
     updated_at: str
+    tracking_token: Optional[str] = None  # For public tracking
 
 class SettingsUpdate(BaseModel):
     company_name: Optional[str] = None
