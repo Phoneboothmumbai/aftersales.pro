@@ -167,6 +167,10 @@ function AppRoutes() {
       <Route path="/super-admin" element={<SuperAdminLogin />} />
       <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
 
+      {/* Public Tracking Routes */}
+      <Route path="/track" element={<PublicTrack />} />
+      <Route path="/track/:jobNumber/:trackingToken" element={<PublicTrack />} />
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
