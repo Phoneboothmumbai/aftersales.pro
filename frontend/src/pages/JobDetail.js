@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Layout from "../components/Layout";
+import PhotoUpload from "../components/PhotoUpload";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -35,6 +36,10 @@ import {
   Loader2,
   Download,
   ExternalLink,
+  Camera,
+  QrCode,
+  Copy,
+  Link as LinkIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateTime, formatCurrency, getStatusColor, getStatusLabel, PAYMENT_MODES } from "../lib/utils";
@@ -47,6 +52,7 @@ export default function JobDetail() {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [trackingLink, setTrackingLink] = useState(null);
 
   // Modals
   const [diagnosisModal, setDiagnosisModal] = useState(false);
