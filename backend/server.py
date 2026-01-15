@@ -1394,6 +1394,16 @@ async def upload_job_photo(
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
+    # Check plan limit for photos
+    limit_check = await check_photo_limit(user["tenant_id"], job_id)
+    if not limit_check["allowed"]:
+        raise HTTPException(status_code=403, detail=limit_check["message"])
+    
+    # Check feature access
+    feature_check = await check_feature_access(user["tenant_id"], "photo_upload")
+    if not feature_check["allowed"]:
+        raise HTTPException(status_code=403, detail=feature_check["message"])
+    
     # Validate file extension
     file_ext = Path(file.filename).suffix.lower()
     if file_ext not in ALLOWED_EXTENSIONS:
