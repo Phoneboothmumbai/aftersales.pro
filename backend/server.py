@@ -1258,7 +1258,7 @@ async def get_all_tenants(
         query["is_active"] = False
     elif status_filter == "trial":
         query["subscription_status"] = {"$in": ["trial", None]}
-    elif status == "paid":
+    elif status_filter == "paid":
         query["subscription_status"] = "paid"
     
     tenants = await db.tenants.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
