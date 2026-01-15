@@ -41,7 +41,10 @@ export function getStatusColor(status) {
     received: "status-received",
     diagnosed: "status-diagnosed",
     waiting_for_approval: "status-waiting_for_approval",
+    in_progress: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+    pending_parts: "bg-orange-500/10 text-orange-600 border-orange-500/20",
     repaired: "status-repaired",
+    delivered: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
     closed: "status-closed",
   };
   return colors[status] || "bg-gray-100 text-gray-700";
@@ -52,7 +55,10 @@ export function getStatusLabel(status) {
     received: "Received",
     diagnosed: "Diagnosed",
     waiting_for_approval: "Waiting for Approval",
+    in_progress: "In Progress",
+    pending_parts: "Pending Parts",
     repaired: "Repaired",
+    delivered: "Delivered",
     closed: "Closed",
   };
   return labels[status] || status;
