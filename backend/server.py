@@ -913,6 +913,266 @@ Status: {job['status'].replace('_', ' ').title()}
         "phone": phone
     }
 
+# ==================== SUPER ADMIN MODELS ====================
+
+class SuperAdminLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class SuperAdminResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    name: str
+    email: str
+    role: str
+    created_at: str
+
+class SuperAdminLoginResponse(BaseModel):
+    token: str
+    user: SuperAdminResponse
+
+class TenantAdminResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    company_name: str
+    subdomain: str
+    settings: dict
+    trial_ends_at: str
+    is_active: bool = True
+    subscription_status: str = "trial"
+    created_at: str
+    admin_email: Optional[str] = None
+    total_jobs: int = 0
+    total_users: int = 0
+
+class TenantUpdateByAdmin(BaseModel):
+    is_active: Optional[bool] = None
+    subscription_status: Optional[str] = None
+    trial_ends_at: Optional[str] = None
+
+# ==================== SUPER ADMIN HELPERS ====================
+
+def create_super_admin_token(user_id: str, role: str) -> str:
+    payload = {
+        "user_id": user_id,
+        "role": role,
+        "is_super_admin": True,
+        "exp": datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRATION_HOURS)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+async def get_super_admin(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if not payload.get("is_super_admin"):
+            raise HTTPException(status_code=403, detail="Super admin access required")
+        user = await db.super_admins.find_one({"id": payload["user_id"]}, {"_id": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="Super admin not found")
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+# ==================== SUPER ADMIN ROUTES ====================
+
+@api_router.post("/super-admin/login", response_model=SuperAdminLoginResponse)
+async def super_admin_login(data: SuperAdminLogin):
+    user = await db.super_admins.find_one({"email": data.email.lower()})
+    
+    if not user or not verify_password(data.password, user["password"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    token = create_super_admin_token(user["id"], user["role"])
+    user_response = {k: v for k, v in user.items() if k not in ["password", "_id"]}
+    
+    return SuperAdminLoginResponse(token=token, user=SuperAdminResponse(**user_response))
+
+@api_router.get("/super-admin/me", response_model=SuperAdminResponse)
+async def get_super_admin_me(admin: dict = Depends(get_super_admin)):
+    return SuperAdminResponse(**admin)
+
+@api_router.get("/super-admin/stats")
+async def get_platform_stats(admin: dict = Depends(get_super_admin)):
+    total_tenants = await db.tenants.count_documents({})
+    active_tenants = await db.tenants.count_documents({"is_active": {"$ne": False}})
+    total_users = await db.users.count_documents({})
+    total_jobs = await db.jobs.count_documents({})
+    
+    # Jobs by status
+    pipeline = [
+        {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+    ]
+    status_counts = await db.jobs.aggregate(pipeline).to_list(10)
+    jobs_by_status = {item["_id"]: item["count"] for item in status_counts}
+    
+    # Recent signups (last 7 days)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    recent_signups = await db.tenants.count_documents({"created_at": {"$gte": week_ago}})
+    
+    # Trial vs paid
+    trial_tenants = await db.tenants.count_documents({"subscription_status": {"$in": ["trial", None]}})
+    paid_tenants = await db.tenants.count_documents({"subscription_status": "paid"})
+    
+    return {
+        "total_tenants": total_tenants,
+        "active_tenants": active_tenants,
+        "inactive_tenants": total_tenants - active_tenants,
+        "trial_tenants": trial_tenants,
+        "paid_tenants": paid_tenants,
+        "total_users": total_users,
+        "total_jobs": total_jobs,
+        "jobs_by_status": jobs_by_status,
+        "recent_signups": recent_signups
+    }
+
+@api_router.get("/super-admin/tenants", response_model=List[TenantAdminResponse])
+async def get_all_tenants(
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    admin: dict = Depends(get_super_admin)
+):
+    query = {}
+    
+    if search:
+        query["$or"] = [
+            {"company_name": {"$regex": search, "$options": "i"}},
+            {"subdomain": {"$regex": search, "$options": "i"}}
+        ]
+    
+    if status == "active":
+        query["is_active"] = {"$ne": False}
+    elif status == "inactive":
+        query["is_active"] = False
+    elif status == "trial":
+        query["subscription_status"] = {"$in": ["trial", None]}
+    elif status == "paid":
+        query["subscription_status"] = "paid"
+    
+    tenants = await db.tenants.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Enrich with additional data
+    result = []
+    for tenant in tenants:
+        # Get admin email
+        admin_user = await db.users.find_one(
+            {"tenant_id": tenant["id"], "role": "admin"},
+            {"email": 1, "_id": 0}
+        )
+        
+        # Get counts
+        total_jobs = await db.jobs.count_documents({"tenant_id": tenant["id"]})
+        total_users = await db.users.count_documents({"tenant_id": tenant["id"]})
+        
+        tenant_data = {
+            **tenant,
+            "is_active": tenant.get("is_active", True),
+            "subscription_status": tenant.get("subscription_status", "trial"),
+            "admin_email": admin_user["email"] if admin_user else None,
+            "total_jobs": total_jobs,
+            "total_users": total_users
+        }
+        result.append(TenantAdminResponse(**tenant_data))
+    
+    return result
+
+@api_router.get("/super-admin/tenants/{tenant_id}")
+async def get_tenant_details(tenant_id: str, admin: dict = Depends(get_super_admin)):
+    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    # Get all users
+    users = await db.users.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0, "password": 0}
+    ).to_list(100)
+    
+    # Get all branches
+    branches = await db.branches.find({"tenant_id": tenant_id}, {"_id": 0}).to_list(100)
+    
+    # Get job stats
+    total_jobs = await db.jobs.count_documents({"tenant_id": tenant_id})
+    
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+    ]
+    status_counts = await db.jobs.aggregate(pipeline).to_list(10)
+    jobs_by_status = {item["_id"]: item["count"] for item in status_counts}
+    
+    # Recent jobs
+    recent_jobs = await db.jobs.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0, "job_number": 1, "customer": 1, "status": 1, "created_at": 1}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    return {
+        "tenant": {
+            **tenant,
+            "is_active": tenant.get("is_active", True),
+            "subscription_status": tenant.get("subscription_status", "trial")
+        },
+        "users": users,
+        "branches": branches,
+        "stats": {
+            "total_jobs": total_jobs,
+            "jobs_by_status": jobs_by_status
+        },
+        "recent_jobs": recent_jobs
+    }
+
+@api_router.put("/super-admin/tenants/{tenant_id}")
+async def update_tenant_by_admin(
+    tenant_id: str,
+    data: TenantUpdateByAdmin,
+    admin: dict = Depends(get_super_admin)
+):
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.tenants.update_one({"id": tenant_id}, {"$set": update_data})
+    
+    updated_tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    return {
+        **updated_tenant,
+        "is_active": updated_tenant.get("is_active", True),
+        "subscription_status": updated_tenant.get("subscription_status", "trial")
+    }
+
+@api_router.post("/super-admin/setup")
+async def setup_super_admin():
+    """One-time setup to create the first super admin"""
+    existing = await db.super_admins.find_one({})
+    if existing:
+        raise HTTPException(status_code=400, detail="Super admin already exists")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    admin_id = str(uuid.uuid4())
+    
+    super_admin = {
+        "id": admin_id,
+        "name": "Super Admin",
+        "email": "superadmin@aftersales.pro",
+        "password": hash_password("SuperAdmin@123"),
+        "role": "super_admin",
+        "created_at": now
+    }
+    
+    await db.super_admins.insert_one(super_admin)
+    
+    return {
+        "message": "Super admin created successfully",
+        "email": "superadmin@aftersales.pro",
+        "password": "SuperAdmin@123",
+        "note": "Please change the password after first login"
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
