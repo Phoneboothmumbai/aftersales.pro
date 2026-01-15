@@ -307,6 +307,37 @@ export default function JobCreate() {
                   />
                 </div>
               </div>
+
+              {/* Notes and Password */}
+              <div className="grid sm:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="device-password">Device Password / PIN</Label>
+                  <Input
+                    id="device-password"
+                    name="password"
+                    value={formData.device.password}
+                    onChange={handleDeviceChange}
+                    placeholder="Enter device password or PIN"
+                    type="text"
+                    data-testid="device-password-input"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Required for diagnosis. Stored securely.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="device-notes">Additional Notes</Label>
+                  <Textarea
+                    id="device-notes"
+                    name="notes"
+                    value={formData.device.notes}
+                    onChange={handleDeviceChange}
+                    placeholder="Any additional notes about the device..."
+                    rows={2}
+                    data-testid="device-notes-input"
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
