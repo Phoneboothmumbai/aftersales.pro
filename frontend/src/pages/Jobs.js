@@ -14,6 +14,12 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../components/ui/popover";
+import { Calendar } from "../components/ui/calendar";
+import {
   Plus,
   Search,
   Filter,
@@ -22,8 +28,11 @@ import {
   Laptop,
   Tablet,
   HardDrive,
+  CalendarIcon,
+  X,
 } from "lucide-react";
 import { formatDate, getStatusColor, getStatusLabel } from "../lib/utils";
+import { format } from "date-fns";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -43,6 +52,8 @@ export default function Jobs() {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [statusFilter, setStatusFilter] = useState(searchParams.get("status") || "all");
   const [branchFilter, setBranchFilter] = useState(searchParams.get("branch") || "all");
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
 
   useEffect(() => {
     fetchBranches();
@@ -50,7 +61,7 @@ export default function Jobs() {
 
   useEffect(() => {
     fetchJobs();
-  }, [statusFilter, branchFilter]);
+  }, [statusFilter, branchFilter, dateFrom, dateTo]);
 
   const fetchBranches = async () => {
     try {
@@ -65,9 +76,11 @@ export default function Jobs() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (statusFilter && statusFilter !== "all") params.append("status", statusFilter);
+      if (statusFilter && statusFilter !== "all") params.append("status_filter", statusFilter);
       if (branchFilter && branchFilter !== "all") params.append("branch_id", branchFilter);
       if (search) params.append("search", search);
+      if (dateFrom) params.append("date_from", format(dateFrom, "yyyy-MM-dd"));
+      if (dateTo) params.append("date_to", format(dateTo, "yyyy-MM-dd"));
 
       const response = await axios.get(`${API}/jobs?${params.toString()}`);
       setJobs(response.data);
@@ -105,6 +118,11 @@ export default function Jobs() {
       }
       return prev;
     });
+  };
+
+  const clearDateFilter = () => {
+    setDateFrom(null);
+    setDateTo(null);
   };
 
   const statusOptions = [
