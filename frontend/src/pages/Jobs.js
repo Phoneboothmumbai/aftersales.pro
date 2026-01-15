@@ -61,6 +61,7 @@ export default function Jobs() {
 
   useEffect(() => {
     fetchJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, branchFilter, dateFrom, dateTo]);
 
   const fetchBranches = async () => {
