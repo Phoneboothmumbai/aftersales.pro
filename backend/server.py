@@ -744,6 +744,22 @@ async def update_job_status(job_id: str, data: StatusUpdate, user: dict = Depend
 
 # ==================== PDF GENERATION ====================
 
+def generate_qr_code(data: str) -> BytesIO:
+    """Generate QR code as bytes"""
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+    return buffer
+
 @api_router.get("/jobs/{job_id}/pdf")
 async def generate_job_pdf(job_id: str, user: dict = Depends(get_current_user)):
     job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]}, {"_id": 0})
@@ -759,14 +775,30 @@ async def generate_job_pdf(job_id: str, user: dict = Depends(get_current_user)):
     title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=18, spaceAfter=10)
     heading_style = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=12, spaceBefore=15, spaceAfter=5)
     normal_style = styles['Normal']
+    small_style = ParagraphStyle('Small', parent=styles['Normal'], fontSize=8)
     
     elements = []
     
-    # Header
-    elements.append(Paragraph(tenant["company_name"], title_style))
-    elements.append(Paragraph(f"Job Sheet: {job['job_number']}", heading_style))
-    elements.append(Paragraph(f"Date: {job['created_at'][:10]}", normal_style))
-    elements.append(Spacer(1, 10*mm))
+    # Generate QR code for public tracking
+    tracking_token = job.get("tracking_token", "")
+    tracking_url = f"Track Status: {job['job_number']} | Token: {tracking_token}"
+    qr_buffer = generate_qr_code(tracking_url)
+    qr_image = Image(qr_buffer, width=25*mm, height=25*mm)
+    
+    # Header with QR code
+    header_data = [
+        [Paragraph(tenant["company_name"], title_style), qr_image],
+        [Paragraph(f"Job Sheet: {job['job_number']}", heading_style), ""],
+        [Paragraph(f"Date: {job['created_at'][:10]}", normal_style), Paragraph(f"Tracking: {tracking_token}", small_style)]
+    ]
+    header_table = Table(header_data, colWidths=[135*mm, 30*mm])
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('SPAN', (1, 0), (1, 1)),
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 5*mm))
     
     # Customer Info
     elements.append(Paragraph("Customer Information", heading_style))
@@ -851,6 +883,169 @@ async def generate_job_pdf(job_id: str, user: dict = Depends(get_current_user)):
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename=job-{job['job_number']}.pdf"}
     )
+
+# ==================== PHOTO UPLOAD ====================
+
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.heic'}
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+
+@api_router.post("/jobs/{job_id}/photos")
+async def upload_job_photo(
+    job_id: str,
+    photo_type: str = Form(default="before"),  # before, after, damage
+    file: UploadFile = File(...),
+    user: dict = Depends(get_current_user)
+):
+    """Upload a photo for a job (before/after repair, damage documentation)"""
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Validate file extension
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail=f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}")
+    
+    # Read and check file size
+    contents = await file.read()
+    if len(contents) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum 10MB allowed")
+    
+    # Create tenant-specific directory
+    tenant_dir = UPLOAD_DIR / user["tenant_id"]
+    tenant_dir.mkdir(exist_ok=True)
+    
+    # Generate unique filename
+    photo_id = str(uuid.uuid4())
+    filename = f"{job_id}_{photo_id}{file_ext}"
+    file_path = tenant_dir / filename
+    
+    # Save file
+    async with aiofiles.open(file_path, 'wb') as f:
+        await f.write(contents)
+    
+    # Create photo record
+    now = datetime.now(timezone.utc).isoformat()
+    photo = {
+        "id": photo_id,
+        "filename": filename,
+        "url": f"/uploads/{user['tenant_id']}/{filename}",
+        "type": photo_type,
+        "uploaded_by": user["id"],
+        "uploaded_at": now
+    }
+    
+    # Update job with photo
+    await db.jobs.update_one(
+        {"id": job_id},
+        {
+            "$push": {"photos": photo},
+            "$set": {"updated_at": now}
+        }
+    )
+    
+    return {"message": "Photo uploaded successfully", "photo": photo}
+
+@api_router.delete("/jobs/{job_id}/photos/{photo_id}")
+async def delete_job_photo(
+    job_id: str,
+    photo_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Delete a photo from a job"""
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Find the photo
+    photo = next((p for p in job.get("photos", []) if p["id"] == photo_id), None)
+    if not photo:
+        raise HTTPException(status_code=404, detail="Photo not found")
+    
+    # Delete file from disk
+    file_path = UPLOAD_DIR / user["tenant_id"] / photo["filename"]
+    if file_path.exists():
+        file_path.unlink()
+    
+    # Remove from database
+    now = datetime.now(timezone.utc).isoformat()
+    await db.jobs.update_one(
+        {"id": job_id},
+        {
+            "$pull": {"photos": {"id": photo_id}},
+            "$set": {"updated_at": now}
+        }
+    )
+    
+    return {"message": "Photo deleted successfully"}
+
+# ==================== PUBLIC TRACKING ====================
+
+class PublicJobStatus(BaseModel):
+    """Limited job info for public tracking"""
+    job_number: str
+    status: str
+    device_brand: str
+    device_model: str
+    created_at: str
+    updated_at: str
+    status_history: List[dict]
+    diagnosis_summary: Optional[str] = None
+    repair_summary: Optional[str] = None
+    company_name: str
+
+@api_router.get("/public/track/{job_number}/{tracking_token}", response_model=PublicJobStatus)
+async def public_track_job(job_number: str, tracking_token: str):
+    """Public endpoint for customers to track their job status (no auth required)"""
+    job = await db.jobs.find_one({
+        "job_number": job_number,
+        "tracking_token": tracking_token
+    }, {"_id": 0})
+    
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found. Please check your job number and tracking token.")
+    
+    # Get company name
+    tenant = await db.tenants.find_one({"id": job["tenant_id"]}, {"_id": 0})
+    company_name = tenant["company_name"] if tenant else "Unknown"
+    
+    # Sanitize status history (remove user_id)
+    sanitized_history = [
+        {
+            "status": entry["status"],
+            "timestamp": entry["timestamp"],
+            "notes": entry.get("notes", "")
+        }
+        for entry in job.get("status_history", [])
+    ]
+    
+    return PublicJobStatus(
+        job_number=job["job_number"],
+        status=job["status"],
+        device_brand=job["device"]["brand"],
+        device_model=job["device"]["model"],
+        created_at=job["created_at"],
+        updated_at=job["updated_at"],
+        status_history=sanitized_history,
+        diagnosis_summary=job["diagnosis"]["diagnosis"] if job.get("diagnosis") else None,
+        repair_summary=job["repair"]["work_done"] if job.get("repair") else None,
+        company_name=company_name
+    )
+
+@api_router.get("/jobs/{job_id}/tracking-link")
+async def get_tracking_link(job_id: str, user: dict = Depends(get_current_user)):
+    """Get the public tracking link for a job"""
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]}, {"_id": 0})
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    tracking_token = job.get("tracking_token", "")
+    
+    return {
+        "job_number": job["job_number"],
+        "tracking_token": tracking_token,
+        "tracking_path": f"/track/{job['job_number']}/{tracking_token}"
+    }
 
 # ==================== WHATSAPP MESSAGE ====================
 
