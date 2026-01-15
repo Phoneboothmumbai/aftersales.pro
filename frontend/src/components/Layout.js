@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { Button } from "./ui/button";
+import UniversalSearch from "./UniversalSearch";
 import {
   DropdownMenu,
   DropdownMenuContent,
