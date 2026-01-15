@@ -144,9 +144,8 @@ export default function Customers() {
     setDeviceHistory(null);
   };
 
-  const DeviceIcon = ({ type }) => {
-    const Icon = deviceIcons[type] || HardDrive;
-    return <Icon className="w-4 h-4" />;
+  const getDeviceIcon = (type) => {
+    return deviceIcons[type] || HardDrive;
   };
 
   return (
