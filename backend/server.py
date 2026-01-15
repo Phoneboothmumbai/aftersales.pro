@@ -1568,6 +1568,8 @@ class TenantAdminResponse(BaseModel):
     trial_ends_at: str
     is_active: bool = True
     subscription_status: str = "trial"
+    subscription_plan: str = "free"
+    subscription_ends_at: Optional[str] = None
     created_at: str
     admin_email: Optional[str] = None
     total_jobs: int = 0
@@ -1576,7 +1578,76 @@ class TenantAdminResponse(BaseModel):
 class TenantUpdateByAdmin(BaseModel):
     is_active: Optional[bool] = None
     subscription_status: Optional[str] = None
+    subscription_plan: Optional[str] = None
     trial_ends_at: Optional[str] = None
+    subscription_ends_at: Optional[str] = None
+
+# ==================== SUBSCRIPTION PLAN MODELS ====================
+
+SUBSCRIPTION_PLANS = {
+    "free": {
+        "name": "Free",
+        "price": 0,
+        "duration_days": 0,
+        "features": ["Up to 50 jobs/month", "1 user", "Basic reports"],
+        "max_jobs_per_month": 50,
+        "max_users": 1
+    },
+    "basic": {
+        "name": "Basic",
+        "price": 499,
+        "duration_days": 30,
+        "features": ["Unlimited jobs", "Up to 3 users", "Standard reports", "Email notifications"],
+        "max_jobs_per_month": -1,
+        "max_users": 3
+    },
+    "pro": {
+        "name": "Pro",
+        "price": 999,
+        "duration_days": 30,
+        "features": ["Unlimited jobs", "Up to 10 users", "Advanced analytics", "Priority support", "Inventory management"],
+        "max_jobs_per_month": -1,
+        "max_users": 10
+    },
+    "enterprise": {
+        "name": "Enterprise",
+        "price": 2499,
+        "duration_days": 30,
+        "features": ["Unlimited everything", "Unlimited users", "Custom branding", "API access", "Dedicated support"],
+        "max_jobs_per_month": -1,
+        "max_users": -1
+    }
+}
+
+class AssignPlanRequest(BaseModel):
+    plan: str  # free, basic, pro, enterprise
+    duration_months: int = 1
+    notes: Optional[str] = None
+
+class ExtendValidityRequest(BaseModel):
+    days: int
+    reason: Optional[str] = None
+
+class RecordPaymentRequest(BaseModel):
+    amount: float
+    payment_mode: str  # cash, bank_transfer, upi, cheque, card
+    reference_number: Optional[str] = None
+    plan: Optional[str] = None
+    duration_months: int = 1
+    notes: Optional[str] = None
+
+class PaymentResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    tenant_id: str
+    amount: float
+    payment_mode: str
+    reference_number: Optional[str] = None
+    plan: Optional[str] = None
+    duration_months: int = 1
+    notes: Optional[str] = None
+    recorded_by: str
+    created_at: str
 
 # ==================== SUPER ADMIN HELPERS ====================
 
