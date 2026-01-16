@@ -2560,6 +2560,14 @@ async def get_tenant_details(tenant_id: str, admin: dict = Depends(get_super_adm
     # Get job stats
     total_jobs = await db.jobs.count_documents({"tenant_id": tenant_id})
     
+    # Get this month's jobs count
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    this_month_jobs = await db.jobs.count_documents({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": month_start}
+    })
+    
     pipeline = [
         {"$match": {"tenant_id": tenant_id}},
         {"$group": {"_id": "$status", "count": {"$sum": 1}}}
@@ -2567,23 +2575,40 @@ async def get_tenant_details(tenant_id: str, admin: dict = Depends(get_super_adm
     status_counts = await db.jobs.aggregate(pipeline).to_list(10)
     jobs_by_status = {item["_id"]: item["count"] for item in status_counts}
     
+    # Get inventory count
+    total_inventory = await db.inventory.count_documents({"tenant_id": tenant_id})
+    
+    # Get total photos count
+    total_photos = await db.photos.count_documents({"tenant_id": tenant_id})
+    
+    # Get customers count
+    total_customers = await db.jobs.aggregate([
+        {"$match": {"tenant_id": tenant_id}},
+        {"$group": {"_id": "$customer.phone"}},
+        {"$count": "total"}
+    ]).to_list(1)
+    customers_count = total_customers[0]["total"] if total_customers else 0
+    
     # Recent jobs
     recent_jobs = await db.jobs.find(
         {"tenant_id": tenant_id},
         {"_id": 0, "job_number": 1, "customer": 1, "status": 1, "created_at": 1}
     ).sort("created_at", -1).limit(10).to_list(10)
     
-    # Get payment history
-    payments = await db.payments.find(
+    # Get payment history from tenant_payments collection
+    payments = await db.tenant_payments.find(
         {"tenant_id": tenant_id},
         {"_id": 0}
-    ).sort("created_at", -1).limit(10).to_list(10)
+    ).sort("created_at", -1).limit(20).to_list(20)
+    
+    # Calculate total revenue from this tenant
+    total_paid = sum(p.get("amount", 0) for p in payments)
     
     # Get action logs
     action_logs = await db.admin_action_logs.find(
         {"tenant_id": tenant_id},
         {"_id": 0}
-    ).sort("created_at", -1).limit(10).to_list(10)
+    ).sort("created_at", -1).limit(20).to_list(20)
     
     return {
         "tenant": {
@@ -2597,7 +2622,12 @@ async def get_tenant_details(tenant_id: str, admin: dict = Depends(get_super_adm
         "branches": branches,
         "stats": {
             "total_jobs": total_jobs,
-            "jobs_by_status": jobs_by_status
+            "this_month_jobs": this_month_jobs,
+            "jobs_by_status": jobs_by_status,
+            "total_inventory": total_inventory,
+            "total_photos": total_photos,
+            "total_customers": customers_count,
+            "total_paid": total_paid
         },
         "recent_jobs": recent_jobs,
         "payments": payments,
