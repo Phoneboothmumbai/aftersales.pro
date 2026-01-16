@@ -750,6 +750,14 @@ export default function SuperAdminDashboard() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <CardTitle className="text-white">All Shops</CardTitle>
                 <div className="flex gap-2 w-full sm:w-auto">
+                  <Button
+                    onClick={() => setShowCreateShop(true)}
+                    className="bg-green-600 hover:bg-green-700"
+                    data-testid="create-shop-btn"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Shop
+                  </Button>
                   <div className="relative flex-1 sm:flex-none">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                     <Input
