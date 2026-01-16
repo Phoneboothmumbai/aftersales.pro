@@ -67,6 +67,14 @@ import ReactMarkdown from "react-markdown";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Legal Pages Configuration
+const LEGAL_PAGES = [
+  { key: "privacy_policy", title: "Privacy Policy", icon: Shield, enabledKey: "privacy_enabled" },
+  { key: "terms_of_service", title: "Terms of Service", icon: Scale, enabledKey: "terms_enabled" },
+  { key: "refund_policy", title: "Refund Policy", icon: FileText, enabledKey: "refund_enabled" },
+  { key: "disclaimer", title: "Disclaimer", icon: AlertTriangle, enabledKey: "disclaimer_enabled" },
+];
+
 const PLAN_ICONS = {
   free: <Star className="w-4 h-4" />,
   starter: <Zap className="w-4 h-4" />,
