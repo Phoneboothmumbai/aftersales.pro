@@ -62,6 +62,10 @@ import {
   AlertTriangle,
   RotateCcw,
   ExternalLink,
+  TrendingUp,
+  BarChart3,
+  PieChart,
+  Store,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
