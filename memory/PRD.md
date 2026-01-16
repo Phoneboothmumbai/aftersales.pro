@@ -44,7 +44,7 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Device Password field** - Store device PIN/password for diagnosis
 - ✅ **Device Notes field** - Additional notes about the device
 
-### Super Admin Portal (January 15, 2026)
+### Super Admin Portal (January 15-16, 2026)
 - ✅ **Dynamic Subscription Plans** - Plans stored in MongoDB, fully CRUD-able
 - ✅ **Plan Limits**: max_users, max_branches, max_jobs_per_month, max_inventory_items, max_photos_per_job, max_storage_mb
 - ✅ **18 Feature Toggles**: job_management, basic_reports, pdf_job_sheet, qr_tracking, whatsapp_messages, photo_upload, inventory_management, advanced_analytics, technician_metrics, customer_management, email_notifications, sms_notifications, custom_branding, api_access, priority_support, dedicated_account_manager, data_export, multi_branch
@@ -55,6 +55,8 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Payment History** - Track all payments per tenant
 - ✅ **Admin Action Logs** - Audit trail of all plan changes and extensions
 - ✅ **Plans Tab UI** - Dedicated tab with plan cards showing all details
+- ✅ **Create Shop from Super Admin** - POST /api/super-admin/tenants (NEW)
+- ✅ **Analytics & Billing Tab** - Revenue charts, plan distribution, expiring subscriptions (NEW)
 
 ### Plan Limit Enforcement (January 15, 2026)
 - ✅ **User Limit Check** - Block adding users beyond plan limit
