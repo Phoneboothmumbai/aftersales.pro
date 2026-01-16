@@ -827,7 +827,9 @@ async def get_legal_page(page_type: str, subdomain: Optional[str] = None):
     if page_type not in valid_pages:
         raise HTTPException(status_code=404, detail="Page not found")
     
-    # If subdomain provided, try to get tenant-specific content
+    today = datetime.now(timezone.utc).strftime("%B %d, %Y")
+    
+    # If subdomain provided, try to get tenant-specific content first
     if subdomain:
         tenant = await db.tenants.find_one({"subdomain": subdomain.lower()}, {"_id": 0})
         if tenant:
@@ -846,9 +848,18 @@ async def get_legal_page(page_type: str, subdomain: Optional[str] = None):
                     "is_custom": True
                 }
     
+    # Try to get global platform settings
+    platform_settings = await db.platform_settings.find_one({"type": "legal_pages"}, {"_id": 0})
+    if platform_settings and platform_settings.get(page_type):
+        return {
+            "page_type": page_type,
+            "content": platform_settings[page_type].replace("{date}", today),
+            "is_custom": True
+        }
+    
     # Return default content
     content = DEFAULT_LEGAL_PAGES.get(page_type, "")
-    content = content.replace("{date}", datetime.now(timezone.utc).strftime("%B %d, %Y"))
+    content = content.replace("{date}", today)
     
     return {
         "page_type": page_type,
