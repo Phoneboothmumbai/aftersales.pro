@@ -204,6 +204,7 @@ export default function SuperAdminDashboard() {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     fetchData();
     fetchPlans();
+    fetchLegalPages();
   }, [token, navigate]);
 
   const fetchData = async () => {
