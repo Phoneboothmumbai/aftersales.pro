@@ -620,6 +620,15 @@ export default function SuperAdminDashboard() {
                   Plans
                 </Button>
                 <Button
+                  variant={activeTab === "analytics" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab("analytics")}
+                  className={activeTab === "analytics" ? "bg-slate-600" : "text-slate-400"}
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Analytics
+                </Button>
+                <Button
                   variant={activeTab === "settings" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("settings")}
