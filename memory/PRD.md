@@ -64,6 +64,16 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Photo Limit Check** - Block uploading photos beyond per-job limit (+ photo_upload feature check)
 - ✅ **Plan Usage API** - GET /api/tenants/plan-usage returns current usage vs limits
 
+### Legal & Compliance Pages (January 16, 2026)
+- ✅ **Privacy Policy** - GDPR/CCPA compliant with safe legal language
+- ✅ **Terms of Service** - Platform usage terms with liability protection
+- ✅ **Refund Policy** - Subscription billing and refund terms
+- ✅ **Disclaimer** - Liability limitations and data usage disclaimer
+- ✅ **Editable Content** - Admins can customize all pages from Settings
+- ✅ **Markdown Support** - Full markdown rendering for rich formatting
+- ✅ **Enable/Disable Pages** - Toggle visibility of each page
+- ✅ **Reset to Default** - One-click restore to default compliant templates
+
 ## Navigation Structure
 - Dashboard - Overview stats
 - Jobs - All repair jobs with date range filter
