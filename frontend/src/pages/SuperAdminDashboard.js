@@ -914,7 +914,182 @@ export default function SuperAdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* Settings Tab */}
+        {activeTab === "settings" && (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Platform Settings</h2>
+              <p className="text-slate-400">Manage global platform configuration</p>
+            </div>
+
+            {/* Legal Pages Section */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Legal & Compliance Pages
+                </CardTitle>
+                <p className="text-sm text-slate-400">
+                  Manage default legal pages for all tenants. Individual shops can customize these in their settings.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {LEGAL_PAGES.map((page) => {
+                    const Icon = page.icon;
+                    return (
+                      <div
+                        key={page.key}
+                        className="bg-slate-700/50 rounded-lg p-4 flex items-start justify-between"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 bg-slate-600/50 rounded-lg flex items-center justify-center">
+                            <Icon className="w-5 h-5 text-slate-300" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-white">{page.title}</h4>
+                            <p className="text-xs text-slate-400 mt-1">
+                              {legalPages[page.key] ? `${legalPages[page.key].length} characters` : "Not configured"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditLegalPage(page)}
+                            className="border-slate-600"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <a
+                            href={`/legal/${page.key}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Button size="sm" variant="ghost" className="text-slate-400">
+                              <ExternalLink className="w-4 h-4" />
+                            </Button>
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Public URLs Info */}
+                <div className="mt-6 bg-slate-900/50 rounded-lg p-4">
+                  <p className="text-sm font-medium text-slate-400 mb-2">Public URLs:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {LEGAL_PAGES.map((page) => (
+                      <a
+                        key={page.key}
+                        href={`/legal/${page.key}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-full"
+                      >
+                        /legal/{page.key}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Platform Info */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Platform Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-slate-700/50 rounded-lg p-4">
+                    <p className="text-2xl font-bold text-white">{plans.length}</p>
+                    <p className="text-sm text-slate-400">Active Plans</p>
+                  </div>
+                  <div className="bg-slate-700/50 rounded-lg p-4">
+                    <p className="text-2xl font-bold text-white">{tenants.length}</p>
+                    <p className="text-sm text-slate-400">Total Tenants</p>
+                  </div>
+                  <div className="bg-slate-700/50 rounded-lg p-4">
+                    <p className="text-2xl font-bold text-white">{stats?.total_users || 0}</p>
+                    <p className="text-sm text-slate-400">Total Users</p>
+                  </div>
+                  <div className="bg-slate-700/50 rounded-lg p-4">
+                    <p className="text-2xl font-bold text-white">{stats?.total_jobs || 0}</p>
+                    <p className="text-sm text-slate-400">Total Jobs</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </main>
+
+      {/* Legal Page Edit Modal */}
+      <Dialog open={!!editingLegalPage} onOpenChange={() => setEditingLegalPage(null)}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {editingLegalPage && <editingLegalPage.icon className="w-5 h-5 text-red-500" />}
+              Edit {editingLegalPage?.title}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Tabs defaultValue="edit" className="flex-1 flex flex-col overflow-hidden">
+            <TabsList className="bg-slate-700 mb-4">
+              <TabsTrigger value="edit">Edit</TabsTrigger>
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="edit" className="flex-1 overflow-hidden mt-0">
+              <div className="space-y-4 h-full flex flex-col">
+                <div className="flex items-center justify-between">
+                  <Label>Content (Markdown supported)</Label>
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm text-slate-400">Page Enabled</Label>
+                    <Switch
+                      checked={legalEditEnabled}
+                      onCheckedChange={setLegalEditEnabled}
+                    />
+                  </div>
+                </div>
+                <Textarea
+                  value={legalEditContent}
+                  onChange={(e) => setLegalEditContent(e.target.value)}
+                  className="flex-1 min-h-[400px] bg-slate-900 border-slate-600 font-mono text-sm resize-none"
+                  placeholder="Enter page content in Markdown format..."
+                />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="preview" className="flex-1 overflow-auto mt-0">
+              <div className="bg-slate-900 rounded-lg p-6 min-h-[400px] prose prose-invert prose-slate max-w-none prose-headings:text-white prose-h1:text-xl prose-h2:text-lg prose-p:text-slate-300 prose-li:text-slate-300 prose-strong:text-white">
+                <ReactMarkdown>{legalEditContent}</ReactMarkdown>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <div className="flex justify-end gap-2 pt-4 border-t border-slate-700">
+            <Button variant="ghost" onClick={() => setEditingLegalPage(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveLegalPage}
+              disabled={legalSaving}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {legalSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Create/Edit Plan Modal */}
       <Dialog open={showCreatePlan || showEditPlan} onOpenChange={() => { setShowCreatePlan(false); setShowEditPlan(false); setEditingPlan(null); }}>
