@@ -2774,6 +2774,86 @@ async def get_feature_options(admin: dict = Depends(get_super_admin)):
     """Get all available feature options with descriptions"""
     return FEATURE_DESCRIPTIONS
 
+# ==================== SUPER ADMIN LEGAL PAGES ====================
+
+@api_router.get("/super-admin/legal-pages")
+async def get_super_admin_legal_pages(admin: dict = Depends(get_super_admin)):
+    """Get all global legal pages for super admin"""
+    # Get from platform_settings collection or return defaults
+    settings = await db.platform_settings.find_one({"type": "legal_pages"}, {"_id": 0})
+    
+    today = datetime.now(timezone.utc).strftime("%B %d, %Y")
+    
+    if settings:
+        return {
+            "privacy_policy": settings.get("privacy_policy", DEFAULT_LEGAL_PAGES["privacy_policy"].replace("{date}", today)),
+            "terms_of_service": settings.get("terms_of_service", DEFAULT_LEGAL_PAGES["terms_of_service"].replace("{date}", today)),
+            "refund_policy": settings.get("refund_policy", DEFAULT_LEGAL_PAGES["refund_policy"].replace("{date}", today)),
+            "disclaimer": settings.get("disclaimer", DEFAULT_LEGAL_PAGES["disclaimer"].replace("{date}", today)),
+            "privacy_enabled": settings.get("privacy_enabled", True),
+            "terms_enabled": settings.get("terms_enabled", True),
+            "refund_enabled": settings.get("refund_enabled", True),
+            "disclaimer_enabled": settings.get("disclaimer_enabled", True)
+        }
+    
+    return {
+        "privacy_policy": DEFAULT_LEGAL_PAGES["privacy_policy"].replace("{date}", today),
+        "terms_of_service": DEFAULT_LEGAL_PAGES["terms_of_service"].replace("{date}", today),
+        "refund_policy": DEFAULT_LEGAL_PAGES["refund_policy"].replace("{date}", today),
+        "disclaimer": DEFAULT_LEGAL_PAGES["disclaimer"].replace("{date}", today),
+        "privacy_enabled": True,
+        "terms_enabled": True,
+        "refund_enabled": True,
+        "disclaimer_enabled": True
+    }
+
+@api_router.put("/super-admin/legal-pages/{page_type}")
+async def update_super_admin_legal_page(
+    page_type: str,
+    data: LegalPageUpdate,
+    admin: dict = Depends(get_super_admin)
+):
+    """Update a global legal page"""
+    valid_pages = ["privacy_policy", "terms_of_service", "refund_policy", "disclaimer"]
+    if page_type not in valid_pages:
+        raise HTTPException(status_code=400, detail="Invalid page type")
+    
+    enabled_key = page_type.replace("_policy", "_enabled").replace("_of_service", "_enabled")
+    if page_type == "terms_of_service":
+        enabled_key = "terms_enabled"
+    elif page_type == "privacy_policy":
+        enabled_key = "privacy_enabled"
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Upsert platform settings
+    await db.platform_settings.update_one(
+        {"type": "legal_pages"},
+        {
+            "$set": {
+                page_type: data.content,
+                enabled_key: data.is_enabled,
+                "updated_at": now,
+                "updated_by": admin["id"]
+            },
+            "$setOnInsert": {"type": "legal_pages", "created_at": now}
+        },
+        upsert=True
+    )
+    
+    # Log the action
+    action_log = {
+        "id": str(uuid.uuid4()),
+        "action": "legal_page_updated",
+        "page_type": page_type,
+        "performed_by": admin["id"],
+        "performed_by_name": admin["name"],
+        "created_at": now
+    }
+    await db.admin_action_logs.insert_one(action_log)
+    
+    return {"message": f"{page_type.replace('_', ' ').title()} updated successfully"}
+
 @api_router.post("/super-admin/tenants/{tenant_id}/assign-plan")
 async def assign_plan_to_tenant(
     tenant_id: str,
