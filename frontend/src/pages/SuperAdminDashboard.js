@@ -1656,9 +1656,10 @@ export default function SuperAdminDashboard() {
 
       {/* Tenant Details Modal */}
       <Dialog open={!!selectedTenant} onOpenChange={() => setSelectedTenant(null)}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
+              <Store className="w-5 h-5" />
               {selectedTenant?.company_name}
               <Badge className={getPlanColor(tenantDetails?.tenant?.subscription_plan || "free")}>
                 {getPlanIcon(tenantDetails?.tenant?.subscription_plan || "free")}
@@ -1667,6 +1668,11 @@ export default function SuperAdminDashboard() {
                    (tenantDetails?.tenant?.subscription_plan || "free").slice(1)}
                 </span>
               </Badge>
+              {tenantDetails?.tenant?.is_active ? (
+                <Badge className="bg-green-600/20 text-green-400">Active</Badge>
+              ) : (
+                <Badge className="bg-red-600/20 text-red-400">Inactive</Badge>
+              )}
             </DialogTitle>
           </DialogHeader>
 
@@ -1676,75 +1682,127 @@ export default function SuperAdminDashboard() {
             </div>
           ) : tenantDetails ? (
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 bg-slate-700">
+              <TabsList className="grid w-full grid-cols-6 bg-slate-700">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="subscription">Subscription</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+                <TabsTrigger value="team">Team</TabsTrigger>
+                <TabsTrigger value="subscription">Billing</TabsTrigger>
                 <TabsTrigger value="payments">Payments</TabsTrigger>
-                <TabsTrigger value="history">History</TabsTrigger>
+                <TabsTrigger value="history">Logs</TabsTrigger>
               </TabsList>
 
+              {/* Overview Tab - Enhanced */}
               <TabsContent value="overview" className="space-y-6 mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-slate-400">Subdomain</p>
-                    <p className="font-medium">{tenantDetails.tenant.subdomain}.aftersales.pro</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-slate-400">Status</p>
-                    <div className="flex gap-2 mt-1">
-                      {tenantDetails.tenant.is_active ? (
-                        <Badge className="bg-green-600/20 text-green-400">Active</Badge>
-                      ) : (
-                        <Badge className="bg-red-600/20 text-red-400">Inactive</Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-slate-400">Created</p>
-                    <p className="font-medium">{formatDate(tenantDetails.tenant.created_at)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-slate-400">
-                      {tenantDetails.tenant.subscription_status === "paid" ? "Subscription Ends" : "Trial Ends"}
-                    </p>
-                    <p className="font-medium">
-                      {tenantDetails.tenant.subscription_status === "paid"
-                        ? formatDate(tenantDetails.tenant.subscription_ends_at)
-                        : formatDate(tenantDetails.tenant.trial_ends_at)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
+                {/* Quick Stats Grid */}
+                <div className="grid grid-cols-4 gap-3">
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
+                    <ClipboardList className="w-5 h-5 mx-auto mb-1 text-blue-400" />
                     <p className="text-2xl font-bold">{tenantDetails.stats.total_jobs}</p>
-                    <p className="text-sm text-slate-400">Total Jobs</p>
+                    <p className="text-xs text-slate-400">Total Jobs</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
+                    <Users className="w-5 h-5 mx-auto mb-1 text-green-400" />
                     <p className="text-2xl font-bold">{tenantDetails.users.length}</p>
-                    <p className="text-sm text-slate-400">Users</p>
+                    <p className="text-xs text-slate-400">Team Members</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
+                    <Building2 className="w-5 h-5 mx-auto mb-1 text-purple-400" />
                     <p className="text-2xl font-bold">{tenantDetails.branches.length}</p>
-                    <p className="text-sm text-slate-400">Branches</p>
+                    <p className="text-xs text-slate-400">Branches</p>
+                  </div>
+                  <div className="bg-slate-700/50 rounded-lg p-3 text-center">
+                    <Package className="w-5 h-5 mx-auto mb-1 text-yellow-400" />
+                    <p className="text-2xl font-bold">{tenantDetails.stats.total_inventory || 0}</p>
+                    <p className="text-xs text-slate-400">Inventory Items</p>
                   </div>
                 </div>
 
-                <div>
-                  <p className="text-sm font-medium text-slate-400 mb-2">Team Members</p>
-                  <div className="space-y-2">
-                    {tenantDetails.users.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-2">
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-slate-500" />
-                          <span className="text-sm">{user.email}</span>
-                        </div>
-                        <Badge variant="outline" className="text-xs">{user.role}</Badge>
+                {/* Shop Info */}
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="bg-slate-700/30 border-slate-600">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm text-slate-400">Shop Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Subdomain</span>
+                        <span className="font-medium">{tenantDetails.tenant.subdomain}.aftersales.pro</span>
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Created</span>
+                        <span className="font-medium">{formatDate(tenantDetails.tenant.created_at)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Email</span>
+                        <span className="font-medium">{tenantDetails.tenant.settings?.email || "-"}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Phone</span>
+                        <span className="font-medium">{tenantDetails.tenant.settings?.phone || "-"}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-700/30 border-slate-600">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm text-slate-400">Subscription Info</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Plan</span>
+                        <Badge className={getPlanColor(tenantDetails.tenant.subscription_plan || "free")}>
+                          {(tenantDetails.tenant.subscription_plan || "free").charAt(0).toUpperCase() + 
+                           (tenantDetails.tenant.subscription_plan || "free").slice(1)}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Status</span>
+                        <Badge className={tenantDetails.tenant.subscription_status === "paid" ? "bg-green-600/20 text-green-400" : "bg-yellow-600/20 text-yellow-400"}>
+                          {tenantDetails.tenant.subscription_status === "paid" ? "Paid" : "Trial"}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">{tenantDetails.tenant.subscription_status === "paid" ? "Expires" : "Trial Ends"}</span>
+                        <span className="font-medium">
+                          {tenantDetails.tenant.subscription_status === "paid"
+                            ? formatDate(tenantDetails.tenant.subscription_ends_at)
+                            : formatDate(tenantDetails.tenant.trial_ends_at)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Total Payments</span>
+                        <span className="font-medium text-green-400">
+                          {formatCurrency(tenantDetails.payments?.reduce((sum, p) => sum + p.amount, 0) || 0)}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
+                {/* Branches List */}
+                <Card className="bg-slate-700/30 border-slate-600">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm text-slate-400 flex items-center justify-between">
+                      <span>Branches</span>
+                      <Badge variant="outline">{tenantDetails.branches.length}</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-2">
+                      {tenantDetails.branches.map((branch) => (
+                        <div key={branch.id} className="bg-slate-600/30 rounded-lg p-2 flex items-center gap-2">
+                          <Building2 className="w-4 h-4 text-slate-400" />
+                          <div>
+                            <p className="font-medium text-sm">{branch.name}</p>
+                            {branch.address && <p className="text-xs text-slate-400">{branch.address}</p>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
                 <div className="flex gap-2 pt-4 border-t border-slate-700">
                   <Button
                     variant={tenantDetails.tenant.is_active ? "destructive" : "default"}
@@ -1753,11 +1811,230 @@ export default function SuperAdminDashboard() {
                     className={!tenantDetails.tenant.is_active ? "bg-green-600 hover:bg-green-700" : ""}
                   >
                     {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Power className="w-4 h-4 mr-2" />}
-                    {tenantDetails.tenant.is_active ? "Deactivate" : "Activate"}
+                    {tenantDetails.tenant.is_active ? "Deactivate Shop" : "Activate Shop"}
+                  </Button>
+                  <Button onClick={() => setShowAssignPlan(true)} className="bg-blue-600 hover:bg-blue-700">
+                    <Crown className="w-4 h-4 mr-2" />
+                    Change Plan
+                  </Button>
+                  <Button variant="outline" onClick={() => setShowExtendValidity(true)} className="border-slate-600">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Extend Validity
                   </Button>
                 </div>
               </TabsContent>
 
+              {/* Settings Tab - NEW */}
+              <TabsContent value="settings" className="space-y-6 mt-4">
+                <Card className="bg-slate-700/30 border-slate-600">
+                  <CardHeader>
+                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      Shop Settings
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Company Name</Label>
+                        <Input
+                          value={tenantDetails.tenant.company_name}
+                          disabled
+                          className="bg-slate-600/50 border-slate-500"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Subdomain</Label>
+                        <div className="flex items-center gap-1">
+                          <Input
+                            value={tenantDetails.tenant.subdomain}
+                            disabled
+                            className="bg-slate-600/50 border-slate-500"
+                          />
+                          <span className="text-slate-400 text-sm">.aftersales.pro</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Contact Email</Label>
+                        <Input
+                          value={tenantDetails.tenant.settings?.email || ""}
+                          disabled
+                          className="bg-slate-600/50 border-slate-500"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Contact Phone</Label>
+                        <Input
+                          value={tenantDetails.tenant.settings?.phone || ""}
+                          disabled
+                          className="bg-slate-600/50 border-slate-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Address</Label>
+                      <Textarea
+                        value={tenantDetails.tenant.settings?.address || ""}
+                        disabled
+                        className="bg-slate-600/50 border-slate-500"
+                        rows={2}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Theme</Label>
+                        <Input
+                          value={tenantDetails.tenant.settings?.theme || "light"}
+                          disabled
+                          className="bg-slate-600/50 border-slate-500"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Language</Label>
+                        <Input
+                          value={tenantDetails.tenant.settings?.language || "en"}
+                          disabled
+                          className="bg-slate-600/50 border-slate-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Footer Text (for receipts)</Label>
+                      <Input
+                        value={tenantDetails.tenant.settings?.footer_text || ""}
+                        disabled
+                        className="bg-slate-600/50 border-slate-500"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Plan Limits & Usage */}
+                <Card className="bg-slate-700/30 border-slate-600">
+                  <CardHeader>
+                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                      <Database className="w-4 h-4" />
+                      Plan Limits & Usage
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {(() => {
+                      const currentPlan = plans.find(p => p.id === (tenantDetails.tenant.subscription_plan || "free"));
+                      if (!currentPlan) return <p className="text-slate-400">No plan limits configured</p>;
+                      return (
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-slate-600/30 rounded-lg p-3">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm text-slate-400">Users</span>
+                              <span className="text-sm">{tenantDetails.users.length} / {currentPlan.max_users}</span>
+                            </div>
+                            <div className="w-full bg-slate-600 rounded-full h-2">
+                              <div 
+                                className="bg-blue-500 h-2 rounded-full" 
+                                style={{ width: `${Math.min((tenantDetails.users.length / currentPlan.max_users) * 100, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="bg-slate-600/30 rounded-lg p-3">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm text-slate-400">Branches</span>
+                              <span className="text-sm">{tenantDetails.branches.length} / {currentPlan.max_branches}</span>
+                            </div>
+                            <div className="w-full bg-slate-600 rounded-full h-2">
+                              <div 
+                                className="bg-purple-500 h-2 rounded-full" 
+                                style={{ width: `${Math.min((tenantDetails.branches.length / currentPlan.max_branches) * 100, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="bg-slate-600/30 rounded-lg p-3">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm text-slate-400">Jobs/Month</span>
+                              <span className="text-sm">{tenantDetails.stats.this_month_jobs || 0} / {currentPlan.max_jobs_per_month}</span>
+                            </div>
+                            <div className="w-full bg-slate-600 rounded-full h-2">
+                              <div 
+                                className="bg-green-500 h-2 rounded-full" 
+                                style={{ width: `${Math.min(((tenantDetails.stats.this_month_jobs || 0) / currentPlan.max_jobs_per_month) * 100, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className="bg-slate-600/30 rounded-lg p-3">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm text-slate-400">Inventory Items</span>
+                              <span className="text-sm">{tenantDetails.stats.total_inventory || 0} / {currentPlan.max_inventory_items}</span>
+                            </div>
+                            <div className="w-full bg-slate-600 rounded-full h-2">
+                              <div 
+                                className="bg-yellow-500 h-2 rounded-full" 
+                                style={{ width: `${Math.min(((tenantDetails.stats.total_inventory || 0) / currentPlan.max_inventory_items) * 100, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Team Tab - NEW */}
+              <TabsContent value="team" className="space-y-6 mt-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">Team Members</h3>
+                    <p className="text-sm text-slate-400">{tenantDetails.users.length} member(s) in this shop</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  {tenantDetails.users.map((user) => (
+                    <Card key={user.id} className="bg-slate-700/30 border-slate-600">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-slate-600/50 rounded-full flex items-center justify-center">
+                              <span className="text-lg font-medium">{user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}</span>
+                            </div>
+                            <div>
+                              <p className="font-medium">{user.name || "No name"}</p>
+                              <p className="text-sm text-slate-400">{user.email}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className={user.role === "admin" ? "bg-purple-600/20 text-purple-400" : "bg-blue-600/20 text-blue-400"}>
+                              {user.role === "admin" ? <Crown className="w-3 h-3 mr-1" /> : <Users className="w-3 h-3 mr-1" />}
+                              {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-slate-600 grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <span className="text-slate-400">Branch: </span>
+                            <span>{tenantDetails.branches.find(b => b.id === user.branch_id)?.name || "All Branches"}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">Created: </span>
+                            <span>{formatDate(user.created_at)}</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400">ID: </span>
+                            <span className="font-mono text-xs">{user.id.substring(0, 8)}...</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+
+              {/* Subscription/Billing Tab */}
               <TabsContent value="subscription" className="space-y-6 mt-4">
                 <div className="bg-slate-700/30 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-4">
