@@ -161,6 +161,22 @@ export default function SuperAdminDashboard() {
   const [showExtendValidity, setShowExtendValidity] = useState(false);
   const [showRecordPayment, setShowRecordPayment] = useState(false);
   
+  // Create Shop modal
+  const [showCreateShop, setShowCreateShop] = useState(false);
+  const [createShopForm, setCreateShopForm] = useState({
+    company_name: "",
+    subdomain: "",
+    admin_name: "",
+    admin_email: "",
+    admin_password: "",
+    subscription_plan: "free",
+    trial_days: 14
+  });
+  
+  // Analytics state
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  
   // Legal pages state
   const [legalPages, setLegalPages] = useState({});
   const [editingLegalPage, setEditingLegalPage] = useState(null);
@@ -197,6 +213,7 @@ export default function SuperAdminDashboard() {
     duration_months: 1,
     notes: ""
   });
+
 
   const token = localStorage.getItem("superAdminToken");
 
