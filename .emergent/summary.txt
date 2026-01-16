@@ -3,177 +3,183 @@ The user wants to build a multi-tenant SaaS platform named aftersales.pro to man
 
 PRODUCT REQUIREMENTS:
 - **Core Flow**: A detailed job status workflow: Received -> Diagnosed -> Waiting for Approval -> In Progress / Pending for Parts -> Repaired -> Delivered -> Closed.
-- **Data Capture**:
-    - Capture approval details (who approved, estimated amount).
-    - Capture repair details (work done).
-    - Capture delivery details (amount received, payment mode).
+- **Data Capture**: Capture approval, repair, and delivery details.
 - **Job Sheet**: A printable, PDF version of the job sheet with a QR code for public status tracking.
-- **WhatsApp Integration**: A button to open WhatsApp with pre-filled messages for different job stages (e.g., diagnosis details, ready for delivery), including full device information (brand, model, serial number).
+- **WhatsApp Integration**: Button to open WhatsApp with pre-filled messages.
 - **Photo Upload**: Ability to upload photos of the device's condition.
-- **Customers Page**: A dedicated page to view all customers, their devices, and the repair history for each device.
-- **Inventory Management**: A system to track parts/spares stock, including stock levels and value.
-- **Analytics**: Dashboards for job trends, status breakdowns, and technician performance metrics.
-- **Universal Search**: A global search bar to find jobs, customers, or inventory items by any criteria (name, number, serial, etc.).
-- **Multi-tenancy & Super Admin**: Support for multiple shops with a super admin panel to manage tenants, subscriptions, and view platform analytics.
-- **Custom Domain & SSL**: The application should run on  with SSL enabled for all subdomains.
+- **Customers Page**: A page to view all customers, their devices, and repair history.
+- **Inventory Management**: A system to track parts/spares stock.
+- **Analytics**: Dashboards for job trends, status breakdowns, and technician performance.
+- **Universal Search**: A global search bar to find jobs, customers, or inventory items.
+- **Multi-tenancy & Super Admin**: Support for multiple shops with a super admin panel.
+    - **Enhancement**: Super admin should be able to create and manage dynamic subscription plans with configurable parameters (users, branches, jobs, etc.).
+    - **Enhancement**: Super admin should be able to manage default legal/compliance pages (Privacy Policy, ToS).
+- **Plan Enforcement**: The application must enforce subscription plan limits (e.g., max users, max jobs).
+- **Custom Domain & SSL**: Run on  with SSL.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application (FastAPI + React + MongoDB) with a significant number of features developed locally. The application includes multi-tenancy, JWT auth, a super admin panel, and numerous features like photo uploads, a public tracking page with QR codes, inventory management, customer management, technician analytics, a universal search bar, and a detailed job status workflow.
+A full-stack application (FastAPI + React + MongoDB) is developed. It includes JWT auth, multi-tenancy, a super admin panel with dynamic subscription plan management, plan limit enforcement, and editable legal pages. Many core features like photo uploads, QR code tracking, inventory, and customer management are also implemented.
 
-The code has recently been pulled to the user's live server (), but the deployment is in an unverified state. The backend is running via  and the frontend was rebuilt, but the user reported not seeing the updates.
+However, the application is in a broken state on the user's live server (). The user has been unable to deploy the latest features successfully, and the backend process has been unstable, requiring frequent manual restarts.
 
 **Last working item**:
--   **Last item agent was working:** Troubleshooting the deployment of all new features to the user's live server (). The user's  failed due to local changes, which the agent resolved by having the user Saved working directory and index state WIP on main: d69009b Auto-generated changes. The agent then provided commands to reinstall dependencies, restart the backend, and rebuild/redeploy the frontend. The user reported the site was not updated.
--   **Status:** USER VERIFICATION PENDING
--   **Agent Testing Done:** N (Testing was done in the local sandbox, not on the user's live server post-deployment).
--   **Which testing method agent to use?** Manual testing by the user. The agent must guide the user to perform a hard refresh (Ctrl+Shift+R) and check the application. If issues persist, the agent needs to debug the live environment by asking for Nginx logs (, ), browser console logs, and backend logs ().
--   **User Testing Done:** N
+-   **Last item agent was working:** Troubleshooting a failed deployment on the user's live server. The user reported that the latest features (specifically the Settings tab in the Super Admin panel) are not visible after running deployment commands. The agent has identified the root cause: the latest code developed in the sandbox has not been pushed to the user's GitHub repository.
+-   **Status:** BLOCKED
+-   **Agent Testing Done:** N/A (The issue is on the user's live server).
+-   **Which testing method agent to use?** Manual debugging by instructing the user. The primary action is to guide the user to click the Save to Github button on the Emergent platform and then re-run a corrected deployment script.
+-   **User Testing Done:** Y (User confirmed the new Settings tab is not appearing on the live server).
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** (P0) Deployment on the live server () is not verified. The user reported that the application was not updated after the latest deployment commands were run. This is a critical blocker.
--   **Issue 2:** (P1) The frontend build process is unstable.  fails without the  flag, and the build process generates multiple warnings for missing  dependencies.
--   **Issue 3:** (P2) The backend service on the live server is not managed by . It was started manually with . The original  unit was not found, indicating a fragile deployment setup.
+-   **Issue 1:** (P0) Latest features are not on the live server.
+-   **Issue 2:** (P1) The deployment process is brittle and error-prone.
+-   **Issue 3:** (P2) The backend service is not managed robustly.
 
 **Issues Detail:**
--   **Issue 1: Live Deployment Not Verified**
-    -   **Attempted fixes:** The agent provided a sequence of commands: Saved working directory and index state WIP on main: d69009b Auto-generated changes, , , / for the backend, and , ,  for the frontend.
+-   **Issue 1: Latest features not on the live server**
+    -   **Attempted fixes:** The agent provided several deployment scripts (, , etc.). These failed because the remote  branch does not contain the latest code.
     -   **Next debug checklist:**
-        1.  Ask the user to perform a hard refresh ( or ) or use an incognito window to rule out browser caching.
-        2.  If it still fails, check the Nginx service status: .
-        3.  Check the Nginx error log: .
-        4.  Check the backend log: .
-        5.  Ask the user for a screenshot of the browser and the developer console (F12) to see any frontend errors.
-    -   **Why fix this issue and what will be achieved with the fix?** To confirm that all the recently developed features are live and functional for the user. All future work is blocked until the deployment is stable.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** Y (Deployment has been a consistent problem).
+        1.  Instruct the user to click the **Save to Github** button in the Emergent chat interface. This is the CRITICAL unblocking step.
+        2.  Verify on GitHub that the new code (e.g., changes to ) has been pushed.
+        3.  Provide a simplified, step-by-step deployment script for the user to run on their server (). Avoid complex one-liners that have previously failed.
+    -   **Why fix this issue and what will be achieved with the fix?** This will sync the user's repository with the code developed by the agent, allowing the new features to be deployed and verified on the live server. All progress is blocked until this is resolved.
+    -   **Status:** BLOCKED
+    -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** Both (via user).
-    -   **Blocked on other issue:** None.
+    -   **Blocked on other issue:** None. This is the main blocker.
+
+-   **Issue 2: Brittle deployment process**
+    -   **Attempted fixes:** The agent provided various one-liner commands that failed due to path errors (), Python dependency issues (, ), and user confusion. The agent then provided corrected, more specific commands.
+    -   **Next debug checklist:**
+        1.  Once Issue 1 is resolved, provide a clear, multi-step command sequence instead of a single long chain.
+        2.  Confirm the Python environment () is activated for all backend commands.
+        3.  Ensure  is used for the frontend build.
+        4.  Provide a command to back up and restore the user's manually edited .
+    -   **Why fix this issue and what will be achieved with the fix?** To create a reliable and repeatable deployment process for the user.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Both (deployment process).
+    -   **Blocked on other issue:** Issue 1.
+
+-   **Issue 3: Backend service instability**
+    -   **Attempted fixes:** The user has been repeatedly restarting the backend manually using  after it crashes or is not found.
+    -   **Next debug checklist:** Once the deployment is stable, guide the user to create a  service file for the backend to ensure it runs persistently and restarts on failure.
+    -   **Why fix this issue and what will be achieved with the fix?** A robust, production-ready backend that doesn't require manual intervention.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Backend.
+    -   **Blocked on other issue:** Issue 1, Issue 2.
 
 **In progress Task List**:
--   **Task 1: Set up Custom Domain and SSL (P1)**
-    -   **Where to resume:** The user has already configured the A records for  to point to . The next step is to verify DNS propagation on the server using .
-    -   **What will be achieved with this?** The application will be accessible via the custom domain  with a valid SSL certificate for the main domain and all subdomains.
-    -   **Status:** BLOCKED
-    -   **Should Test frontend/backend/both after fix?** Frontend (accessibility via URL).
-    -   **Blocked on something:** Issue 1: Live Deployment Not Verified. The site must be working correctly before configuring SSL.
+-   None. The entire focus is on fixing the live server deployment.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P0) Enhance Super Admin Portal: Implement features to manually assign subscription plans, extend validity for offline payments, and add other requested admin functionalities. This was the user's last request.
+    -   (P1) Frontend UI for Plan Usage: Add progress bars in the tenant dashboard to show current usage against plan limits (e.g., Users: 3/5 used).
 -   **Future Tasks:**
-    -   (P1) Email notifications for job status changes.
+    -   (P2) Email notifications for job status changes.
     -   (P2) AMC (Annual Maintenance Contract)/repeat customer tagging.
-    -   (P3) Refactor the monolithic  into a modular structure (e.g., using FastAPI routers for different features like , , ).
+    -   (P3) Refactor the monolithic  into a modular structure using FastAPI routers.
     -   (P3) Containerize the application using Docker to simplify deployments.
 
 **Completed work in this session**
-*Note: The following features were implemented and tested in the agent's local sandbox. They are pending final verification on the user's live server.*
--   **Photo Upload**: Implemented backend storage and frontend components for uploading device photos.
--   **QR Code & Public Tracking**: Added a QR code to the job sheet PDF that links to a public, unauthenticated page for customers to track job status.
--   **Inventory Management**: Created backend CRUD and a frontend page to manage stock of parts/spares.
--   **Technician & Job Analytics**: Implemented backend endpoints and a frontend Analytics page to display job trends and technician performance.
--   **Date Range Filter**: Added date pickers to the Jobs page to filter jobs by creation date.
--   **Customers Page**: Developed a new page to list all customers, with a drill-down view to see their devices and repair history.
--   **Universal Search Bar**: Added a global search component to the header for finding jobs, customers, etc., from any page.
--   **Expanded Workflow**: Overhauled the job status system to a more detailed workflow (, , , etc.) and updated the UI/API accordingly.
--   **Enhanced WhatsApp Messages**: Updated the WhatsApp integration to include full device details in pre-filled messages.
+-   **Dynamic Plan Management:** Implemented a full CRUD system for subscription plans in the Super Admin panel, stored in MongoDB. Super admins can create, edit, and delete plans with custom parameters (users, jobs, branches, storage, etc.).
+-   **Plan Limit Enforcement:** Added backend middleware to check and enforce subscription plan limits when tenants create users, jobs, branches, inventory items, or upload photos.
+-   **Editable Legal Pages:**
+    -   Created backend endpoints and frontend UI for the Super Admin to create and edit default legal content (Privacy Policy, ToS, etc.).
+    -   Created public-facing, unauthenticated routes () to display the content.
+    -   Removed the legal page editing feature from the individual tenant settings to centralize it in the Super Admin panel, as per user request.
+-   **HTML Title & Meta Update:** Changed the title and meta description in .
+-   **Deployment Troubleshooting:** Extensive back-and-forth providing commands to the user to restart services, fix dependency errors, and attempt to deploy new code on their live server.
 
 **Earlier issues found/mentioned but not fixed**
 -   **Issue 1: React Hook Dependency Warnings**
-    -   **Debug checklist:** Review all files with  hooks (e.g., , , ) and add the missing dependencies to the dependency arrays as suggested by ESLint warnings.
-    -   **Why to solve this issue and what will be achieved with this?** Prevents bugs caused by stale state and ensures components re-render correctly when their data dependencies change.
+    -   **Debug checklist:** Review files like  and  to add missing dependencies to  arrays.
+    -   **Why to solve this issue and what will be achieved with this?** Prevents bugs caused by stale state and ensures components re-render correctly.
     -   **Should Test frontend/backend/both after fix:** Frontend.
     -   **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
-- The user's GitHub repository being out of sync with the code on the live server. This was the primary issue from the last handoff and it re-occurred, causing a  conflict that had to be resolved with No local changes to save.
+-   The user's GitHub repository () is out of sync with the agent's work. The previous handoff noted this as a problem, and it is the primary blocker in this session as well. The user runs  expecting new features, but the agent's code has not been pushed to the remote repository.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, Motor (async MongoDB), Pydantic, JWT,  for file uploads,  for QR generation,  for PDFs.
+-   **Backend**: FastAPI, Motor (async MongoDB), Pydantic, JWT.
 -   **Frontend**: React, React Router, Axios, Tailwind CSS, Shadcn UI, .
--   **Deployment**: Manual deployment to an Ubuntu server, Nginx reverse proxy,  for process management. Git for version control.
+-   **Deployment**: Manual deployment to an Ubuntu server, Nginx reverse proxy,  for process management. The process is currently broken.
 
 **key DB schema**
--   **jobs**: has been updated to include , , , , , .
--   **inventory**: 
--   *Note: Customers are not a separate collection; they are derived from the  collection.*
+-   **plans**:  (New collection)
+-   **legal_pages**:  (New collection)
+-   **tenants**: Updated to include , , .
 
 **All files of reference**
--   : The single, massive backend file containing all logic.
--   : Completely rewritten to support the new multi-stage job workflow.
--   : New page for customer relationship management.
--   : New page for inventory management.
--   : New page for analytics.
--   : New global search component.
--   : Updated with navigation links for all new pages and the universal search bar.
--   : Updated with routes for all new pages.
+-   : Heavily modified to add dynamic plans, limit enforcement, and legal page CRUD.
+-   : Completely overhauled to include tabs for Tenants, Plans, and Settings (with legal page management).
+-   : Modified to remove the legal page editor.
+-   : New component to display public legal documents.
+-   : Title and meta description updated.
+-   : Modified on the live server to handle dependency issues.
 
 **Areas that need refactoring**:
--    is critically oversized and needs to be broken down into multiple files using FastAPI's .
--   The frontend deployment process is brittle, relying on . The dependency conflicts should be properly resolved.
--   The backend process on the server should be managed by a  service for robustness instead of a manual  command.
+-   The deployment process is the highest priority for refactoring. It needs to be simple and reliable, likely moving to  for the backend and a cleaner build script for the frontend.
+-    remains a monolith and is becoming increasingly difficult to manage.
+-   Frontend dependencies still require .
 
 **key api endpoints**
--   : Universal search endpoint.
--   : Lists unique customers.
--   : Full CRUD for inventory items.
--   : Endpoint for technician metrics.
--   : New endpoint to record customer approval.
--   : New endpoint to record device delivery.
--   : Public page for job tracking.
+-    (GET, POST)
+-    (PUT, DELETE)
+-    (GET)
+-    (PUT)
+-    (GET)
+-    (GET, public)
 
 **Critical Info for New Agent**
--   You are again acting as a **deployment assistant** for a live server. Your primary goal is to ensure the application is running correctly on the user's server (). Do not start new feature development until the live site is verified.
--   The user is on a live server. Do not use local sandbox testing tools like  or . Debugging must be done by requesting logs and outputs from the user's server.
--   The user has a tendency to ignore verification steps and immediately ask for new features. You must gently guide them to verify the current state first, as the deployment is fragile.
+-   **DO NOT develop any new features.** Your one and only priority is to help the user get the existing features deployed and working on their live server ().
+-   The root cause of the deployment failure is that the code you see in the sandbox **is not in the user's GitHub repository**.
+-   You must guide the user to **click the Save to Github button** in the Emergent chat. This is the only way to resolve the blocker.
+-   Once the code is pushed, provide simple, step-by-step commands for the user. Avoid long, chained commands as they have consistently failed.
+-   The user has manually edited  on their server. Your deployment script must back up this file and restore it after the build to avoid overwriting their changes.
+-   Expect to debug Python dependency issues () and Node version warnings on the user's server.
 
 **documents and test reports created in this job**
--    (updated multiple times)
--   
--   
+-    (updated)
 -   
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**:  - Request to configure custom domain.
-2.  **User**:  - Asking for confirmation on DNS setup.
-3.  **User**: (Shares screenshot of  failing) - Reporting DNS is not yet propagated.
-4.  **User**:  - Asks to work on other features while waiting for DNS.
-5.  **User**:  - Selects next features to build.
-6.  **User**:  - Request to build the Customers page.
-7.  **User**:  - Request to build search and new device fields.
-8.  **User**:  - Requests a major overhaul of the job workflow and WhatsApp messages.
-9.  **User**:  - Asks how to deploy all the changes to the live server.
-10. **User**:  - Latest feature request, made after the deployment attempt.
+1.  **User**:  - User confirms login works but the new UI is not there.
+2.  **User**: Provides the GitHub link, confirming their repository.
+3.  **Agent**: Realizes the code isn't pushed and instructs the user to click Save to Github.
+4.  **User**: Runs another deployment command (without saving to GitHub), which fails on  and  dependencies.
+5.  **Agent**: Provides a command to fix the  version in .
+6.  **User**: Runs the fixed command; the backend starts.
+7.  **Agent**: Asks the user to hard refresh and check again.
+8.  **User**: Shares a screenshot showing the Settings tab is still missing in the Super Admin panel.
+9.  **Agent**: Re-iterates that the user MUST click Save to Github first and provides a more robust deployment command (HEAD is now at f67efe1 Auto-generated changes).
+10. **User**: The conversation ends here, with the user needing to take the action of saving the code to their repository.
 
 **Project Health Check:**
--   **Broken**: The state of the live deployment at  is unknown and likely broken, as the user reported not updated. The frontend dependency tree is unstable.
+-   **Broken**: The live deployment is non-functional and out of sync with the developed code. The backend process is unstable.
 
 **3rd Party Integrations**
--   None implemented.
+-   None.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES (Used extensively for local sandbox development).
+-   **Testing agent used after significant changes**: YES (in the sandbox, for plan management and limit enforcement).
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**:
-    -   
-    -   
-    -   
-    -   
--   **Known regressions**: The manual deployment process itself.
+-   **Test files created**: Test files were updated by the testing agent in  and .
+-   **Known regressions**: The entire live deployment process is a regression from the locally tested, working state.
 
 **Credentials to test flow:**
 -   **Super Admin URL**: 
 -   **Super Admin Email**: 
 -   **Super Admin Password**: 
--   **Tenant Login URL**:  (Requires a subdomain created by Super Admin)
+-   **Tenant Login URL**: 
 
 **What agent forgot to execute**
--   The agent did not address the root cause of the frontend dependency issues ( errors), opting for a workaround ().
--   The agent did not create a robust  service for the backend on the live server, falling back to the less reliable  method.
--   The agent did not prioritize verifying the live deployment after the user reported it was not working, and instead ended the session.</analysis>
+-   The agent did not initially enforce the Save to Github step strongly enough, leading to multiple failed deployment cycles.
+-   The agent provided complex, chained commands that were not robust to the user's specific server environment (e.g., directory paths), causing errors and confusion. A more piecemeal, verifiable approach would have been better.</analysis>
