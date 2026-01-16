@@ -201,6 +201,9 @@ function AppRoutes() {
       <Route path="/track" element={<PublicTrack />} />
       <Route path="/track/:jobNumber/:trackingToken" element={<PublicTrack />} />
 
+      {/* Legal Pages (Public) */}
+      <Route path="/legal/:pageType" element={<LegalPage />} />
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
