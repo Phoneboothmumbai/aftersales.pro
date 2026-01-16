@@ -548,8 +548,17 @@ export default function SuperAdminDashboard() {
                   onClick={() => setActiveTab("plans")}
                   className={activeTab === "plans" ? "bg-slate-600" : "text-slate-400"}
                 >
-                  <Settings className="w-4 h-4 mr-2" />
+                  <Crown className="w-4 h-4 mr-2" />
                   Plans
+                </Button>
+                <Button
+                  variant={activeTab === "settings" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab("settings")}
+                  className={activeTab === "settings" ? "bg-slate-600" : "text-slate-400"}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
                 </Button>
               </div>
               <Button
