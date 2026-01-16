@@ -119,7 +119,7 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `GET /api/metrics/technicians` - Technician performance
 - `GET /api/metrics/overview` - Shop overview stats
 
-### Super Admin (NEW)
+### Super Admin
 - `POST /api/super-admin/login` - Super admin login
 - `GET /api/super-admin/me` - Get current super admin
 - `GET /api/super-admin/stats` - Platform-wide statistics
@@ -130,6 +130,7 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `DELETE /api/super-admin/plans/{id}` - Delete subscription plan (soft delete)
 - `GET /api/super-admin/feature-options` - Get all feature descriptions
 - `GET /api/super-admin/tenants` - List all tenants with plan info
+- `POST /api/super-admin/tenants` - **Create new tenant/shop from Super Admin** (NEW)
 - `GET /api/super-admin/tenants/{id}` - Tenant details with payments/logs
 - `PUT /api/super-admin/tenants/{id}` - Update tenant status
 - `POST /api/super-admin/tenants/{id}/assign-plan` - Assign subscription plan
@@ -138,6 +139,9 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `GET /api/super-admin/tenants/{id}/payments` - View payment history
 - `GET /api/super-admin/tenants/{id}/action-logs` - View admin action logs
 - `GET /api/super-admin/payments` - All recent payments across tenants
+- `GET /api/super-admin/analytics` - **Platform-wide analytics & billing** (NEW)
+- `GET /api/super-admin/legal-pages` - Get all legal pages
+- `PUT /api/super-admin/legal-pages/{slug}` - Update legal page content
 
 ### Public
 - `GET /api/public/track/{job_number}/{tracking_token}` - Public job status
