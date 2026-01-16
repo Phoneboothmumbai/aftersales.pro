@@ -57,6 +57,10 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Plans Tab UI** - Dedicated tab with plan cards showing all details
 - ✅ **Create Shop from Super Admin** - POST /api/super-admin/tenants (NEW)
 - ✅ **Analytics & Billing Tab** - Revenue charts, plan distribution, expiring subscriptions (NEW)
+- ✅ **Enhanced Tenant Details Modal** - 6 tabs: Overview, Settings, Team, Billing, Payments, Logs (NEW)
+- ✅ **Shop Settings View** - View company name, subdomain, contact info, address, theme, footer text (NEW)
+- ✅ **Team Management View** - See all team members with roles, branches, creation dates (NEW)
+- ✅ **Plan Limits & Usage Display** - Progress bars showing usage vs limits (NEW)
 
 ### Plan Limit Enforcement (January 15, 2026)
 - ✅ **User Limit Check** - Block adding users beyond plan limit
