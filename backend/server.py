@@ -2627,6 +2627,258 @@ async def update_tenant_by_admin(
         "subscription_plan": updated_tenant.get("subscription_plan", "free")
     }
 
+@api_router.post("/super-admin/tenants")
+async def create_tenant_by_admin(
+    data: TenantCreateByAdmin,
+    admin: dict = Depends(get_super_admin)
+):
+    """Create a new tenant (shop) from Super Admin panel"""
+    # Check if subdomain is taken
+    existing = await db.tenants.find_one({"subdomain": data.subdomain.lower()})
+    if existing:
+        raise HTTPException(status_code=400, detail="Subdomain already taken")
+    
+    # Check if email is taken
+    existing_email = await db.users.find_one({"email": data.admin_email.lower()})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    trial_ends = (datetime.now(timezone.utc) + timedelta(days=data.trial_days)).isoformat()
+    
+    # Create tenant
+    tenant_id = str(uuid.uuid4())
+    tenant = {
+        "id": tenant_id,
+        "company_name": data.company_name,
+        "subdomain": data.subdomain.lower(),
+        "settings": {
+            "theme": "light",
+            "language": "en",
+            "logo_url": None,
+            "address": "",
+            "phone": "",
+            "email": data.admin_email,
+            "footer_text": f"Thank you for choosing {data.company_name}"
+        },
+        "subscription_plan": data.subscription_plan,
+        "subscription_status": "trial",
+        "is_active": True,
+        "trial_ends_at": trial_ends,
+        "created_at": now
+    }
+    await db.tenants.insert_one(tenant)
+    
+    # Create admin user
+    user_id = str(uuid.uuid4())
+    user = {
+        "id": user_id,
+        "tenant_id": tenant_id,
+        "name": data.admin_name,
+        "email": data.admin_email.lower(),
+        "password": hash_password(data.admin_password),
+        "role": "admin",
+        "branch_id": None,
+        "created_at": now
+    }
+    await db.users.insert_one(user)
+    
+    # Create default branch
+    branch_id = str(uuid.uuid4())
+    branch = {
+        "id": branch_id,
+        "tenant_id": tenant_id,
+        "name": "Main Branch",
+        "address": "",
+        "phone": "",
+        "created_at": now
+    }
+    await db.branches.insert_one(branch)
+    
+    # Log the action
+    await db.admin_action_logs.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin["id"],
+        "admin_email": admin["email"],
+        "tenant_id": tenant_id,
+        "action": "create_tenant",
+        "details": {
+            "company_name": data.company_name,
+            "subdomain": data.subdomain,
+            "admin_email": data.admin_email,
+            "plan": data.subscription_plan
+        },
+        "created_at": now
+    })
+    
+    return {
+        "message": "Shop created successfully",
+        "tenant": {
+            "id": tenant_id,
+            "company_name": data.company_name,
+            "subdomain": data.subdomain,
+            "admin_email": data.admin_email
+        }
+    }
+
+@api_router.get("/super-admin/analytics")
+async def get_super_admin_analytics(admin: dict = Depends(get_super_admin)):
+    """Get platform-wide analytics including revenue and billing"""
+    now = datetime.now(timezone.utc)
+    
+    # Time periods
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    week_start = (now - timedelta(days=7)).isoformat()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    year_start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    
+    # Revenue calculations from payments
+    total_revenue_pipeline = [
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]
+    total_revenue_result = await db.tenant_payments.aggregate(total_revenue_pipeline).to_list(1)
+    total_revenue = total_revenue_result[0]["total"] if total_revenue_result else 0
+    
+    # Monthly revenue
+    monthly_revenue_pipeline = [
+        {"$match": {"created_at": {"$gte": month_start}}},
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]
+    monthly_revenue_result = await db.tenant_payments.aggregate(monthly_revenue_pipeline).to_list(1)
+    monthly_revenue = monthly_revenue_result[0]["total"] if monthly_revenue_result else 0
+    
+    # Revenue by month (last 12 months)
+    twelve_months_ago = (now - timedelta(days=365)).isoformat()
+    revenue_by_month_pipeline = [
+        {"$match": {"created_at": {"$gte": twelve_months_ago}}},
+        {"$addFields": {
+            "month": {"$substr": ["$created_at", 0, 7]}
+        }},
+        {"$group": {
+            "_id": "$month",
+            "revenue": {"$sum": "$amount"},
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    revenue_by_month = await db.tenant_payments.aggregate(revenue_by_month_pipeline).to_list(12)
+    
+    # Revenue by payment mode
+    revenue_by_mode_pipeline = [
+        {"$group": {
+            "_id": "$payment_mode",
+            "total": {"$sum": "$amount"},
+            "count": {"$sum": 1}
+        }}
+    ]
+    revenue_by_mode = await db.tenant_payments.aggregate(revenue_by_mode_pipeline).to_list(10)
+    
+    # Plan distribution
+    plan_distribution_pipeline = [
+        {"$group": {
+            "_id": {"$ifNull": ["$subscription_plan", "free"]},
+            "count": {"$sum": 1}
+        }}
+    ]
+    plan_distribution = await db.tenants.aggregate(plan_distribution_pipeline).to_list(10)
+    
+    # Subscription status distribution
+    status_distribution_pipeline = [
+        {"$group": {
+            "_id": {"$ifNull": ["$subscription_status", "trial"]},
+            "count": {"$sum": 1}
+        }}
+    ]
+    status_distribution = await db.tenants.aggregate(status_distribution_pipeline).to_list(10)
+    
+    # New signups trend (last 30 days)
+    thirty_days_ago = (now - timedelta(days=30)).isoformat()
+    signups_trend_pipeline = [
+        {"$match": {"created_at": {"$gte": thirty_days_ago}}},
+        {"$addFields": {
+            "date": {"$substr": ["$created_at", 0, 10]}
+        }},
+        {"$group": {
+            "_id": "$date",
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    signups_trend = await db.tenants.aggregate(signups_trend_pipeline).to_list(30)
+    
+    # Jobs trend (last 30 days)
+    jobs_trend_pipeline = [
+        {"$match": {"created_at": {"$gte": thirty_days_ago}}},
+        {"$addFields": {
+            "date": {"$substr": ["$created_at", 0, 10]}
+        }},
+        {"$group": {
+            "_id": "$date",
+            "count": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ]
+    jobs_trend = await db.jobs.aggregate(jobs_trend_pipeline).to_list(30)
+    
+    # Top tenants by jobs
+    top_tenants_pipeline = [
+        {"$group": {
+            "_id": "$tenant_id",
+            "job_count": {"$sum": 1}
+        }},
+        {"$sort": {"job_count": -1}},
+        {"$limit": 10}
+    ]
+    top_tenants_by_jobs = await db.jobs.aggregate(top_tenants_pipeline).to_list(10)
+    
+    # Enrich top tenants with names
+    for t in top_tenants_by_jobs:
+        tenant = await db.tenants.find_one({"id": t["_id"]}, {"company_name": 1, "subdomain": 1, "_id": 0})
+        if tenant:
+            t["company_name"] = tenant.get("company_name", "Unknown")
+            t["subdomain"] = tenant.get("subdomain", "unknown")
+    
+    # Recent payments
+    recent_payments = await db.tenant_payments.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    # Enrich recent payments with tenant info
+    for payment in recent_payments:
+        tenant = await db.tenants.find_one({"id": payment.get("tenant_id")}, {"company_name": 1, "_id": 0})
+        payment["company_name"] = tenant.get("company_name", "Unknown") if tenant else "Unknown"
+    
+    # Expiring subscriptions (next 30 days)
+    next_30_days = (now + timedelta(days=30)).isoformat()
+    expiring_soon = await db.tenants.find(
+        {
+            "subscription_status": "paid",
+            "subscription_ends_at": {"$lte": next_30_days, "$gte": now.isoformat()}
+        },
+        {"_id": 0, "id": 1, "company_name": 1, "subdomain": 1, "subscription_ends_at": 1, "subscription_plan": 1}
+    ).sort("subscription_ends_at", 1).limit(10).to_list(10)
+    
+    return {
+        "revenue": {
+            "total": total_revenue,
+            "monthly": monthly_revenue,
+            "by_month": revenue_by_month,
+            "by_payment_mode": revenue_by_mode
+        },
+        "tenants": {
+            "plan_distribution": plan_distribution,
+            "status_distribution": status_distribution,
+            "signups_trend": signups_trend,
+            "top_by_jobs": top_tenants_by_jobs,
+            "expiring_soon": expiring_soon
+        },
+        "jobs": {
+            "trend": jobs_trend
+        },
+        "recent_payments": recent_payments
+    }
+
 # ==================== SUBSCRIPTION MANAGEMENT ROUTES ====================
 
 async def get_plans_from_db() -> dict:
