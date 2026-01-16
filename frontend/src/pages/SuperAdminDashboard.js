@@ -157,6 +157,13 @@ export default function SuperAdminDashboard() {
   const [showExtendValidity, setShowExtendValidity] = useState(false);
   const [showRecordPayment, setShowRecordPayment] = useState(false);
   
+  // Legal pages state
+  const [legalPages, setLegalPages] = useState({});
+  const [editingLegalPage, setEditingLegalPage] = useState(null);
+  const [legalEditContent, setLegalEditContent] = useState("");
+  const [legalEditEnabled, setLegalEditEnabled] = useState(true);
+  const [legalSaving, setLegalSaving] = useState(false);
+  
   // Form states
   const [planForm, setPlanForm] = useState({
     id: "",
