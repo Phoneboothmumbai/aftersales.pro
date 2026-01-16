@@ -371,18 +371,36 @@ export default function Landing() {
       {/* Footer */}
       <footer className="border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Wrench className="w-5 h-5 text-primary-foreground" />
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <Wrench className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <span className="font-bold">
+                  aftersales<span className="text-primary">.pro</span>
+                </span>
               </div>
-              <span className="font-bold">
-                aftersales<span className="text-primary">.pro</span>
-              </span>
+              <div className="flex flex-wrap justify-center gap-4 text-sm">
+                <a href="/legal/privacy_policy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy Policy
+                </a>
+                <a href="/legal/terms_of_service" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Terms of Service
+                </a>
+                <a href="/legal/refund_policy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Refund Policy
+                </a>
+                <a href="/legal/disclaimer" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Disclaimer
+                </a>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} AfterSales.pro. All rights reserved.
-            </p>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                © {new Date().getFullYear()} AfterSales.pro. All rights reserved.
+              </p>
+            </div>
           </div>
         </div>
       </footer>
