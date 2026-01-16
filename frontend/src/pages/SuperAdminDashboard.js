@@ -58,7 +58,12 @@ import {
   HardDrive,
   X,
   Check,
+  Scale,
+  AlertTriangle,
+  RotateCcw,
+  ExternalLink,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
