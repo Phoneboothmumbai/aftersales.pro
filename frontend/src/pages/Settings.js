@@ -10,8 +10,9 @@ import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Switch } from "../components/ui/switch";
 import { Separator } from "../components/ui/separator";
-import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText } from "lucide-react";
+import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText, Shield } from "lucide-react";
 import { toast } from "sonner";
+import LegalPagesSettings from "../components/LegalPagesSettings";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
