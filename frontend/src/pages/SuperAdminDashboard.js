@@ -254,6 +254,25 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  const fetchAnalytics = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const response = await axios.get(`${API}/super-admin/analytics`);
+      setAnalytics(response.data);
+    } catch (error) {
+      console.error("Failed to fetch analytics:", error);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  // Fetch analytics when tab is selected
+  useEffect(() => {
+    if (activeTab === "analytics" && !analytics) {
+      fetchAnalytics();
+    }
+  }, [activeTab]);
+
   const fetchLegalPages = async () => {
     try {
       // Fetch all default legal pages
@@ -271,6 +290,34 @@ export default function SuperAdminDashboard() {
       setLegalPages(pages);
     } catch (error) {
       console.error("Failed to fetch legal pages:", error);
+    }
+  };
+
+  const handleCreateShop = async () => {
+    if (!createShopForm.company_name || !createShopForm.subdomain || !createShopForm.admin_email || !createShopForm.admin_password) {
+      alert("Please fill in all required fields");
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await axios.post(`${API}/super-admin/tenants`, createShopForm);
+      fetchData();
+      setShowCreateShop(false);
+      setCreateShopForm({
+        company_name: "",
+        subdomain: "",
+        admin_name: "",
+        admin_email: "",
+        admin_password: "",
+        subscription_plan: "free",
+        trial_days: 14
+      });
+      alert("Shop created successfully!");
+    } catch (error) {
+      console.error("Failed to create shop:", error);
+      alert(error.response?.data?.detail || "Failed to create shop");
+    } finally {
+      setActionLoading(false);
     }
   };
 
