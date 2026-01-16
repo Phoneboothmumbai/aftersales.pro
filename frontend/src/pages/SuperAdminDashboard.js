@@ -1000,6 +1000,276 @@ export default function SuperAdminDashboard() {
           </div>
         )}
 
+        {/* Analytics Tab */}
+        {activeTab === "analytics" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Analytics & Billing</h2>
+                <p className="text-slate-400">Platform-wide revenue and performance metrics</p>
+              </div>
+              <Button
+                onClick={fetchAnalytics}
+                variant="outline"
+                className="border-slate-600"
+                disabled={analyticsLoading}
+              >
+                {analyticsLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RotateCcw className="w-4 h-4 mr-2" />}
+                Refresh
+              </Button>
+            </div>
+
+            {analyticsLoading && !analytics ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+              </div>
+            ) : analytics ? (
+              <>
+                {/* Revenue Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="bg-gradient-to-br from-green-600/20 to-green-800/20 border-green-600/30">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-green-600/30 rounded-xl flex items-center justify-center">
+                          <IndianRupee className="w-6 h-6 text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-3xl font-bold text-white">{formatCurrency(analytics.revenue?.total || 0)}</p>
+                          <p className="text-sm text-green-400">Total Revenue</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border-blue-600/30">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-blue-600/30 rounded-xl flex items-center justify-center">
+                          <TrendingUp className="w-6 h-6 text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-3xl font-bold text-white">{formatCurrency(analytics.revenue?.monthly || 0)}</p>
+                          <p className="text-sm text-blue-400">This Month</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border-purple-600/30">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-purple-600/30 rounded-xl flex items-center justify-center">
+                          <CreditCard className="w-6 h-6 text-purple-400" />
+                        </div>
+                        <div>
+                          <p className="text-3xl font-bold text-white">{analytics.recent_payments?.length || 0}</p>
+                          <p className="text-sm text-purple-400">Recent Payments</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Revenue by Month Chart */}
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5" />
+                      Revenue by Month
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-64 flex items-end gap-2">
+                      {analytics.revenue?.by_month?.length > 0 ? (
+                        analytics.revenue.by_month.map((month, index) => {
+                          const maxRevenue = Math.max(...analytics.revenue.by_month.map(m => m.revenue));
+                          const height = maxRevenue > 0 ? (month.revenue / maxRevenue) * 100 : 0;
+                          return (
+                            <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                              <div 
+                                className="w-full bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg transition-all hover:opacity-80"
+                                style={{ height: `${Math.max(height, 5)}%` }}
+                                title={`${month._id}: ${formatCurrency(month.revenue)}`}
+                              />
+                              <span className="text-xs text-slate-400 transform -rotate-45 origin-center">
+                                {month._id?.substring(5) || ''}
+                              </span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                          No revenue data available
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Plan Distribution */}
+                  <Card className="bg-slate-800 border-slate-700">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <PieChart className="w-5 h-5" />
+                        Plan Distribution
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {analytics.tenants?.plan_distribution?.map((item, index) => {
+                          const total = analytics.tenants.plan_distribution.reduce((sum, i) => sum + i.count, 0);
+                          const percentage = total > 0 ? ((item.count / total) * 100).toFixed(1) : 0;
+                          return (
+                            <div key={index} className="flex items-center gap-3">
+                              <Badge className={getPlanColor(item._id)}>
+                                {getPlanIcon(item._id)}
+                                <span className="ml-1">{item._id?.charAt(0).toUpperCase() + item._id?.slice(1)}</span>
+                              </Badge>
+                              <div className="flex-1 bg-slate-700 rounded-full h-2">
+                                <div 
+                                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                              <span className="text-white font-medium w-12 text-right">{item.count}</span>
+                              <span className="text-slate-400 text-sm w-12 text-right">{percentage}%</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Payment Mode Distribution */}
+                  <Card className="bg-slate-800 border-slate-700">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <CreditCard className="w-5 h-5" />
+                        Revenue by Payment Mode
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {analytics.revenue?.by_payment_mode?.length > 0 ? (
+                          analytics.revenue.by_payment_mode.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between bg-slate-700/50 rounded-lg p-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-slate-600/50 rounded-lg flex items-center justify-center">
+                                  {item._id === 'upi' ? '📱' : item._id === 'cash' ? '💵' : item._id === 'card' ? '💳' : '🏦'}
+                                </div>
+                                <span className="text-white capitalize">{item._id || 'Other'}</span>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-white font-medium">{formatCurrency(item.total)}</p>
+                                <p className="text-xs text-slate-400">{item.count} payments</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-slate-400 text-center py-4">No payment data available</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Recent Payments & Expiring Subscriptions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Recent Payments */}
+                  <Card className="bg-slate-800 border-slate-700">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <History className="w-5 h-5" />
+                        Recent Payments
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 max-h-80 overflow-y-auto">
+                        {analytics.recent_payments?.length > 0 ? (
+                          analytics.recent_payments.map((payment, index) => (
+                            <div key={index} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
+                              <div>
+                                <p className="text-white font-medium">{payment.company_name}</p>
+                                <p className="text-xs text-slate-400">
+                                  {payment.payment_mode?.charAt(0).toUpperCase() + payment.payment_mode?.slice(1)} • {formatDate(payment.created_at)}
+                                </p>
+                              </div>
+                              <p className="text-green-400 font-medium">{formatCurrency(payment.amount)}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-slate-400 text-center py-4">No recent payments</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Expiring Subscriptions */}
+                  <Card className="bg-slate-800 border-slate-700">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                        Expiring Soon (30 days)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 max-h-80 overflow-y-auto">
+                        {analytics.tenants?.expiring_soon?.length > 0 ? (
+                          analytics.tenants.expiring_soon.map((tenant, index) => (
+                            <div key={index} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
+                              <div>
+                                <p className="text-white font-medium">{tenant.company_name}</p>
+                                <p className="text-xs text-slate-400">{tenant.subdomain}.aftersales.pro</p>
+                              </div>
+                              <div className="text-right">
+                                <Badge className={getPlanColor(tenant.subscription_plan)}>
+                                  {tenant.subscription_plan}
+                                </Badge>
+                                <p className="text-xs text-yellow-400 mt-1">{formatDate(tenant.subscription_ends_at)}</p>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-slate-400 text-center py-4">No subscriptions expiring soon</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Top Tenants by Jobs */}
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Store className="w-5 h-5" />
+                      Top Shops by Jobs
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                      {analytics.tenants?.top_by_jobs?.slice(0, 5).map((tenant, index) => (
+                        <div key={index} className="bg-slate-700/50 rounded-lg p-4 text-center">
+                          <div className="w-12 h-12 bg-slate-600/50 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span className="text-xl font-bold text-white">#{index + 1}</span>
+                          </div>
+                          <p className="text-white font-medium truncate">{tenant.company_name}</p>
+                          <p className="text-xs text-slate-400 truncate">{tenant.subdomain}</p>
+                          <p className="text-2xl font-bold text-blue-400 mt-2">{tenant.job_count}</p>
+                          <p className="text-xs text-slate-400">jobs</p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <div className="text-center py-12 text-slate-400">
+                <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Click Refresh to load analytics data</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Settings Tab */}
         {activeTab === "settings" && (
           <div className="space-y-6">
