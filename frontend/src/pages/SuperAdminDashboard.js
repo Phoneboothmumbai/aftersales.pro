@@ -232,6 +232,51 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  const fetchLegalPages = async () => {
+    try {
+      // Fetch all default legal pages
+      const pages = {};
+      for (const page of LEGAL_PAGES) {
+        try {
+          const response = await axios.get(`${API}/legal/${page.key}`);
+          pages[page.key] = response.data.content;
+          pages[page.enabledKey] = true; // Default enabled
+        } catch (e) {
+          pages[page.key] = "";
+          pages[page.enabledKey] = false;
+        }
+      }
+      setLegalPages(pages);
+    } catch (error) {
+      console.error("Failed to fetch legal pages:", error);
+    }
+  };
+
+  const handleEditLegalPage = (page) => {
+    setEditingLegalPage(page);
+    setLegalEditContent(legalPages[page.key] || "");
+    setLegalEditEnabled(legalPages[page.enabledKey] !== false);
+  };
+
+  const handleSaveLegalPage = async () => {
+    if (!editingLegalPage) return;
+    setLegalSaving(true);
+    try {
+      // Save to global settings (we'll need a super admin endpoint for this)
+      await axios.put(
+        `${API}/super-admin/legal-pages/${editingLegalPage.key}`,
+        { content: legalEditContent, is_enabled: legalEditEnabled }
+      );
+      await fetchLegalPages();
+      setEditingLegalPage(null);
+    } catch (error) {
+      console.error("Failed to save legal page:", error);
+      alert("Failed to save. Make sure the backend supports this endpoint.");
+    } finally {
+      setLegalSaving(false);
+    }
+  };
+
   const fetchTenantDetails = async (tenantId) => {
     setDetailsLoading(true);
     try {
