@@ -2126,6 +2126,119 @@ export default function SuperAdminDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Shop Modal */}
+      <Dialog open={showCreateShop} onOpenChange={setShowCreateShop}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Store className="w-5 h-5 text-green-500" />
+              Create New Shop
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Company Name *</Label>
+                <Input
+                  value={createShopForm.company_name}
+                  onChange={(e) => setCreateShopForm({ ...createShopForm, company_name: e.target.value })}
+                  placeholder="ABC Repairs"
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Subdomain *</Label>
+                <div className="flex items-center gap-1">
+                  <Input
+                    value={createShopForm.subdomain}
+                    onChange={(e) => setCreateShopForm({ ...createShopForm, subdomain: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') })}
+                    placeholder="abcrepairs"
+                    className="bg-slate-700 border-slate-600"
+                  />
+                  <span className="text-slate-400 text-sm whitespace-nowrap">.aftersales.pro</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Admin Name *</Label>
+                <Input
+                  value={createShopForm.admin_name}
+                  onChange={(e) => setCreateShopForm({ ...createShopForm, admin_name: e.target.value })}
+                  placeholder="John Doe"
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Admin Email *</Label>
+                <Input
+                  type="email"
+                  value={createShopForm.admin_email}
+                  onChange={(e) => setCreateShopForm({ ...createShopForm, admin_email: e.target.value })}
+                  placeholder="admin@example.com"
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Admin Password *</Label>
+              <Input
+                type="password"
+                value={createShopForm.admin_password}
+                onChange={(e) => setCreateShopForm({ ...createShopForm, admin_password: e.target.value })}
+                placeholder="Secure password"
+                className="bg-slate-700 border-slate-600"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Subscription Plan</Label>
+                <Select
+                  value={createShopForm.subscription_plan}
+                  onValueChange={(value) => setCreateShopForm({ ...createShopForm, subscription_plan: value })}
+                >
+                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {plans.filter(p => p.is_active).map((plan) => (
+                      <SelectItem key={plan.id} value={plan.id}>
+                        {plan.name} - {plan.price === 0 ? "Free" : formatCurrency(plan.price)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Trial Days</Label>
+                <Input
+                  type="number"
+                  value={createShopForm.trial_days}
+                  onChange={(e) => setCreateShopForm({ ...createShopForm, trial_days: parseInt(e.target.value) || 14 })}
+                  className="bg-slate-700 border-slate-600"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setShowCreateShop(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateShop}
+              disabled={!createShopForm.company_name || !createShopForm.subdomain || !createShopForm.admin_email || !createShopForm.admin_password || actionLoading}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+              Create Shop
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
