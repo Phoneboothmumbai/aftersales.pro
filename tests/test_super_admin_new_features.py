@@ -33,8 +33,9 @@ class TestSuperAdminLogin:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
         assert "token" in data, "Response should contain token"
-        assert "admin" in data, "Response should contain admin info"
-        assert data["admin"]["email"] == SUPER_ADMIN_EMAIL
+        # Response contains 'user' instead of 'admin'
+        assert "user" in data, "Response should contain user info"
+        assert data["user"]["email"] == SUPER_ADMIN_EMAIL
         print(f"✓ Super Admin login successful")
     
     def test_login_invalid_credentials(self):
@@ -436,8 +437,10 @@ class TestRecordPayment:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
         assert "message" in data, "Response should contain message"
-        assert "payment_id" in data, "Response should contain payment_id"
-        print(f"✓ Payment recorded successfully: {data.get('payment_id')}")
+        # Response contains 'payment' object with 'id' instead of 'payment_id'
+        assert "payment" in data, "Response should contain payment info"
+        assert "id" in data["payment"], "Payment should have id"
+        print(f"✓ Payment recorded successfully: {data['payment']['id']}")
     
     def test_record_payment_different_modes(self, auth_headers, test_tenant_id):
         """Test payment recording with different payment modes"""
