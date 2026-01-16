@@ -201,25 +201,6 @@ export default function Settings() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Legal Pages */}
-        {isAdmin && (
-          <Card className="card-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Legal & Compliance Pages
-              </CardTitle>
-              <CardDescription>
-                Manage Privacy Policy, Terms of Service, Refund Policy, and Disclaimers.
-                These pages are required for regulatory compliance.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <LegalPagesSettings />
-            </CardContent>
-          </Card>
-        )}
       </div>
     </Layout>
   );
