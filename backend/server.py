@@ -818,6 +818,113 @@ async def update_tenant_settings(settings: SettingsUpdate, user: dict = Depends(
     tenant = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0})
     return TenantResponse(**tenant)
 
+# ==================== LEGAL PAGES ROUTES ====================
+
+@api_router.get("/legal/{page_type}")
+async def get_legal_page(page_type: str, subdomain: Optional[str] = None):
+    """Get a legal page content (public endpoint)"""
+    valid_pages = ["privacy_policy", "terms_of_service", "refund_policy", "disclaimer"]
+    if page_type not in valid_pages:
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    # If subdomain provided, try to get tenant-specific content
+    if subdomain:
+        tenant = await db.tenants.find_one({"subdomain": subdomain.lower()}, {"_id": 0})
+        if tenant:
+            legal_pages = tenant.get("legal_pages", {})
+            # Check if page is enabled for this tenant
+            enabled_key = f"{page_type.replace('_policy', '').replace('_of_service', '')}_enabled"
+            if not legal_pages.get(enabled_key, True):
+                raise HTTPException(status_code=404, detail="Page not available")
+            
+            # Return tenant-specific content if available
+            if legal_pages.get(page_type):
+                return {
+                    "page_type": page_type,
+                    "content": legal_pages[page_type],
+                    "company_name": tenant.get("company_name", ""),
+                    "is_custom": True
+                }
+    
+    # Return default content
+    content = DEFAULT_LEGAL_PAGES.get(page_type, "")
+    content = content.replace("{date}", datetime.now(timezone.utc).strftime("%B %d, %Y"))
+    
+    return {
+        "page_type": page_type,
+        "content": content,
+        "is_custom": False
+    }
+
+@api_router.get("/tenants/legal-pages")
+async def get_tenant_legal_pages(user: dict = Depends(require_admin)):
+    """Get all legal pages configuration for the tenant"""
+    tenant = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    legal_pages = tenant.get("legal_pages", {})
+    
+    # Return current config with defaults
+    today = datetime.now(timezone.utc).strftime("%B %d, %Y")
+    return {
+        "privacy_policy": legal_pages.get("privacy_policy", DEFAULT_LEGAL_PAGES["privacy_policy"].replace("{date}", today)),
+        "terms_of_service": legal_pages.get("terms_of_service", DEFAULT_LEGAL_PAGES["terms_of_service"].replace("{date}", today)),
+        "refund_policy": legal_pages.get("refund_policy", DEFAULT_LEGAL_PAGES["refund_policy"].replace("{date}", today)),
+        "disclaimer": legal_pages.get("disclaimer", DEFAULT_LEGAL_PAGES["disclaimer"].replace("{date}", today)),
+        "privacy_enabled": legal_pages.get("privacy_enabled", True),
+        "terms_enabled": legal_pages.get("terms_enabled", True),
+        "refund_enabled": legal_pages.get("refund_enabled", True),
+        "disclaimer_enabled": legal_pages.get("disclaimer_enabled", True)
+    }
+
+@api_router.put("/tenants/legal-pages/{page_type}")
+async def update_tenant_legal_page(
+    page_type: str,
+    data: LegalPageUpdate,
+    user: dict = Depends(require_admin)
+):
+    """Update a specific legal page for the tenant"""
+    valid_pages = ["privacy_policy", "terms_of_service", "refund_policy", "disclaimer"]
+    if page_type not in valid_pages:
+        raise HTTPException(status_code=400, detail="Invalid page type")
+    
+    enabled_key = page_type.replace("_policy", "_enabled").replace("_of_service", "_enabled")
+    if page_type == "terms_of_service":
+        enabled_key = "terms_enabled"
+    elif page_type == "privacy_policy":
+        enabled_key = "privacy_enabled"
+    
+    update_data = {
+        f"legal_pages.{page_type}": data.content,
+        f"legal_pages.{enabled_key}": data.is_enabled,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.tenants.update_one(
+        {"id": user["tenant_id"]},
+        {"$set": update_data}
+    )
+    
+    return {"message": f"{page_type.replace('_', ' ').title()} updated successfully"}
+
+@api_router.post("/tenants/legal-pages/reset/{page_type}")
+async def reset_legal_page_to_default(
+    page_type: str,
+    user: dict = Depends(require_admin)
+):
+    """Reset a legal page to default content"""
+    valid_pages = ["privacy_policy", "terms_of_service", "refund_policy", "disclaimer"]
+    if page_type not in valid_pages:
+        raise HTTPException(status_code=400, detail="Invalid page type")
+    
+    await db.tenants.update_one(
+        {"id": user["tenant_id"]},
+        {"$unset": {f"legal_pages.{page_type}": ""}}
+    )
+    
+    return {"message": f"{page_type.replace('_', ' ').title()} reset to default"}
+
 # ==================== AUTH ROUTES ====================
 
 @api_router.post("/auth/login", response_model=LoginResponse)
