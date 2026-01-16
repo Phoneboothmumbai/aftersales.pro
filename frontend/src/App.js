@@ -22,6 +22,7 @@ import Customers from "./pages/Customers";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import PublicTrack from "./pages/PublicTrack";
+import LegalPage from "./pages/LegalPage";
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
