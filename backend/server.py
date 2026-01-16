@@ -2143,6 +2143,15 @@ class TenantUpdateByAdmin(BaseModel):
     trial_ends_at: Optional[str] = None
     subscription_ends_at: Optional[str] = None
 
+class TenantCreateByAdmin(BaseModel):
+    company_name: str
+    subdomain: str
+    admin_name: str
+    admin_email: EmailStr
+    admin_password: str
+    subscription_plan: str = "free"
+    trial_days: int = 14
+
 # ==================== SUBSCRIPTION PLAN MODELS ====================
 
 # Default plans (used for seeding)
