@@ -314,19 +314,19 @@ export default function SuperAdminDashboard() {
 
   const fetchLegalPages = async () => {
     try {
-      // Fetch all default legal pages
-      const pages = {};
-      for (const page of LEGAL_PAGES) {
-        try {
-          const response = await axios.get(`${API}/legal/${page.key}`);
-          pages[page.key] = response.data.content;
-          pages[page.enabledKey] = true; // Default enabled
-        } catch (e) {
-          pages[page.key] = "";
-          pages[page.enabledKey] = false;
-        }
-      }
-      setLegalPages(pages);
+      // Fetch all legal pages from super admin endpoint
+      const response = await axios.get(`${API}/super-admin/legal-pages`);
+      const data = response.data;
+      setLegalPages({
+        privacy_policy: data.privacy_policy || "",
+        terms_of_service: data.terms_of_service || "",
+        refund_policy: data.refund_policy || "",
+        disclaimer: data.disclaimer || "",
+        privacy_enabled: data.privacy_enabled ?? true,
+        terms_enabled: data.terms_enabled ?? true,
+        refund_enabled: data.refund_enabled ?? true,
+        disclaimer_enabled: data.disclaimer_enabled ?? true
+      });
     } catch (error) {
       console.error("Failed to fetch legal pages:", error);
     }
