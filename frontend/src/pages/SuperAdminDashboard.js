@@ -1488,6 +1488,235 @@ export default function SuperAdminDashboard() {
           </div>
         )}
 
+        {/* Announcements Tab */}
+        {activeTab === "announcements" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Broadcast Announcements</h2>
+                <p className="text-slate-400">Send announcements to all shops or specific groups</p>
+              </div>
+              <Button
+                onClick={() => setShowCreateAnnouncement(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+                data-testid="create-announcement-btn"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Announcement
+              </Button>
+            </div>
+
+            {/* Announcements List */}
+            <div className="grid gap-4">
+              {announcements.length === 0 ? (
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardContent className="py-12 text-center">
+                    <Megaphone className="w-12 h-12 mx-auto mb-4 text-slate-500" />
+                    <p className="text-slate-400">No announcements yet</p>
+                    <p className="text-sm text-slate-500 mt-1">Create your first announcement to broadcast to shops</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                announcements.map((announcement) => (
+                  <Card key={announcement.id} className="bg-slate-800 border-slate-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge className={
+                              announcement.type === "warning" ? "bg-yellow-600/20 text-yellow-400" :
+                              announcement.type === "error" ? "bg-red-600/20 text-red-400" :
+                              announcement.type === "success" ? "bg-green-600/20 text-green-400" :
+                              "bg-blue-600/20 text-blue-400"
+                            }>
+                              {announcement.type?.charAt(0).toUpperCase() + announcement.type?.slice(1)}
+                            </Badge>
+                            <Badge variant="outline" className="text-slate-400">
+                              {announcement.target === "all" ? "All Shops" : announcement.target}
+                            </Badge>
+                          </div>
+                          <h3 className="text-lg font-medium text-white">{announcement.title}</h3>
+                          <p className="text-slate-400 mt-1">{announcement.content}</p>
+                          <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
+                            <span>Created: {formatDate(announcement.created_at)}</span>
+                            {announcement.expires_at && (
+                              <span>Expires: {formatDate(announcement.expires_at)}</span>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-red-400 hover:text-red-300 hover:bg-red-900/30"
+                          onClick={() => handleDeleteAnnouncement(announcement.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Support Tickets Tab */}
+        {activeTab === "tickets" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-white">Support Tickets</h2>
+                <p className="text-slate-400">Manage support requests from shops</p>
+              </div>
+              <div className="flex gap-2">
+                <Select value={ticketFilter} onValueChange={(v) => { setTicketFilter(v); fetchTickets(); }}>
+                  <SelectTrigger className="w-32 bg-slate-700 border-slate-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="open">Open</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={fetchTickets} variant="outline" className="border-slate-600">
+                  <RotateCcw className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Tickets List */}
+              <div className="space-y-3">
+                {tickets.length === 0 ? (
+                  <Card className="bg-slate-800 border-slate-700">
+                    <CardContent className="py-12 text-center">
+                      <Ticket className="w-12 h-12 mx-auto mb-4 text-slate-500" />
+                      <p className="text-slate-400">No support tickets</p>
+                      <p className="text-sm text-slate-500 mt-1">Tickets from shops will appear here</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  tickets.map((ticket) => (
+                    <Card 
+                      key={ticket.id} 
+                      className={`bg-slate-800 border-slate-700 cursor-pointer transition-all hover:border-slate-500 ${selectedTicket?.id === ticket.id ? 'ring-2 ring-blue-500' : ''}`}
+                      onClick={() => setSelectedTicket(ticket)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge className={
+                                ticket.status === "closed" ? "bg-slate-600/20 text-slate-400" :
+                                ticket.status === "in_progress" ? "bg-yellow-600/20 text-yellow-400" :
+                                "bg-green-600/20 text-green-400"
+                              }>
+                                {ticket.status?.replace("_", " ").charAt(0).toUpperCase() + ticket.status?.replace("_", " ").slice(1)}
+                              </Badge>
+                              <span className="text-xs text-slate-500">{ticket.company_name}</span>
+                            </div>
+                            <h4 className="font-medium text-white">{ticket.subject}</h4>
+                            <p className="text-sm text-slate-400 mt-1 line-clamp-2">{ticket.message}</p>
+                            <p className="text-xs text-slate-500 mt-2">{formatDate(ticket.created_at)}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+
+              {/* Selected Ticket Detail */}
+              {selectedTicket && (
+                <Card className="bg-slate-800 border-slate-700 h-fit sticky top-20">
+                  <CardHeader className="border-b border-slate-700">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-white">{selectedTicket.subject}</CardTitle>
+                        <p className="text-sm text-slate-400 mt-1">
+                          From: {selectedTicket.company_name} ({selectedTicket.subdomain}.aftersales.pro)
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelectedTicket(null)}
+                        className="text-slate-400"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 space-y-4">
+                    {/* Original Message */}
+                    <div className="bg-slate-900/50 rounded-lg p-4">
+                      <p className="text-slate-300">{selectedTicket.message}</p>
+                      <p className="text-xs text-slate-500 mt-2">{formatDate(selectedTicket.created_at)}</p>
+                    </div>
+
+                    {/* Replies */}
+                    {selectedTicket.replies?.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-medium text-slate-400">Replies</h4>
+                        {selectedTicket.replies.map((reply, idx) => (
+                          <div 
+                            key={idx} 
+                            className={`rounded-lg p-3 ${reply.from === "admin" ? "bg-blue-900/20 border border-blue-600/30 ml-4" : "bg-slate-700/50 mr-4"}`}
+                          >
+                            <p className="text-sm text-slate-300">{reply.message}</p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {reply.from === "admin" ? "Super Admin" : "Shop"} • {formatDate(reply.created_at)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Reply Input */}
+                    {selectedTicket.status !== "closed" && (
+                      <div className="space-y-2">
+                        <Textarea
+                          value={ticketReply}
+                          onChange={(e) => setTicketReply(e.target.value)}
+                          placeholder="Type your reply..."
+                          className="bg-slate-700 border-slate-600 min-h-[100px]"
+                        />
+                        <div className="flex justify-between">
+                          <Button
+                            variant="outline"
+                            className="border-red-600 text-red-400 hover:bg-red-900/30"
+                            onClick={() => handleCloseTicket(selectedTicket.id)}
+                          >
+                            Close Ticket
+                          </Button>
+                          <Button
+                            onClick={handleReplyToTicket}
+                            disabled={actionLoading || !ticketReply.trim()}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+                            Send Reply
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedTicket.status === "closed" && (
+                      <div className="text-center py-4 text-slate-400">
+                        <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-500" />
+                        <p>This ticket has been closed</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Settings Tab */}
         {activeTab === "settings" && (
           <div className="space-y-6">
