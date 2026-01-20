@@ -542,9 +542,14 @@ export default function JobDetail() {
                     <Wrench className="w-5 h-5 text-blue-500" />
                     Repair Details
                   </CardTitle>
-                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("repaired")}>
+                  <Button 
+                    size="sm" 
+                    onClick={() => openWhatsApp("repaired")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    data-testid="whatsapp-repair-btn"
+                  >
                     <MessageSquare className="w-4 h-4 mr-1" />
-                    Send to Customer
+                    Send WhatsApp
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
