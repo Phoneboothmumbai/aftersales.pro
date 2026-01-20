@@ -15,7 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
+import { ArrowLeft, Save, Loader2, MessageSquare, CheckCircle, ExternalLink, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { DEVICE_TYPES, DEVICE_CONDITIONS, DEFAULT_ACCESSORIES } from "../lib/utils";
 
