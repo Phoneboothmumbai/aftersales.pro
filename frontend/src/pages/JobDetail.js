@@ -500,9 +500,14 @@ export default function JobDetail() {
                     <ThumbsUp className="w-5 h-5 text-green-500" />
                     Customer Approval
                   </CardTitle>
-                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("approved")}>
+                  <Button 
+                    size="sm" 
+                    onClick={() => openWhatsApp("approved")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    data-testid="whatsapp-approval-btn"
+                  >
                     <MessageSquare className="w-4 h-4 mr-1" />
-                    Send Confirmation
+                    Send WhatsApp
                   </Button>
                 </CardHeader>
                 <CardContent>
