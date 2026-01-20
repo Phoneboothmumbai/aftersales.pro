@@ -66,6 +66,14 @@ import {
   BarChart3,
   PieChart,
   Store,
+  Ban,
+  PlayCircle,
+  MessageSquare,
+  Send,
+  Megaphone,
+  Phone,
+  UserCheck,
+  Ticket,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
