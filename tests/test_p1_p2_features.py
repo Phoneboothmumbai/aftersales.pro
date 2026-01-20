@@ -10,7 +10,7 @@ import requests
 import os
 import io
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://techfix-36.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fixflow-67.preview.emergentagent.com')
 
 # Test credentials from the review request
 TEST_TENANT = {

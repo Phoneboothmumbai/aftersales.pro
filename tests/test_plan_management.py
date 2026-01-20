@@ -10,7 +10,7 @@ import os
 import uuid
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://repairsaas.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fixflow-67.preview.emergentagent.com').rstrip('/')
 
 # Super Admin credentials
 SUPER_ADMIN_EMAIL = "superadmin@aftersales.pro"

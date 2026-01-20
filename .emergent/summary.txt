@@ -2,184 +2,162 @@
 The user wants to build a multi-tenant SaaS platform named aftersales.pro to manage the lifecycle of repair jobs for repair shops.
 
 PRODUCT REQUIREMENTS:
-- **Core Flow**: A detailed job status workflow: Received -> Diagnosed -> Waiting for Approval -> In Progress / Pending for Parts -> Repaired -> Delivered -> Closed.
+- **Core Flow**: A detailed job status workflow from Received to Closed.
 - **Data Capture**: Capture approval, repair, and delivery details.
-- **Job Sheet**: A printable, PDF version of the job sheet with a QR code for public status tracking.
-- **WhatsApp Integration**: Button to open WhatsApp with pre-filled messages.
-- **Photo Upload**: Ability to upload photos of the device's condition.
-- **Customers Page**: A page to view all customers, their devices, and repair history.
-- **Inventory Management**: A system to track parts/spares stock.
-- **Analytics**: Dashboards for job trends, status breakdowns, and technician performance.
-- **Universal Search**: A global search bar to find jobs, customers, or inventory items.
-- **Multi-tenancy & Super Admin**: Support for multiple shops with a super admin panel.
-    - **Enhancement**: Super admin should be able to create and manage dynamic subscription plans with configurable parameters (users, branches, jobs, etc.).
-    - **Enhancement**: Super admin should be able to manage default legal/compliance pages (Privacy Policy, ToS).
+- **Job Sheet**: Printable PDF job sheet with a QR code for public status tracking.
+- **Integrations**: WhatsApp integration for pre-filled messages.
+- **Features**: Photo uploads, a dedicated Customers page, inventory management, and analytics dashboards.
+- **Multi-tenancy & Super Admin**:
+    - Support for multiple shops with a super admin panel.
+    - Super admin can create and manage dynamic subscription plans.
+    - Super admin can manage default legal/compliance pages (Privacy Policy, ToS).
+    - **New**: Super admin should have a Login as Shop feature, suspend/unsuspend capabilities, and communication tools like broadcast announcements and support tickets.
 - **Plan Enforcement**: The application must enforce subscription plan limits (e.g., max users, max jobs).
-- **Custom Domain & SSL**: Run on  with SSL.
+- **Deployment**: The application must run on  with a wildcard SSL certificate.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application (FastAPI + React + MongoDB) is developed. It includes JWT auth, multi-tenancy, a super admin panel with dynamic subscription plan management, plan limit enforcement, and editable legal pages. Many core features like photo uploads, QR code tracking, inventory, and customer management are also implemented.
+A full-stack application (FastAPI + React + MongoDB) has been developed and successfully deployed to the user's live server () after a complete server rebuild. The deployment includes a fresh install of all dependencies, Nginx configuration, and a wildcard SSL certificate from Let's Encrypt using Cloudflare for DNS validation and auto-renewal.
 
-However, the application is in a broken state on the user's live server (). The user has been unable to deploy the latest features successfully, and the backend process has been unstable, requiring frequent manual restarts.
+The application features JWT authentication, multi-tenancy, and a comprehensive super admin panel with dynamic subscription plan management, plan limit enforcement, and editable legal pages. The latest features, including an analytics tab and an Add Shop modal, have been deployed.
 
 **Last working item**:
--   **Last item agent was working:** Troubleshooting a failed deployment on the user's live server. The user reported that the latest features (specifically the Settings tab in the Super Admin panel) are not visible after running deployment commands. The agent has identified the root cause: the latest code developed in the sandbox has not been pushed to the user's GitHub repository.
--   **Status:** BLOCKED
--   **Agent Testing Done:** N/A (The issue is on the user's live server).
--   **Which testing method agent to use?** Manual debugging by instructing the user. The primary action is to guide the user to click the Save to Github button on the Emergent platform and then re-run a corrected deployment script.
--   **User Testing Done:** Y (User confirmed the new Settings tab is not appearing on the live server).
+-   **Last item agent was working:** Implementing several new features in the Super Admin panel as requested by the user: Login as Shop, Suspend/Unsuspend Shop, Broadcast Announcements, and Support Tickets. The agent added the necessary backend endpoints in  and was in the process of updating the frontend component  to include the UI for these new features.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** both
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** (P0) Latest features are not on the live server.
--   **Issue 2:** (P1) The deployment process is brittle and error-prone.
--   **Issue 3:** (P2) The backend service is not managed robustly.
+-   **Issue 1:** (P0) The user-requested features (Login as Shop, Suspend/Unsuspend, Announcements, Tickets) are partially implemented and not yet functional or tested.
 
 **Issues Detail:**
--   **Issue 1: Latest features not on the live server**
-    -   **Attempted fixes:** The agent provided several deployment scripts (, , etc.). These failed because the remote  branch does not contain the latest code.
+-   **Issue 1: New Super Admin features are incomplete**
+    -   **Attempted fixes:** Backend endpoints have been added to . Frontend state variables, functions, and UI tabs have been partially added to .
     -   **Next debug checklist:**
-        1.  Instruct the user to click the **Save to Github** button in the Emergent chat interface. This is the CRITICAL unblocking step.
-        2.  Verify on GitHub that the new code (e.g., changes to ) has been pushed.
-        3.  Provide a simplified, step-by-step deployment script for the user to run on their server (). Avoid complex one-liners that have previously failed.
-    -   **Why fix this issue and what will be achieved with the fix?** This will sync the user's repository with the code developed by the agent, allowing the new features to be deployed and verified on the live server. All progress is blocked until this is resolved.
-    -   **Status:** BLOCKED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Both (via user).
-    -   **Blocked on other issue:** None. This is the main blocker.
-
--   **Issue 2: Brittle deployment process**
-    -   **Attempted fixes:** The agent provided various one-liner commands that failed due to path errors (), Python dependency issues (, ), and user confusion. The agent then provided corrected, more specific commands.
-    -   **Next debug checklist:**
-        1.  Once Issue 1 is resolved, provide a clear, multi-step command sequence instead of a single long chain.
-        2.  Confirm the Python environment () is activated for all backend commands.
-        3.  Ensure  is used for the frontend build.
-        4.  Provide a command to back up and restore the user's manually edited .
-    -   **Why fix this issue and what will be achieved with the fix?** To create a reliable and repeatable deployment process for the user.
+        1.  Review the changes in  to complete the UI implementation.
+        2.  Add the content for the Announcements and Support Tickets tabs.
+        3.  Implement the Login as Shop and Suspend/Unsuspend logic in the frontend action buttons within the tenant details modal.
+        4.  Thoroughly test all new functionalities.
+    -   **Why fix this issue and what will be achieved with the fix?** To fulfill the user's latest feature requests and enhance the management capabilities of the Super Admin panel.
     -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Both (deployment process).
-    -   **Blocked on other issue:** Issue 1.
-
--   **Issue 3: Backend service instability**
-    -   **Attempted fixes:** The user has been repeatedly restarting the backend manually using  after it crashes or is not found.
-    -   **Next debug checklist:** Once the deployment is stable, guide the user to create a  service file for the backend to ensure it runs persistently and restarts on failure.
-    -   **Why fix this issue and what will be achieved with the fix?** A robust, production-ready backend that doesn't require manual intervention.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** Backend.
-    -   **Blocked on other issue:** Issue 1, Issue 2.
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on other issue:** None.
 
 **In progress Task List**:
--   None. The entire focus is on fixing the live server deployment.
+-   **Task 1: Complete New Super Admin Features**
+    -   **Where to resume:** Continue editing . The agent was last adding the UI elements for the new tabs (Announcements, Tickets) and action buttons (Login as Shop, Suspend/Unsuspend).
+    -   **What will be achieved with this?** A fully functional Super Admin panel with enhanced tenant management and communication tools.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P1) Frontend UI for Plan Usage: Add progress bars in the tenant dashboard to show current usage against plan limits (e.g., Users: 3/5 used).
+    -   (P1) **WhatsApp Alerts**: Notify shops about expiring subscriptions via WhatsApp.
+    -   (P1) Frontend UI for Plan Usage: Add progress bars in the tenant dashboard to show current usage against plan limits.
 -   **Future Tasks:**
+    -   (P2) **Revenue Forecasting**: Predict next month's revenue based on expiring subscriptions.
+    -   (P2) **Churn Report**: Analytics for shops that did not renew.
     -   (P2) Email notifications for job status changes.
-    -   (P2) AMC (Annual Maintenance Contract)/repeat customer tagging.
     -   (P3) Refactor the monolithic  into a modular structure using FastAPI routers.
-    -   (P3) Containerize the application using Docker to simplify deployments.
+    -   (P3) Containerize the application using Docker to simplify future deployments.
 
 **Completed work in this session**
--   **Dynamic Plan Management:** Implemented a full CRUD system for subscription plans in the Super Admin panel, stored in MongoDB. Super admins can create, edit, and delete plans with custom parameters (users, jobs, branches, storage, etc.).
--   **Plan Limit Enforcement:** Added backend middleware to check and enforce subscription plan limits when tenants create users, jobs, branches, inventory items, or upload photos.
--   **Editable Legal Pages:**
-    -   Created backend endpoints and frontend UI for the Super Admin to create and edit default legal content (Privacy Policy, ToS, etc.).
-    -   Created public-facing, unauthenticated routes () to display the content.
-    -   Removed the legal page editing feature from the individual tenant settings to centralize it in the Super Admin panel, as per user request.
--   **HTML Title & Meta Update:** Changed the title and meta description in .
--   **Deployment Troubleshooting:** Extensive back-and-forth providing commands to the user to restart services, fix dependency errors, and attempt to deploy new code on their live server.
-
-**Earlier issues found/mentioned but not fixed**
--   **Issue 1: React Hook Dependency Warnings**
-    -   **Debug checklist:** Review files like  and  to add missing dependencies to  arrays.
-    -   **Why to solve this issue and what will be achieved with this?** Prevents bugs caused by stale state and ensures components re-render correctly.
-    -   **Should Test frontend/backend/both after fix:** Frontend.
-    -   **Is recurring issue?** Y
-
-**Known issue recurrence from previous fork**
--   The user's GitHub repository () is out of sync with the agent's work. The previous handoff noted this as a problem, and it is the primary blocker in this session as well. The user runs  expecting new features, but the agent's code has not been pushed to the remote repository.
+-   **Full Live Server Deployment:** Guided the user through a complete, from-scratch server setup on a fresh Ubuntu instance.
+    -   Installed all system dependencies (Node.js, Python, Nginx, MongoDB).
+    -   Cloned the repository and set up the Python virtual environment.
+    -   Installed all backend and frontend dependencies, resolving multiple conflicts (, , and various missing Python modules).
+    -   **Wildcard SSL Setup:** Configured a wildcard SSL certificate for  and  using Certbot with Cloudflare's DNS plugin, enabling automatic renewal.
+    -   **Nginx Configuration:** Set up Nginx as a reverse proxy for the frontend and backend API.
+    -   **Firewall Configuration:** Configured  to allow traffic on necessary ports (22, 80, 443, 8001).
+    -   **Troubleshooting:** Resolved numerous deployment issues, including Cloudflare 522 errors, missing frontend  files, stuck backend processes, and database connection problems.
+-   **Super Admin Panel Enhancements (Deployed):**
+    -   Implemented and deployed the Add Shop feature.
+    -   Implemented and deployed the Analytics tab with revenue and plan distribution charts.
+    -   Implemented and deployed an enhanced tenant details modal with 6 tabs (Overview, Settings, Team, Billing, Payments, Logs).
+-   **Database Seeding:** Created scripts to seed the production database with a default super admin user and a full suite of subscription plans (Forever Free, Starter, Basic, Pro, Enterprise).
+-   **Plan Limit Enforcement:** Verified that tenant plan limits (for users, branches, etc.) are correctly enforced by the backend.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
 -   **Backend**: FastAPI, Motor (async MongoDB), Pydantic, JWT.
--   **Frontend**: React, React Router, Axios, Tailwind CSS, Shadcn UI, .
--   **Deployment**: Manual deployment to an Ubuntu server, Nginx reverse proxy,  for process management. The process is currently broken.
+-   **Frontend**: React, React Router, Axios, Tailwind CSS, Shadcn UI.
+-   **Deployment**: Manual deployment to a live Ubuntu server, Nginx reverse proxy,  for process management, Let's Encrypt/Certbot with Cloudflare for SSL, UFW firewall.
 
 **key DB schema**
--   **plans**:  (New collection)
--   **legal_pages**:  (New collection)
--   **tenants**: Updated to include , , .
+-   **plans**: Seeded with 5 default subscription plans.
+-   **super_admins**: Collection for super admin users.
+-   **tenants**: Includes , , .
+-   **announcements**: (New) To be implemented for broadcasting messages.
+-   **support_tickets**: (New) To be implemented for the support system.
 
 **All files of reference**
--   : Heavily modified to add dynamic plans, limit enforcement, and legal page CRUD.
--   : Completely overhauled to include tabs for Tenants, Plans, and Settings (with legal page management).
--   : Modified to remove the legal page editor.
--   : New component to display public legal documents.
--   : Title and meta description updated.
--   : Modified on the live server to handle dependency issues.
+-   : Heavily modified to add new API endpoints for suspend/unsuspend, impersonation, announcements, and tickets.
+-   : Heavily modified to add UI for the new features.
+-    (on the live server): Contains production environment variables.
+-    (on the live server): Nginx configuration file.
+-    (on the live server): Cloudflare API token for SSL renewal.
 
 **Areas that need refactoring**:
--   The deployment process is the highest priority for refactoring. It needs to be simple and reliable, likely moving to  for the backend and a cleaner build script for the frontend.
--    remains a monolith and is becoming increasingly difficult to manage.
--   Frontend dependencies still require .
+-   The deployment process, while successful, is entirely manual. Creating a deployment script or moving to Docker would improve reliability.
+-    is a large monolith that would benefit from being broken down into smaller, more manageable FastAPI routers.
 
 **key api endpoints**
+-    (POST)
 -    (GET, POST)
--    (PUT, DELETE)
+-    (GET, PUT)
 -    (GET)
--    (PUT)
--    (GET)
--    (GET, public)
+-    (GET, POST, PUT, DELETE)
+-   **New (Implemented in backend, pending frontend)**:
+    -    (POST)
+    -    (POST)
+    -    (GET, POST)
+    -    (GET)
 
 **Critical Info for New Agent**
--   **DO NOT develop any new features.** Your one and only priority is to help the user get the existing features deployed and working on their live server ().
--   The root cause of the deployment failure is that the code you see in the sandbox **is not in the user's GitHub repository**.
--   You must guide the user to **click the Save to Github button** in the Emergent chat. This is the only way to resolve the blocker.
--   Once the code is pushed, provide simple, step-by-step commands for the user. Avoid long, chained commands as they have consistently failed.
--   The user has manually edited  on their server. Your deployment script must back up this file and restore it after the build to avoid overwriting their changes.
--   Expect to debug Python dependency issues () and Node version warnings on the user's server.
+-   The user's live server is at . All deployment actions happen here. The agent has root access via user-provided shell interactions.
+-   The server was completely rebuilt from scratch in this session. The setup is fresh but was done manually step-by-step. Be prepared to debug environment-specific issues.
+-   The immediate task is to finish the feature implementation in the sandbox environment. Do not attempt to deploy until the features are complete and tested locally.
+-   The user has a custom  file that must be preserved during frontend deployments. The process is: back it up, copy the new build, then restore the backup.
 
 **documents and test reports created in this job**
 -    (updated)
 -   
--   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**:  - User confirms login works but the new UI is not there.
-2.  **User**: Provides the GitHub link, confirming their repository.
-3.  **Agent**: Realizes the code isn't pushed and instructs the user to click Save to Github.
-4.  **User**: Runs another deployment command (without saving to GitHub), which fails on  and  dependencies.
-5.  **Agent**: Provides a command to fix the  version in .
-6.  **User**: Runs the fixed command; the backend starts.
-7.  **Agent**: Asks the user to hard refresh and check again.
-8.  **User**: Shares a screenshot showing the Settings tab is still missing in the Super Admin panel.
-9.  **Agent**: Re-iterates that the user MUST click Save to Github first and provides a more robust deployment command (HEAD is now at f67efe1 Auto-generated changes).
-10. **User**: The conversation ends here, with the user needing to take the action of saving the code to their repository.
+1.  **User**: Asks for suggested subscription plans to be created, including a forever-free tier.
+2.  **Agent**: Provides a script to seed the database with 5 detailed plans.
+3.  **User**: Asks how to see the changes.
+4.  **Agent**: Instructs the user to hard-refresh the browser.
+5.  **User**: Reiterates that clicking a shop should show all details and allow actions like changing plans and extending dates. Suggests more features.
+6.  **Agent**: Confirms these features already exist in the tenant details modal and proposes a list of new features to add.
+7.  **User**: Approves the implementation of Login as Shop, Suspend/Unsuspend, Announcements, Support Tickets, and WhatsApp alerts. Re-emphasizes the need for all shop management actions to be centralized.
+8.  **Agent**: Acknowledges and begins implementing the approved features in the sandbox.
+9.  **User**: Asks for , Suspend/Unsuspend and a few other communication features from the list.
+10. **Agent**: Starts implementing new features and updating the backend and frontend.
 
 **Project Health Check:**
--   **Broken**: The live deployment is non-functional and out of sync with the developed code. The backend process is unstable.
+-   **Working**: The live deployment on the user's server is functional.
+-   **Broken**: The new features currently under development in the sandbox are incomplete and non-functional.
 
 **3rd Party Integrations**
--   None.
+-   **Cloudflare**: Used for DNS management to enable automatic renewal of wildcard SSL certificates via Certbot. Requires a user-provided API key.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES (in the sandbox, for plan management and limit enforcement).
+-   **Testing agent used after significant changes**: YES, for features implemented before the deployment phase.
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: Test files were updated by the testing agent in  and .
--   **Known regressions**: The entire live deployment process is a regression from the locally tested, working state.
+-   **Test files created**:  was created.
+-   **Known regressions**: None currently, but the manual deployment process is a risk factor.
 
 **Credentials to test flow:**
 -   **Super Admin URL**: 
 -   **Super Admin Email**: 
 -   **Super Admin Password**: 
--   **Tenant Login URL**: 
 
 **What agent forgot to execute**
--   The agent did not initially enforce the Save to Github step strongly enough, leading to multiple failed deployment cycles.
--   The agent provided complex, chained commands that were not robust to the user's specific server environment (e.g., directory paths), causing errors and confusion. A more piecemeal, verifiable approach would have been better.</analysis>
+-   The agent was in the middle of a multi-step implementation and had not finished the frontend UI for the Announcements and Support Tickets tabs, nor had it fully wired up the action buttons for Login as Shop and Suspend/Unsuspend. Testing for these new features is pending.</analysis>
