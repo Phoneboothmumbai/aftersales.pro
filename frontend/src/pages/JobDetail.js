@@ -457,9 +457,14 @@ export default function JobDetail() {
                     <AlertCircle className="w-5 h-5 text-purple-500" />
                     Diagnosis
                   </CardTitle>
-                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("diagnosis")}>
+                  <Button 
+                    size="sm" 
+                    onClick={() => openWhatsApp("diagnosis")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    data-testid="whatsapp-diagnosis-btn"
+                  >
                     <MessageSquare className="w-4 h-4 mr-1" />
-                    Send to Customer
+                    Send WhatsApp
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
