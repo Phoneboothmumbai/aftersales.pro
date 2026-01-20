@@ -2963,6 +2963,142 @@ export default function SuperAdminDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Announcement Modal */}
+      <Dialog open={showCreateAnnouncement} onOpenChange={setShowCreateAnnouncement}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Megaphone className="w-5 h-5 text-blue-500" />
+              Create Announcement
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Title *</Label>
+              <Input
+                value={announcementForm.title}
+                onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
+                placeholder="Announcement title"
+                className="bg-slate-700 border-slate-600"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Content *</Label>
+              <Textarea
+                value={announcementForm.content}
+                onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })}
+                placeholder="Write your announcement..."
+                className="bg-slate-700 border-slate-600 min-h-[120px]"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select
+                  value={announcementForm.type}
+                  onValueChange={(value) => setAnnouncementForm({ ...announcementForm, type: value })}
+                >
+                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="info">Info</SelectItem>
+                    <SelectItem value="warning">Warning</SelectItem>
+                    <SelectItem value="success">Success</SelectItem>
+                    <SelectItem value="error">Error</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Target</Label>
+                <Select
+                  value={announcementForm.target}
+                  onValueChange={(value) => setAnnouncementForm({ ...announcementForm, target: value })}
+                >
+                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Shops</SelectItem>
+                    <SelectItem value="paid">Paid Only</SelectItem>
+                    <SelectItem value="trial">Trial Only</SelectItem>
+                    <SelectItem value="free">Free Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Expires At (optional)</Label>
+              <Input
+                type="date"
+                value={announcementForm.expires_at}
+                onChange={(e) => setAnnouncementForm({ ...announcementForm, expires_at: e.target.value })}
+                className="bg-slate-700 border-slate-600"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setShowCreateAnnouncement(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateAnnouncement}
+              disabled={!announcementForm.title || !announcementForm.content || actionLoading}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+              Broadcast
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Suspend Shop Modal */}
+      <Dialog open={showSuspendModal} onOpenChange={setShowSuspendModal}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-500">
+              <Ban className="w-5 h-5" />
+              Suspend Shop
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-4">
+              <p className="text-red-400 text-sm">
+                This will immediately suspend <strong>{selectedTenant?.company_name}</strong>. 
+                The shop will lose access to all features until unsuspended.
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Reason for Suspension *</Label>
+              <Textarea
+                value={suspendReason}
+                onChange={(e) => setSuspendReason(e.target.value)}
+                placeholder="Enter the reason for suspending this shop..."
+                className="bg-slate-700 border-slate-600 min-h-[100px]"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => { setShowSuspendModal(false); setSuspendReason(""); }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSuspendShop}
+              disabled={!suspendReason.trim() || actionLoading}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Ban className="w-4 h-4 mr-2" />}
+              Suspend Shop
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
