@@ -192,6 +192,31 @@ export default function SuperAdminDashboard() {
   const [legalEditEnabled, setLegalEditEnabled] = useState(true);
   const [legalSaving, setLegalSaving] = useState(false);
   
+  // Suspend/Unsuspend state
+  const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [suspendReason, setSuspendReason] = useState("");
+  
+  // Announcements state
+  const [announcements, setAnnouncements] = useState([]);
+  const [showCreateAnnouncement, setShowCreateAnnouncement] = useState(false);
+  const [announcementForm, setAnnouncementForm] = useState({
+    title: "",
+    content: "",
+    type: "info",
+    target: "all",
+    expires_at: ""
+  });
+  
+  // Support Tickets state
+  const [tickets, setTickets] = useState([]);
+  const [ticketFilter, setTicketFilter] = useState("all");
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [ticketReply, setTicketReply] = useState("");
+  
+  // Expiring subscriptions state
+  const [expiringSubscriptions, setExpiringSubscriptions] = useState([]);
+  const [expiringDays, setExpiringDays] = useState(7);
+  
   // Form states
   const [planForm, setPlanForm] = useState({
     id: "",
