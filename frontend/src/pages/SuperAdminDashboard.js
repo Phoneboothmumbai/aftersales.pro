@@ -1001,8 +1001,11 @@ export default function SuperAdminDashboard() {
                     {filteredTenants.map((tenant) => (
                       <tr key={tenant.id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
                         <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium text-white">{tenant.company_name}</p>
+                          <div 
+                            className="cursor-pointer hover:opacity-80"
+                            onClick={() => handleViewTenant(tenant)}
+                          >
+                            <p className="font-medium text-white hover:text-blue-400">{tenant.company_name}</p>
                             <p className="text-sm text-slate-400">{tenant.subdomain}.aftersales.pro</p>
                           </div>
                         </td>
@@ -1011,7 +1014,11 @@ export default function SuperAdminDashboard() {
                         </td>
                         <td className="px-4 py-3">
                           {tenant.is_active ? (
-                            <Badge className="bg-green-600/20 text-green-400 border-green-600/30">Active</Badge>
+                            tenant.suspension_reason ? (
+                              <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-600/30">Suspended</Badge>
+                            ) : (
+                              <Badge className="bg-green-600/20 text-green-400 border-green-600/30">Active</Badge>
+                            )
                           ) : (
                             <Badge className="bg-red-600/20 text-red-400 border-red-600/30">Inactive</Badge>
                           )}
@@ -1033,15 +1040,25 @@ export default function SuperAdminDashboard() {
                           </p>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex gap-2">
+                          <div className="flex gap-1">
                             <Button
                               size="sm"
                               variant="ghost"
                               className="text-slate-400 hover:text-white hover:bg-slate-700"
                               onClick={() => handleViewTenant(tenant)}
                               data-testid={`view-tenant-${tenant.subdomain}`}
+                              title="View Details"
                             >
                               <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/30"
+                              onClick={() => handleLoginAsShop(tenant.id)}
+                              title="Login as Shop"
+                            >
+                              <UserCheck className="w-4 h-4" />
                             </Button>
                             <Button
                               size="sm"
@@ -1051,8 +1068,9 @@ export default function SuperAdminDashboard() {
                                   ? "text-red-400 hover:text-red-300 hover:bg-red-900/30"
                                   : "text-green-400 hover:text-green-300 hover:bg-green-900/30"
                               }
-                              onClick={() => handleToggleActive(tenant.id, tenant.is_active)}
+                              onClick={() => tenant.is_active ? handleToggleActive(tenant.id, tenant.is_active) : handleUnsuspendShop(tenant.id)}
                               data-testid={`toggle-tenant-${tenant.subdomain}`}
+                              title={tenant.is_active ? "Deactivate" : "Activate"}
                             >
                               <Power className="w-4 h-4" />
                             </Button>
