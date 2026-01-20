@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 const AuthContext = createContext(null);
@@ -8,44 +8,13 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [tenant, setTenant] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isImpersonating, setIsImpersonating] = useState(false);
 
-  useEffect(() => {
-    // Check for impersonation token in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const impersonateToken = urlParams.get('impersonate');
-    
-    if (impersonateToken) {
-      // Store original token for later if exists
-      const originalToken = localStorage.getItem("token");
-      if (originalToken) {
-        sessionStorage.setItem("originalToken", originalToken);
-      }
-      
-      // Use impersonation token
-      localStorage.setItem("token", impersonateToken);
-      localStorage.setItem("isImpersonating", "true");
-      setToken(impersonateToken);
-      setIsImpersonating(true);
-      
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (localStorage.getItem("isImpersonating") === "true") {
-      setIsImpersonating(true);
-    }
-    
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async (authToken) => {
     try {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
       const [userRes, tenantRes] = await Promise.all([
         axios.get(`${API}/auth/me`),
         axios.get(`${API}/tenants/me`),
@@ -54,11 +23,63 @@ export const AuthProvider = ({ children }) => {
       setTenant(tenantRes.data);
     } catch (error) {
       console.error("Failed to fetch user:", error);
-      logout();
+      // Clear invalid token
+      localStorage.removeItem("token");
+      localStorage.removeItem("subdomain");
+      localStorage.removeItem("isImpersonating");
+      delete axios.defaults.headers.common["Authorization"];
+      setToken(null);
+      setUser(null);
+      setTenant(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Initialize on mount - run only once
+  useEffect(() => {
+    const initAuth = async () => {
+      // Check for impersonation token in URL first
+      const urlParams = new URLSearchParams(window.location.search);
+      const impersonateToken = urlParams.get('impersonate');
+      
+      if (impersonateToken) {
+        // Store original token for later if exists
+        const originalToken = localStorage.getItem("token");
+        if (originalToken) {
+          sessionStorage.setItem("originalToken", originalToken);
+        }
+        
+        // Use impersonation token
+        localStorage.setItem("token", impersonateToken);
+        localStorage.setItem("isImpersonating", "true");
+        setToken(impersonateToken);
+        setIsImpersonating(true);
+        
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Fetch user with impersonation token
+        await fetchUser(impersonateToken);
+      } else {
+        // Check for existing token in localStorage
+        const storedToken = localStorage.getItem("token");
+        
+        if (localStorage.getItem("isImpersonating") === "true") {
+          setIsImpersonating(true);
+        }
+        
+        if (storedToken) {
+          setToken(storedToken);
+          await fetchUser(storedToken);
+        } else {
+          setLoading(false);
+        }
+      }
+    };
+    
+    initAuth();
+  }, [fetchUser]);
 
   const login = async (email, password, subdomain) => {
     const response = await axios.post(`${API}/auth/login`, {
