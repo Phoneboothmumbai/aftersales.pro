@@ -2115,7 +2115,9 @@ export default function SuperAdminDashboard() {
                    (tenantDetails?.tenant?.subscription_plan || "free").slice(1)}
                 </span>
               </Badge>
-              {tenantDetails?.tenant?.is_active ? (
+              {tenantDetails?.tenant?.suspension_reason ? (
+                <Badge className="bg-yellow-600/20 text-yellow-400">Suspended</Badge>
+              ) : tenantDetails?.tenant?.is_active ? (
                 <Badge className="bg-green-600/20 text-green-400">Active</Badge>
               ) : (
                 <Badge className="bg-red-600/20 text-red-400">Inactive</Badge>
