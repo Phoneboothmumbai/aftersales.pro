@@ -240,7 +240,7 @@ export default function JobDetail() {
   };
 
   // Repair
-  const handleRepair = async () => {
+  const handleRepair = async (sendWhatsApp = false) => {
     if (!repairForm.work_done || !repairForm.final_amount) {
       toast.error("Please fill required fields");
       return;
@@ -250,7 +250,10 @@ export default function JobDetail() {
       await axios.put(`${API}/jobs/${id}/repair`, repairForm);
       toast.success("Repair completed");
       setRepairModal(false);
-      fetchJob();
+      await fetchJob();
+      if (sendWhatsApp) {
+        openWhatsApp("repaired");
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to update repair");
     } finally {
@@ -259,7 +262,7 @@ export default function JobDetail() {
   };
 
   // Delivery
-  const handleDelivery = async () => {
+  const handleDelivery = async (sendWhatsApp = false) => {
     if (!deliveryForm.delivered_to || !deliveryForm.amount_received || !deliveryForm.payment_mode) {
       toast.error("Please fill required fields");
       return;
@@ -269,7 +272,10 @@ export default function JobDetail() {
       await axios.put(`${API}/jobs/${id}/deliver`, deliveryForm);
       toast.success("Delivery recorded");
       setDeliveryModal(false);
-      fetchJob();
+      await fetchJob();
+      if (sendWhatsApp) {
+        openWhatsApp("delivered");
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to record delivery");
     } finally {
