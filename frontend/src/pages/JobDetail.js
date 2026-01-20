@@ -914,10 +914,14 @@ export default function JobDetail() {
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setRepairModal(false)}>Cancel</Button>
-            <Button onClick={handleRepair} disabled={actionLoading}>
-              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Mark Repaired"}
+            <Button variant="outline" onClick={() => handleRepair(false)} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Only"}
+            </Button>
+            <Button onClick={() => handleRepair(true)} disabled={actionLoading} className="bg-green-600 hover:bg-green-700">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save & Send WhatsApp"}
             </Button>
           </DialogFooter>
         </DialogContent>
