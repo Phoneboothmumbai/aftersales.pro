@@ -142,18 +142,27 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `DELETE /api/super-admin/plans/{id}` - Delete subscription plan (soft delete)
 - `GET /api/super-admin/feature-options` - Get all feature descriptions
 - `GET /api/super-admin/tenants` - List all tenants with plan info
-- `POST /api/super-admin/tenants` - **Create new tenant/shop from Super Admin** (NEW)
+- `POST /api/super-admin/tenants` - Create new tenant/shop from Super Admin
 - `GET /api/super-admin/tenants/{id}` - Tenant details with payments/logs
 - `PUT /api/super-admin/tenants/{id}` - Update tenant status
 - `POST /api/super-admin/tenants/{id}/assign-plan` - Assign subscription plan
 - `POST /api/super-admin/tenants/{id}/extend-validity` - Extend trial/subscription
 - `POST /api/super-admin/tenants/{id}/record-payment` - Record offline payment
+- `POST /api/super-admin/tenants/{id}/impersonate` - **Login as Shop (get impersonation token)** (NEW)
+- `POST /api/super-admin/tenants/{id}/suspend` - **Suspend shop with reason** (NEW)
+- `POST /api/super-admin/tenants/{id}/unsuspend` - **Unsuspend shop** (NEW)
 - `GET /api/super-admin/tenants/{id}/payments` - View payment history
 - `GET /api/super-admin/tenants/{id}/action-logs` - View admin action logs
 - `GET /api/super-admin/payments` - All recent payments across tenants
-- `GET /api/super-admin/analytics` - **Platform-wide analytics & billing** (NEW)
+- `GET /api/super-admin/analytics` - Platform-wide analytics & billing
 - `GET /api/super-admin/legal-pages` - Get all legal pages
 - `PUT /api/super-admin/legal-pages/{slug}` - Update legal page content
+- `GET /api/super-admin/announcements` - **List all announcements** (NEW)
+- `POST /api/super-admin/announcements` - **Create announcement** (NEW)
+- `DELETE /api/super-admin/announcements/{id}` - **Delete announcement** (NEW)
+- `GET /api/super-admin/tickets` - **List all support tickets** (NEW)
+- `POST /api/super-admin/tickets/{id}/reply` - **Reply to ticket** (NEW)
+- `POST /api/super-admin/tickets/{id}/close` - **Close ticket** (NEW)
 
 ### Public
 - `GET /api/public/track/{job_number}/{tracking_token}` - Public job status
