@@ -2909,6 +2909,419 @@ async def get_super_admin_analytics(admin: dict = Depends(get_super_admin)):
         "recent_payments": recent_payments
     }
 
+# ==================== LOGIN AS SHOP (IMPERSONATION) ====================
+
+@api_router.post("/super-admin/tenants/{tenant_id}/impersonate")
+async def impersonate_tenant(tenant_id: str, admin: dict = Depends(get_super_admin)):
+    """Generate a token to login as a shop admin"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    # Get the admin user of this tenant
+    admin_user = await db.users.find_one({"tenant_id": tenant_id, "role": "admin"})
+    if not admin_user:
+        raise HTTPException(status_code=404, detail="No admin user found for this tenant")
+    
+    # Create a token for the admin user
+    token = jwt.encode({
+        "user_id": admin_user["id"],
+        "tenant_id": tenant_id,
+        "role": "admin",
+        "impersonated_by": admin["id"],
+        "exp": datetime.now(timezone.utc) + timedelta(hours=2)
+    }, JWT_SECRET, algorithm="HS256")
+    
+    # Log the action
+    now = datetime.now(timezone.utc).isoformat()
+    await db.admin_action_logs.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin["id"],
+        "admin_email": admin["email"],
+        "tenant_id": tenant_id,
+        "action": "impersonate",
+        "details": {"reason": "Super admin login as shop"},
+        "created_at": now
+    })
+    
+    return {
+        "token": token,
+        "user": {
+            "id": admin_user["id"],
+            "name": admin_user.get("name", ""),
+            "email": admin_user["email"],
+            "role": admin_user["role"],
+            "tenant_id": tenant_id
+        },
+        "tenant": {
+            "id": tenant["id"],
+            "company_name": tenant["company_name"],
+            "subdomain": tenant["subdomain"]
+        }
+    }
+
+# ==================== SUSPEND/UNSUSPEND SHOP ====================
+
+class SuspendTenantRequest(BaseModel):
+    reason: str
+    notify_admin: bool = True
+
+@api_router.post("/super-admin/tenants/{tenant_id}/suspend")
+async def suspend_tenant(
+    tenant_id: str, 
+    data: SuspendTenantRequest,
+    admin: dict = Depends(get_super_admin)
+):
+    """Suspend a shop with reason"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    await db.tenants.update_one(
+        {"id": tenant_id},
+        {"$set": {
+            "is_active": False,
+            "suspended_at": now,
+            "suspension_reason": data.reason,
+            "suspended_by": admin["id"]
+        }}
+    )
+    
+    # Log the action
+    await db.admin_action_logs.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin["id"],
+        "admin_email": admin["email"],
+        "tenant_id": tenant_id,
+        "action": "suspend",
+        "details": {"reason": data.reason, "notify_admin": data.notify_admin},
+        "created_at": now
+    })
+    
+    return {"message": "Shop suspended successfully", "reason": data.reason}
+
+@api_router.post("/super-admin/tenants/{tenant_id}/unsuspend")
+async def unsuspend_tenant(
+    tenant_id: str,
+    admin: dict = Depends(get_super_admin)
+):
+    """Unsuspend a shop"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    await db.tenants.update_one(
+        {"id": tenant_id},
+        {
+            "$set": {"is_active": True, "unsuspended_at": now},
+            "$unset": {"suspended_at": "", "suspension_reason": "", "suspended_by": ""}
+        }
+    )
+    
+    # Log the action
+    await db.admin_action_logs.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin["id"],
+        "admin_email": admin["email"],
+        "tenant_id": tenant_id,
+        "action": "unsuspend",
+        "details": {},
+        "created_at": now
+    })
+    
+    return {"message": "Shop unsuspended successfully"}
+
+# ==================== ANNOUNCEMENTS ====================
+
+class AnnouncementCreate(BaseModel):
+    title: str
+    content: str
+    type: str = "info"  # info, warning, urgent
+    target: str = "all"  # all, active, trial, paid
+    expires_at: Optional[str] = None
+
+@api_router.get("/super-admin/announcements")
+async def get_announcements(admin: dict = Depends(get_super_admin)):
+    """Get all announcements"""
+    announcements = await db.announcements.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return announcements
+
+@api_router.post("/super-admin/announcements")
+async def create_announcement(
+    data: AnnouncementCreate,
+    admin: dict = Depends(get_super_admin)
+):
+    """Create a new announcement"""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    announcement = {
+        "id": str(uuid.uuid4()),
+        "title": data.title,
+        "content": data.content,
+        "type": data.type,
+        "target": data.target,
+        "expires_at": data.expires_at,
+        "created_by": admin["id"],
+        "created_at": now,
+        "is_active": True
+    }
+    
+    await db.announcements.insert_one(announcement)
+    
+    return {"message": "Announcement created", "announcement": {k: v for k, v in announcement.items() if k != "_id"}}
+
+@api_router.delete("/super-admin/announcements/{announcement_id}")
+async def delete_announcement(
+    announcement_id: str,
+    admin: dict = Depends(get_super_admin)
+):
+    """Delete an announcement"""
+    result = await db.announcements.delete_one({"id": announcement_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    return {"message": "Announcement deleted"}
+
+# Tenant endpoint to get announcements
+@api_router.get("/announcements")
+async def get_tenant_announcements(user: dict = Depends(get_current_user)):
+    """Get announcements for the logged-in tenant"""
+    tenant = await db.tenants.find_one({"id": user["tenant_id"]})
+    if not tenant:
+        return []
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Build query based on tenant status
+    query = {
+        "is_active": True,
+        "$or": [
+            {"expires_at": None},
+            {"expires_at": {"$gt": now}}
+        ]
+    }
+    
+    # Filter by target
+    status = tenant.get("subscription_status", "trial")
+    target_filter = {"$or": [
+        {"target": "all"},
+        {"target": status}
+    ]}
+    query.update(target_filter)
+    
+    announcements = await db.announcements.find(query, {"_id": 0}).sort("created_at", -1).to_list(10)
+    return announcements
+
+# ==================== SUPPORT TICKETS ====================
+
+class TicketCreate(BaseModel):
+    subject: str
+    message: str
+    priority: str = "normal"  # low, normal, high, urgent
+
+class TicketReply(BaseModel):
+    message: str
+
+@api_router.get("/super-admin/tickets")
+async def get_all_tickets(
+    status: str = "all",
+    admin: dict = Depends(get_super_admin)
+):
+    """Get all support tickets"""
+    query = {} if status == "all" else {"status": status}
+    tickets = await db.support_tickets.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Enrich with tenant info
+    for ticket in tickets:
+        tenant = await db.tenants.find_one({"id": ticket.get("tenant_id")}, {"company_name": 1, "subdomain": 1, "_id": 0})
+        ticket["company_name"] = tenant.get("company_name", "Unknown") if tenant else "Unknown"
+        ticket["subdomain"] = tenant.get("subdomain", "unknown") if tenant else "unknown"
+    
+    return tickets
+
+@api_router.post("/super-admin/tickets/{ticket_id}/reply")
+async def reply_to_ticket(
+    ticket_id: str,
+    data: TicketReply,
+    admin: dict = Depends(get_super_admin)
+):
+    """Reply to a support ticket"""
+    ticket = await db.support_tickets.find_one({"id": ticket_id})
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    reply = {
+        "id": str(uuid.uuid4()),
+        "message": data.message,
+        "from": "admin",
+        "admin_id": admin["id"],
+        "admin_name": admin.get("name", "Super Admin"),
+        "created_at": now
+    }
+    
+    await db.support_tickets.update_one(
+        {"id": ticket_id},
+        {
+            "$push": {"replies": reply},
+            "$set": {"status": "replied", "updated_at": now}
+        }
+    )
+    
+    return {"message": "Reply sent", "reply": reply}
+
+@api_router.post("/super-admin/tickets/{ticket_id}/close")
+async def close_ticket(
+    ticket_id: str,
+    admin: dict = Depends(get_super_admin)
+):
+    """Close a support ticket"""
+    now = datetime.now(timezone.utc).isoformat()
+    result = await db.support_tickets.update_one(
+        {"id": ticket_id},
+        {"$set": {"status": "closed", "closed_at": now, "closed_by": admin["id"]}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    return {"message": "Ticket closed"}
+
+# Tenant endpoint to create ticket
+@api_router.post("/tickets")
+async def create_ticket(
+    data: TicketCreate,
+    user: dict = Depends(get_current_user)
+):
+    """Create a support ticket"""
+    now = datetime.now(timezone.utc).isoformat()
+    
+    ticket = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": user["tenant_id"],
+        "user_id": user["id"],
+        "user_email": user["email"],
+        "subject": data.subject,
+        "message": data.message,
+        "priority": data.priority,
+        "status": "open",
+        "replies": [],
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    await db.support_tickets.insert_one(ticket)
+    
+    return {"message": "Ticket created", "ticket": {k: v for k, v in ticket.items() if k != "_id"}}
+
+@api_router.get("/tickets")
+async def get_my_tickets(user: dict = Depends(get_current_user)):
+    """Get tickets for the current tenant"""
+    tickets = await db.support_tickets.find(
+        {"tenant_id": user["tenant_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return tickets
+
+@api_router.post("/tickets/{ticket_id}/reply")
+async def tenant_reply_to_ticket(
+    ticket_id: str,
+    data: TicketReply,
+    user: dict = Depends(get_current_user)
+):
+    """Tenant reply to their own ticket"""
+    ticket = await db.support_tickets.find_one({"id": ticket_id, "tenant_id": user["tenant_id"]})
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    reply = {
+        "id": str(uuid.uuid4()),
+        "message": data.message,
+        "from": "tenant",
+        "user_id": user["id"],
+        "user_email": user["email"],
+        "created_at": now
+    }
+    
+    await db.support_tickets.update_one(
+        {"id": ticket_id},
+        {
+            "$push": {"replies": reply},
+            "$set": {"status": "open", "updated_at": now}
+        }
+    )
+    
+    return {"message": "Reply sent", "reply": reply}
+
+# ==================== WHATSAPP ALERTS FOR EXPIRING SUBSCRIPTIONS ====================
+
+@api_router.get("/super-admin/expiring-subscriptions")
+async def get_expiring_subscriptions(
+    days: int = 7,
+    admin: dict = Depends(get_super_admin)
+):
+    """Get shops with expiring subscriptions and generate WhatsApp messages"""
+    now = datetime.now(timezone.utc)
+    future_date = (now + timedelta(days=days)).isoformat()
+    
+    expiring = await db.tenants.find(
+        {
+            "subscription_status": "paid",
+            "subscription_ends_at": {"$lte": future_date, "$gte": now.isoformat()},
+            "is_active": True
+        },
+        {"_id": 0}
+    ).sort("subscription_ends_at", 1).to_list(100)
+    
+    # Enrich with admin contact and WhatsApp link
+    for tenant in expiring:
+        admin_user = await db.users.find_one(
+            {"tenant_id": tenant["id"], "role": "admin"},
+            {"_id": 0, "name": 1, "email": 1}
+        )
+        tenant["admin_name"] = admin_user.get("name", "Admin") if admin_user else "Admin"
+        tenant["admin_email"] = admin_user.get("email", "") if admin_user else ""
+        
+        # Get phone from tenant settings
+        phone = tenant.get("settings", {}).get("phone", "")
+        tenant["phone"] = phone
+        
+        # Calculate days remaining
+        if tenant.get("subscription_ends_at"):
+            try:
+                ends_at = datetime.fromisoformat(tenant["subscription_ends_at"].replace("Z", "+00:00"))
+                days_remaining = (ends_at - now).days
+                tenant["days_remaining"] = days_remaining
+            except:
+                tenant["days_remaining"] = 0
+        
+        # Generate WhatsApp message
+        message = f"""Hi {tenant['admin_name']},
+
+Your subscription for *{tenant['company_name']}* on AfterSales.pro is expiring in {tenant.get('days_remaining', 0)} days.
+
+Please renew to continue using all features without interruption.
+
+Renew now to avoid any service disruption.
+
+Thank you,
+AfterSales.pro Team"""
+        
+        tenant["whatsapp_message"] = message
+        if phone:
+            clean_phone = phone.replace(" ", "").replace("-", "").replace("+", "")
+            if not clean_phone.startswith("91") and len(clean_phone) == 10:
+                clean_phone = "91" + clean_phone
+            tenant["whatsapp_link"] = f"https://wa.me/{clean_phone}?text={message.replace(' ', '%20').replace(chr(10), '%0A')}"
+        else:
+            tenant["whatsapp_link"] = None
+    
+    return expiring
+
 # ==================== SUBSCRIPTION MANAGEMENT ROUTES ====================
 
 async def get_plans_from_db() -> dict:
