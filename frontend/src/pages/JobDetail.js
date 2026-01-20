@@ -991,10 +991,14 @@ export default function JobDetail() {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setDeliveryModal(false)}>Cancel</Button>
-            <Button onClick={handleDelivery} disabled={actionLoading}>
-              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Record Delivery"}
+            <Button variant="outline" onClick={() => handleDelivery(false)} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Only"}
+            </Button>
+            <Button onClick={() => handleDelivery(true)} disabled={actionLoading} className="bg-green-600 hover:bg-green-700">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save & Send WhatsApp"}
             </Button>
           </DialogFooter>
         </DialogContent>
