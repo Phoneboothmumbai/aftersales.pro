@@ -304,6 +304,12 @@ export default function SuperAdminDashboard() {
     if (activeTab === "analytics" && !analytics) {
       fetchAnalytics();
     }
+    if (activeTab === "announcements" && announcements.length === 0) {
+      fetchAnnouncements();
+    }
+    if (activeTab === "tickets" && tickets.length === 0) {
+      fetchTickets();
+    }
   }, [activeTab]);
 
   const fetchLegalPages = async () => {
@@ -323,6 +329,149 @@ export default function SuperAdminDashboard() {
       setLegalPages(pages);
     } catch (error) {
       console.error("Failed to fetch legal pages:", error);
+    }
+  };
+
+  // Announcements functions
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await axios.get(`${API}/super-admin/announcements`);
+      setAnnouncements(response.data);
+    } catch (error) {
+      console.error("Failed to fetch announcements:", error);
+    }
+  };
+
+  const handleCreateAnnouncement = async () => {
+    if (!announcementForm.title || !announcementForm.content) {
+      alert("Please fill in title and content");
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await axios.post(`${API}/super-admin/announcements`, announcementForm);
+      fetchAnnouncements();
+      setShowCreateAnnouncement(false);
+      setAnnouncementForm({ title: "", content: "", type: "info", target: "all", expires_at: "" });
+      alert("Announcement created!");
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to create announcement");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id) => {
+    if (!window.confirm("Delete this announcement?")) return;
+    try {
+      await axios.delete(`${API}/super-admin/announcements/${id}`);
+      fetchAnnouncements();
+    } catch (error) {
+      alert("Failed to delete announcement");
+    }
+  };
+
+  // Support Tickets functions
+  const fetchTickets = async () => {
+    try {
+      const response = await axios.get(`${API}/super-admin/tickets?status=${ticketFilter}`);
+      setTickets(response.data);
+    } catch (error) {
+      console.error("Failed to fetch tickets:", error);
+    }
+  };
+
+  const handleReplyToTicket = async () => {
+    if (!ticketReply.trim()) return;
+    setActionLoading(true);
+    try {
+      await axios.post(`${API}/super-admin/tickets/${selectedTicket.id}/reply`, { message: ticketReply });
+      setTicketReply("");
+      fetchTickets();
+      // Refresh selected ticket
+      const updated = tickets.find(t => t.id === selectedTicket.id);
+      if (updated) setSelectedTicket({ ...updated, replies: [...(updated.replies || []), { message: ticketReply, from: "admin" }] });
+    } catch (error) {
+      alert("Failed to send reply");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCloseTicket = async (ticketId) => {
+    try {
+      await axios.post(`${API}/super-admin/tickets/${ticketId}/close`);
+      fetchTickets();
+      setSelectedTicket(null);
+    } catch (error) {
+      alert("Failed to close ticket");
+    }
+  };
+
+  // Expiring subscriptions
+  const fetchExpiringSubscriptions = async () => {
+    try {
+      const response = await axios.get(`${API}/super-admin/expiring-subscriptions?days=${expiringDays}`);
+      setExpiringSubscriptions(response.data);
+    } catch (error) {
+      console.error("Failed to fetch expiring subscriptions:", error);
+    }
+  };
+
+  // Login as Shop (Impersonation)
+  const handleLoginAsShop = async (tenantId) => {
+    setActionLoading(true);
+    try {
+      const response = await axios.post(`${API}/super-admin/tenants/${tenantId}/impersonate`);
+      const { token, tenant } = response.data;
+      // Open in new tab with the impersonation token
+      const url = `${window.location.origin}/dashboard?impersonate=${token}`;
+      window.open(url, '_blank');
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to login as shop");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Suspend/Unsuspend
+  const handleSuspendShop = async () => {
+    if (!suspendReason.trim()) {
+      alert("Please provide a reason for suspension");
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await axios.post(`${API}/super-admin/tenants/${selectedTenant.id}/suspend`, {
+        reason: suspendReason,
+        notify_admin: true
+      });
+      fetchData();
+      fetchTenantDetails(selectedTenant.id);
+      setShowSuspendModal(false);
+      setSuspendReason("");
+      alert("Shop suspended successfully");
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to suspend shop");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUnsuspendShop = async (tenantId) => {
+    if (!window.confirm("Are you sure you want to unsuspend this shop?")) return;
+    setActionLoading(true);
+    try {
+      await axios.post(`${API}/super-admin/tenants/${tenantId}/unsuspend`);
+      fetchData();
+      if (selectedTenant?.id === tenantId) {
+        fetchTenantDetails(tenantId);
+      }
+      alert("Shop unsuspended successfully");
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to unsuspend shop");
+    } finally {
+      setActionLoading(false);
     }
   };
 
