@@ -498,6 +498,86 @@ export default function JobCreate() {
             </Button>
           </div>
         </form>
+
+        {/* Success Modal with WhatsApp Option */}
+        <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-green-600">
+                <CheckCircle className="w-6 h-6" />
+                Job Created Successfully!
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              {createdJob && (
+                <div className="bg-muted rounded-lg p-4 space-y-2">
+                  <p className="text-lg font-bold">Job #{createdJob.job_number}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Customer: {createdJob.customer?.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Device: {createdJob.device?.brand} {createdJob.device?.model}
+                  </p>
+                </div>
+              )}
+              
+              <div className="text-center text-sm text-muted-foreground">
+                Would you like to notify the customer via WhatsApp?
+              </div>
+
+              {whatsappData && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                  <pre className="whitespace-pre-wrap text-xs text-green-800 dark:text-green-200 max-h-40 overflow-y-auto">
+                    {whatsappData.message}
+                  </pre>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-2">
+                <Button 
+                  onClick={handleOpenWhatsApp} 
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  disabled={!whatsappData}
+                  data-testid="send-whatsapp-btn"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Send WhatsApp Message
+                  <ExternalLink className="w-3 h-3 ml-2" />
+                </Button>
+                <Button 
+                  onClick={handleViewJob} 
+                  variant="outline"
+                  className="w-full"
+                  data-testid="view-job-btn"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  View Job Details
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    setCreatedJob(null);
+                    setWhatsappData(null);
+                    // Reset form
+                    setFormData({
+                      customer: { name: "", mobile: "", email: "" },
+                      device: { device_type: "", brand: "", model: "", serial_imei: "", condition: "", condition_notes: "", notes: "", password: "" },
+                      accessories: [...DEFAULT_ACCESSORIES],
+                      problem_description: "",
+                      technician_observation: "",
+                      branch_id: branches.length === 1 ? branches[0].id : "",
+                    });
+                  }} 
+                  variant="ghost"
+                  className="w-full"
+                  data-testid="create-another-btn"
+                >
+                  Create Another Job
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
