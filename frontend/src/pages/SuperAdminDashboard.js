@@ -782,7 +782,7 @@ export default function SuperAdminDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex bg-slate-700 rounded-lg p-1">
+              <div className="flex bg-slate-700 rounded-lg p-1 flex-wrap">
                 <Button
                   variant={activeTab === "tenants" ? "default" : "ghost"}
                   size="sm"
@@ -790,7 +790,7 @@ export default function SuperAdminDashboard() {
                   className={activeTab === "tenants" ? "bg-slate-600" : "text-slate-400"}
                 >
                   <Building2 className="w-4 h-4 mr-2" />
-                  Tenants
+                  Shops
                 </Button>
                 <Button
                   variant={activeTab === "plans" ? "default" : "ghost"}
@@ -809,6 +809,24 @@ export default function SuperAdminDashboard() {
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Analytics
+                </Button>
+                <Button
+                  variant={activeTab === "announcements" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab("announcements")}
+                  className={activeTab === "announcements" ? "bg-slate-600" : "text-slate-400"}
+                >
+                  <Megaphone className="w-4 h-4 mr-2" />
+                  Broadcast
+                </Button>
+                <Button
+                  variant={activeTab === "tickets" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab("tickets")}
+                  className={activeTab === "tickets" ? "bg-slate-600" : "text-slate-400"}
+                >
+                  <Ticket className="w-4 h-4 mr-2" />
+                  Tickets
                 </Button>
                 <Button
                   variant={activeTab === "settings" ? "default" : "ghost"}
