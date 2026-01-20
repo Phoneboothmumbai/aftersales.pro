@@ -2250,17 +2250,16 @@ export default function SuperAdminDashboard() {
                 </Card>
 
                 {/* Quick Actions */}
-                <div className="flex gap-2 pt-4 border-t border-slate-700">
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-700">
                   <Button
-                    variant={tenantDetails.tenant.is_active ? "destructive" : "default"}
-                    onClick={() => handleToggleActive(tenantDetails.tenant.id, tenantDetails.tenant.is_active)}
+                    onClick={() => handleLoginAsShop(tenantDetails.tenant.id)}
                     disabled={actionLoading}
-                    className={!tenantDetails.tenant.is_active ? "bg-green-600 hover:bg-green-700" : ""}
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
-                    {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Power className="w-4 h-4 mr-2" />}
-                    {tenantDetails.tenant.is_active ? "Deactivate Shop" : "Activate Shop"}
+                    <UserCheck className="w-4 h-4 mr-2" />
+                    Login as Shop
                   </Button>
-                  <Button onClick={() => setShowAssignPlan(true)} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={() => setShowAssignPlan(true)} className="bg-purple-600 hover:bg-purple-700">
                     <Crown className="w-4 h-4 mr-2" />
                     Change Plan
                   </Button>
@@ -2268,6 +2267,38 @@ export default function SuperAdminDashboard() {
                     <Calendar className="w-4 h-4 mr-2" />
                     Extend Validity
                   </Button>
+                  <Button variant="outline" onClick={() => setShowRecordPayment(true)} className="border-slate-600">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Record Payment
+                  </Button>
+                  {tenantDetails.tenant.is_active && !tenantDetails.tenant.suspension_reason ? (
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowSuspendModal(true)}
+                      disabled={actionLoading}
+                    >
+                      <Ban className="w-4 h-4 mr-2" />
+                      Suspend Shop
+                    </Button>
+                  ) : tenantDetails.tenant.suspension_reason ? (
+                    <Button
+                      onClick={() => handleUnsuspendShop(tenantDetails.tenant.id)}
+                      disabled={actionLoading}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlayCircle className="w-4 h-4 mr-2" />}
+                      Unsuspend Shop
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => handleToggleActive(tenantDetails.tenant.id, tenantDetails.tenant.is_active)}
+                      disabled={actionLoading}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Power className="w-4 h-4 mr-2" />}
+                      Activate Shop
+                    </Button>
+                  )}
                 </div>
               </TabsContent>
 
