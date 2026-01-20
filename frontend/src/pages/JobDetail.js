@@ -182,7 +182,7 @@ export default function JobDetail() {
   };
 
   // Diagnosis
-  const handleDiagnosis = async () => {
+  const handleDiagnosis = async (sendWhatsApp = false) => {
     if (!diagnosisForm.diagnosis || !diagnosisForm.estimated_cost || !diagnosisForm.estimated_timeline) {
       toast.error("Please fill all required fields");
       return;
@@ -192,7 +192,10 @@ export default function JobDetail() {
       await axios.put(`${API}/jobs/${id}/diagnosis`, diagnosisForm);
       toast.success("Diagnosis added");
       setDiagnosisModal(false);
-      fetchJob();
+      await fetchJob();
+      if (sendWhatsApp) {
+        openWhatsApp("diagnosis");
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to add diagnosis");
     } finally {
@@ -201,7 +204,7 @@ export default function JobDetail() {
   };
 
   // Approval
-  const handleApproval = async () => {
+  const handleApproval = async (sendWhatsApp = false) => {
     if (!approvalForm.approved_by || !approvalForm.approved_amount) {
       toast.error("Please fill required fields");
       return;
@@ -211,7 +214,10 @@ export default function JobDetail() {
       await axios.put(`${API}/jobs/${id}/approve`, approvalForm);
       toast.success("Approval recorded");
       setApprovalModal(false);
-      fetchJob();
+      await fetchJob();
+      if (sendWhatsApp) {
+        openWhatsApp("approved");
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to record approval");
     } finally {
