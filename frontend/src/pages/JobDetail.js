@@ -362,9 +362,14 @@ export default function JobDetail() {
               <Download className="w-4 h-4 mr-2" />
               PDF
             </Button>
-            <Button variant="outline" size="sm" onClick={() => openWhatsApp(job.status)} data-testid="whatsapp-btn">
+            <Button 
+              size="sm" 
+              onClick={() => openWhatsApp(job.status)} 
+              className="bg-green-600 hover:bg-green-700 text-white"
+              data-testid="whatsapp-btn"
+            >
               <MessageSquare className="w-4 h-4 mr-2" />
-              WhatsApp
+              WhatsApp Customer
             </Button>
           </div>
         </div>
