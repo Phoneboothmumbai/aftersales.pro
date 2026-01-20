@@ -31,6 +31,9 @@ export default function JobCreate() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [branches, setBranches] = useState([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdJob, setCreatedJob] = useState(null);
+  const [whatsappData, setWhatsappData] = useState(null);
   const [formData, setFormData] = useState({
     customer: {
       name: "",
