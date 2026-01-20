@@ -587,9 +587,14 @@ export default function JobDetail() {
                     <Truck className="w-5 h-5 text-emerald-500" />
                     Delivery Details
                   </CardTitle>
-                  <Button variant="outline" size="sm" onClick={() => openWhatsApp("delivered")}>
+                  <Button 
+                    size="sm" 
+                    onClick={() => openWhatsApp("delivered")}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    data-testid="whatsapp-delivery-btn"
+                  >
                     <MessageSquare className="w-4 h-4 mr-1" />
-                    Send Receipt
+                    Send WhatsApp
                   </Button>
                 </CardHeader>
                 <CardContent>
