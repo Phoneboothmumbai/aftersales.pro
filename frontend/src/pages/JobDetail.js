@@ -857,10 +857,14 @@ export default function JobDetail() {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setApprovalModal(false)}>Cancel</Button>
-            <Button onClick={handleApproval} disabled={actionLoading}>
-              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Record Approval"}
+            <Button variant="outline" onClick={() => handleApproval(false)} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Only"}
+            </Button>
+            <Button onClick={() => handleApproval(true)} disabled={actionLoading} className="bg-green-600 hover:bg-green-700">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save & Send WhatsApp"}
             </Button>
           </DialogFooter>
         </DialogContent>
