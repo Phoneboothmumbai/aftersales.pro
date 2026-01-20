@@ -142,12 +142,33 @@ export default function JobCreate() {
     setLoading(true);
     try {
       const response = await axios.post(`${API}/jobs`, formData);
-      toast.success(`Job ${response.data.job_number} created successfully!`);
-      navigate(`/jobs/${response.data.id}`);
+      setCreatedJob(response.data);
+      
+      // Fetch WhatsApp message for the created job
+      try {
+        const whatsappRes = await axios.get(`${API}/jobs/${response.data.id}/whatsapp-message?message_type=received`);
+        setWhatsappData(whatsappRes.data);
+      } catch (e) {
+        console.error("Failed to generate WhatsApp message:", e);
+      }
+      
+      setShowSuccessModal(true);
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to create job");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenWhatsApp = () => {
+    if (whatsappData?.whatsapp_url) {
+      window.open(whatsappData.whatsapp_url, "_blank");
+    }
+  };
+
+  const handleViewJob = () => {
+    if (createdJob) {
+      navigate(`/jobs/${createdJob.id}`);
     }
   };
 
