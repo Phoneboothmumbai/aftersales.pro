@@ -27,12 +27,13 @@ import {
   Package,
   BarChart3,
   UserCircle,
+  Shield,
 } from "lucide-react";
 
 export const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, tenant, logout, isAdmin } = useAuth();
+  const { user, tenant, logout, isAdmin, isImpersonating, exitImpersonation } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -56,6 +57,26 @@ export const Layout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Impersonation Banner */}
+      {isImpersonating && (
+        <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between sticky top-0 z-[100]">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              You are viewing as: <strong>{tenant?.company_name}</strong> ({tenant?.subdomain}.aftersales.pro)
+            </span>
+          </div>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={exitImpersonation}
+            className="bg-black text-white hover:bg-black/80"
+          >
+            Exit Preview
+          </Button>
+        </div>
+      )}
+
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -68,7 +89,7 @@ export const Layout = ({ children }) => {
       <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform md:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        } ${isImpersonating ? "top-10" : ""}`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -136,7 +157,7 @@ export const Layout = ({ children }) => {
       {/* Main content */}
       <div className="md:pl-64">
         {/* Top bar */}
-        <header className="glass sticky top-0 z-30 h-16 flex items-center justify-between px-4 md:px-6 gap-4">
+        <header className={`glass sticky ${isImpersonating ? "top-10" : "top-0"} z-30 h-16 flex items-center justify-between px-4 md:px-6 gap-4`}>
           <div className="flex items-center gap-4 flex-shrink-0">
             <button
               className="md:hidden p-2 hover:bg-muted rounded-lg"
