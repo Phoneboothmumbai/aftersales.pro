@@ -1026,6 +1026,44 @@ export default function JobDetail() {
                 placeholder="UPI ID, Transaction ID, etc."
               />
             </div>
+
+            {/* Expense Fields (Optional) */}
+            <div className="border-t pt-4 mt-4">
+              <p className="text-sm font-medium mb-3 text-muted-foreground">
+                Expense Tracking (Optional - Can add later)
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Parts/Materials Cost (₹)</Label>
+                  <Input
+                    type="number"
+                    value={deliveryForm.expense_parts}
+                    onChange={(e) => setDeliveryForm({ ...deliveryForm, expense_parts: e.target.value })}
+                    placeholder="0"
+                    data-testid="expense-parts-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Labor Cost (₹)</Label>
+                  <Input
+                    type="number"
+                    value={deliveryForm.expense_labor}
+                    onChange={(e) => setDeliveryForm({ ...deliveryForm, expense_labor: e.target.value })}
+                    placeholder="0"
+                    data-testid="expense-labor-input"
+                  />
+                </div>
+              </div>
+              {(deliveryForm.expense_parts || deliveryForm.expense_labor) && (
+                <div className="mt-2 text-sm bg-muted/50 p-2 rounded">
+                  <span className="text-muted-foreground">Estimated Profit: </span>
+                  <span className="font-bold text-green-600">
+                    ₹{((parseFloat(deliveryForm.amount_received) || 0) - (parseFloat(deliveryForm.expense_parts) || 0) - (parseFloat(deliveryForm.expense_labor) || 0)).toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label>Notes</Label>
               <Textarea
