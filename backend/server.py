@@ -163,9 +163,19 @@ class RepairUpdate(BaseModel):
 class DeliveryUpdate(BaseModel):
     delivered_to: str  # Who received the device
     amount_received: float
-    payment_mode: str  # Cash, UPI, Card, etc.
+    payment_mode: str  # Cash, UPI, Card, Credit
     payment_reference: Optional[str] = None
     delivery_notes: Optional[str] = None
+    is_credit: bool = False  # If true, amount is credited to customer ledger
+    credit_amount: Optional[float] = None  # Amount to be credited
+
+class CustomerPayment(BaseModel):
+    customer_id: str
+    amount: float
+    payment_mode: str  # Cash, UPI, Card, Bank Transfer
+    payment_reference: Optional[str] = None
+    notes: Optional[str] = None
+    job_id: Optional[str] = None  # Optional link to a specific job
 
 class CloseJobRequest(BaseModel):
     device_delivered: bool = True
