@@ -150,7 +150,7 @@
   "test_credentials": {
     "super_admin_email": "superadmin@aftersales.pro",
     "super_admin_password": "SuperAdmin@123",
-    "super_admin_url": "https://fixflow-67.preview.emergentagent.com/super-admin"
+    "super_admin_url": "https://aftersales-repair.preview.emergentagent.com/super-admin"
   },
   "subscription_plans": {
     "free": {"price": 0, "max_users": 1, "max_jobs_per_month": 50},
