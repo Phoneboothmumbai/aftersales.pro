@@ -1578,7 +1578,9 @@ async def deliver_job(job_id: str, data: DeliveryUpdate, user: dict = Depends(ge
         "payment_reference": data.payment_reference,
         "delivery_notes": data.delivery_notes,
         "delivered_at": now,
-        "delivered_by": user["id"]
+        "delivered_by": user["id"],
+        "expense_parts": data.expense_parts,
+        "expense_labor": data.expense_labor
     }
     
     status_entry = {
