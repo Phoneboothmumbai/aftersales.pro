@@ -124,11 +124,12 @@ class DeviceInfo(BaseModel):
     device_type: str  # Laptop, Mobile, Tablet, Other
     brand: str
     model: str
-    serial_imei: str
-    condition: str  # Fresh, Active, Physical Damage, Dead, Liquid
+    serial_imei: Optional[str] = None  # Made optional
+    condition: Optional[str] = None  # Made optional - Fresh, Active, Physical Damage, Dead, Liquid
     condition_notes: Optional[str] = None
     notes: Optional[str] = None  # Additional notes about the device
     password: Optional[str] = None  # Device password/PIN
+    unlock_pattern: Optional[str] = None  # Android unlock pattern (e.g., "1-2-3-6-9")
 
 class AccessoryItem(BaseModel):
     name: str
