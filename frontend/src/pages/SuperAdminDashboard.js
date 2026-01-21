@@ -480,6 +480,33 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!selectedUser || !newPassword) {
+      alert("Please enter a new password");
+      return;
+    }
+    if (newPassword.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await axios.post(
+        `${API}/super-admin/tenants/${selectedTenant.id}/users/${selectedUser.id}/reset-password`,
+        { new_password: newPassword }
+      );
+      alert(`Password reset successfully for ${selectedUser.email}`);
+      setShowResetPasswordModal(false);
+      setSelectedUser(null);
+      setNewPassword("");
+    } catch (error) {
+      console.error("Failed to reset password:", error);
+      alert(error.response?.data?.detail || "Failed to reset password");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleCreateShop = async () => {
     if (!createShopForm.company_name || !createShopForm.subdomain || !createShopForm.admin_email || !createShopForm.admin_password) {
       alert("Please fill in all required fields");
