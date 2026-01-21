@@ -284,6 +284,7 @@ class DeviceInfo(BaseModel):
 - [x] Optional IMEI/Serial and Device Condition fields
 - [x] Unlock Pattern field (visual grid + text)
 - [x] Customer Credit/Ledger System
+- [x] Profit Tracking System (password protected, job-wise, party-wise, bulk expense)
 
 ### P1 (High Priority)
 - [ ] Multi-language Support (i18n)
