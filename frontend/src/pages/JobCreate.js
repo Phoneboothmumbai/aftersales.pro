@@ -127,14 +127,7 @@ export default function JobCreate() {
       toast.error("Device type, brand, and model are required");
       return;
     }
-    if (!formData.device.serial_imei) {
-      toast.error("Serial/IMEI number is required");
-      return;
-    }
-    if (!formData.device.condition) {
-      toast.error("Device condition is required");
-      return;
-    }
+    // IMEI/Serial and Condition are now optional
     if (!formData.problem_description) {
       toast.error("Problem description is required");
       return;
