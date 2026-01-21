@@ -4220,11 +4220,32 @@ async def get_customer_stats(user: dict = Depends(get_current_user)):
     new_result = await db.jobs.aggregate(pipeline).to_list(1)
     new_customers_this_month = new_result[0]["total"] if new_result else 0
     
+    # Customers with outstanding credit
+    credit_pipeline = [
+        {"$match": {"tenant_id": tenant_id, "delivery": {"$exists": True}}},
+        {"$group": {
+            "_id": "$customer.mobile",
+            "total_billed": {"$sum": {"$ifNull": [
+                "$delivery.final_amount", 
+                {"$ifNull": ["$repair.final_amount", 0]}
+            ]}},
+            "total_received": {"$sum": {"$ifNull": ["$delivery.amount_received", 0]}}
+        }},
+        {"$project": {
+            "outstanding": {"$subtract": ["$total_billed", "$total_received"]}
+        }},
+        {"$match": {"outstanding": {"$gt": 0}}},
+        {"$count": "total"}
+    ]
+    credit_result = await db.jobs.aggregate(credit_pipeline).to_list(1)
+    customers_with_credit = credit_result[0]["total"] if credit_result else 0
+    
     return {
         "total_customers": total_customers,
         "repeat_customers": repeat_customers,
         "new_customers_this_month": new_customers_this_month,
-        "repeat_rate": round((repeat_customers / total_customers * 100), 1) if total_customers > 0 else 0
+        "repeat_rate": round((repeat_customers / total_customers * 100), 1) if total_customers > 0 else 0,
+        "customers_with_credit": customers_with_credit
     }
 
 # ==================== CUSTOMER LEDGER ROUTES ====================
