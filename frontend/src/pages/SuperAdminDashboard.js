@@ -521,6 +521,35 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  const handleAdminPasswordChange = async () => {
+    if (!adminPasswordForm.currentPassword || !adminPasswordForm.newPassword || !adminPasswordForm.confirmPassword) {
+      alert("Please fill in all password fields");
+      return;
+    }
+    if (adminPasswordForm.newPassword.length < 6) {
+      alert("New password must be at least 6 characters");
+      return;
+    }
+    if (adminPasswordForm.newPassword !== adminPasswordForm.confirmPassword) {
+      alert("New passwords do not match");
+      return;
+    }
+    
+    setPasswordChangeLoading(true);
+    try {
+      await axios.post(`${API}/super-admin/change-password`, {
+        current_password: adminPasswordForm.currentPassword,
+        new_password: adminPasswordForm.newPassword,
+      });
+      alert("Password changed successfully!");
+      setAdminPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to change password");
+    } finally {
+      setPasswordChangeLoading(false);
+    }
+  };
+
   const handleCreateShop = async () => {
     if (!createShopForm.company_name || !createShopForm.subdomain || !createShopForm.admin_email || !createShopForm.admin_password) {
       alert("Please fill in all required fields");
