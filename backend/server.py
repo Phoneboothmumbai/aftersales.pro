@@ -4037,10 +4037,10 @@ async def get_customers(
     search: Optional[str] = None,
     user: dict = Depends(get_current_user)
 ):
-    """Get unique customers with their device count and last visit"""
+    """Get unique customers with their device count, last visit, and outstanding balance"""
     tenant_id = user["tenant_id"]
     
-    # Aggregate to get unique customers by mobile number
+    # Aggregate to get unique customers by mobile number with financial info
     pipeline = [
         {"$match": {"tenant_id": tenant_id}},
         {"$sort": {"created_at": -1}},
@@ -4057,7 +4057,16 @@ async def get_customers(
                 "serial_imei": "$device.serial_imei"
             }},
             "last_visit": {"$first": "$created_at"},
-            "first_visit": {"$last": "$created_at"}
+            "first_visit": {"$last": "$created_at"},
+            "total_billed": {"$sum": {"$ifNull": [
+                "$delivery.final_amount", 
+                {"$cond": {
+                    "if": {"$and": [{"$ifNull": ["$repair.final_amount", False]}, {"$ifNull": ["$delivery", False]}]},
+                    "then": "$repair.final_amount",
+                    "else": 0
+                }}
+            ]}},
+            "total_received": {"$sum": {"$ifNull": ["$delivery.amount_received", 0]}}
         }},
         {"$project": {
             "_id": 0,
@@ -4067,7 +4076,10 @@ async def get_customers(
             "total_jobs": 1,
             "device_count": {"$size": "$devices"},
             "last_visit": 1,
-            "first_visit": 1
+            "first_visit": 1,
+            "total_billed": 1,
+            "total_received": 1,
+            "outstanding_balance": {"$max": [0, {"$subtract": ["$total_billed", "$total_received"]}]}
         }},
         {"$sort": {"last_visit": -1}}
     ]
@@ -4081,6 +4093,17 @@ async def get_customers(
         ]
     
     customers = await db.jobs.aggregate(pipeline).to_list(1000)
+    
+    # Also adjust for direct payments in customer_ledger
+    for customer in customers:
+        payments = await db.customer_ledger.find(
+            {"tenant_id": tenant_id, "customer_mobile": customer["mobile"], "type": "payment"},
+            {"_id": 0, "amount": 1}
+        ).to_list(100)
+        total_direct_payments = sum(p["amount"] for p in payments)
+        customer["total_received"] += total_direct_payments
+        customer["outstanding_balance"] = max(0, customer["total_billed"] - customer["total_received"])
+    
     return {"customers": customers}
 
 @api_router.get("/customers/{mobile}/devices")
