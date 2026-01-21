@@ -92,6 +92,35 @@ export default function Settings() {
           <p className="text-muted-foreground">Manage your shop settings and preferences</p>
         </div>
 
+        {/* Profit Reports - Admin Only */}
+        {isAdmin && (
+          <Card 
+            className="card-shadow cursor-pointer hover:border-green-500/50 transition-colors"
+            onClick={() => navigate("/profit-reports")}
+            data-testid="profit-reports-card"
+          >
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-green-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold flex items-center gap-2">
+                      Profit Reports
+                      <Lock className="w-4 h-4 text-muted-foreground" />
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Track expenses and profit for your repair jobs
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Theme Settings */}
         <Card className="card-shadow">
           <CardHeader>
