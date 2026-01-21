@@ -332,8 +332,8 @@ export default function JobCreate() {
                 </div>
               </div>
 
-              {/* Notes and Password */}
-              <div className="grid sm:grid-cols-2 gap-4 mt-4">
+              {/* Password, Unlock Pattern and Notes */}
+              <div className="grid sm:grid-cols-3 gap-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="device-password">Device Password / PIN</Label>
                   <Input
@@ -341,12 +341,24 @@ export default function JobCreate() {
                     name="password"
                     value={formData.device.password}
                     onChange={handleDeviceChange}
-                    placeholder="Enter device password or PIN"
+                    placeholder="Enter password or PIN"
                     type="text"
                     data-testid="device-password-input"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="unlock-pattern">Unlock Pattern (Android)</Label>
+                  <Input
+                    id="unlock-pattern"
+                    name="unlock_pattern"
+                    value={formData.device.unlock_pattern}
+                    onChange={handleDeviceChange}
+                    placeholder="e.g., L-shape, Z, 1-2-3-6-9"
+                    type="text"
+                    data-testid="unlock-pattern-input"
+                  />
                   <p className="text-xs text-muted-foreground">
-                    Required for diagnosis. Stored securely.
+                    Describe the pattern or use dot numbers (1-9)
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -356,7 +368,7 @@ export default function JobCreate() {
                     name="notes"
                     value={formData.device.notes}
                     onChange={handleDeviceChange}
-                    placeholder="Any additional notes about the device..."
+                    placeholder="Any additional notes..."
                     rows={2}
                     data-testid="device-notes-input"
                   />
