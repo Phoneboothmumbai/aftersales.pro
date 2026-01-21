@@ -34,45 +34,65 @@ export default function Landing() {
           .filter(p => p.is_active !== false && !p.is_deleted)
           .sort((a, b) => (a.price || 0) - (b.price || 0))
           .slice(0, 4); // Show max 4 plans
-        setPlans(displayPlans);
+        
+        if (displayPlans.length > 0) {
+          setPlans(displayPlans);
+        } else {
+          // Use fallback if no plans returned
+          setPlans(getDefaultPlans());
+        }
       } catch (error) {
         console.error("Failed to fetch plans:", error);
-        // Fallback to default plans if API fails
-        setPlans([
-          {
-            name: "Starter",
-            price: 0,
-            billing_cycle: "month",
-            max_jobs_per_month: 50,
-            max_branches: 1,
-            max_users: 2,
-            features: { whatsapp_messages: true, pdf_job_sheet: true }
-          },
-          {
-            name: "Professional",
-            price: 999,
-            billing_cycle: "month",
-            max_jobs_per_month: -1,
-            max_branches: 3,
-            max_users: 10,
-            features: { whatsapp_messages: true, pdf_job_sheet: true, priority_support: true }
-          },
-          {
-            name: "Enterprise",
-            price: -1,
-            billing_cycle: "month",
-            max_jobs_per_month: -1,
-            max_branches: -1,
-            max_users: -1,
-            features: { api_access: true, dedicated_account_manager: true }
-          }
-        ]);
+        setPlans(getDefaultPlans());
       } finally {
         setLoadingPlans(false);
       }
     };
     fetchPlans();
   }, []);
+
+  const getDefaultPlans = () => [
+    {
+      id: "free",
+      name: "Free",
+      price: 0,
+      billing_cycle: "month",
+      max_jobs_per_month: 50,
+      max_branches: 1,
+      max_users: 2,
+      features: { whatsapp_messages: true, pdf_job_sheet: true, job_management: true }
+    },
+    {
+      id: "starter",
+      name: "Starter",
+      price: 499,
+      billing_cycle: "month",
+      max_jobs_per_month: 200,
+      max_branches: 2,
+      max_users: 5,
+      features: { whatsapp_messages: true, pdf_job_sheet: true, job_management: true, photo_upload: true }
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      price: 999,
+      billing_cycle: "month",
+      max_jobs_per_month: -1,
+      max_branches: 5,
+      max_users: 15,
+      features: { whatsapp_messages: true, pdf_job_sheet: true, inventory_management: true, advanced_analytics: true, priority_support: true }
+    },
+    {
+      id: "enterprise",
+      name: "Enterprise",
+      price: -1,
+      billing_cycle: "month",
+      max_jobs_per_month: -1,
+      max_branches: -1,
+      max_users: -1,
+      features: { api_access: true, dedicated_account_manager: true, custom_branding: true }
+    }
+  ];
 
   const formatPrice = (plan) => {
     if (plan.price === 0) return "Free";
