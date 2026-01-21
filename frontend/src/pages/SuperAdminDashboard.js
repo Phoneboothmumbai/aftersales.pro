@@ -202,6 +202,19 @@ export default function SuperAdminDashboard() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [newPassword, setNewPassword] = useState("");
   
+  // Super Admin Password Change state
+  const [adminPasswordForm, setAdminPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
+  const [showAdminPasswords, setShowAdminPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+  
   // Announcements state
   const [announcements, setAnnouncements] = useState([]);
   const [showCreateAnnouncement, setShowCreateAnnouncement] = useState(false);
