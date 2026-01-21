@@ -168,6 +168,22 @@ class DeliveryUpdate(BaseModel):
     delivery_notes: Optional[str] = None
     is_credit: bool = False  # If true, amount is credited to customer ledger
     credit_amount: Optional[float] = None  # Amount to be credited
+    expense_parts: Optional[float] = None  # Parts/materials cost (optional)
+    expense_labor: Optional[float] = None  # Labor cost (optional)
+
+class BulkExpenseUpdate(BaseModel):
+    job_id: str
+    expense_parts: float
+    expense_labor: float
+
+class BulkExpenseRequest(BaseModel):
+    expenses: List[BulkExpenseUpdate]
+
+class ProfitPasswordSet(BaseModel):
+    password: str
+
+class ProfitPasswordVerify(BaseModel):
+    password: str
 
 class CustomerPayment(BaseModel):
     customer_id: str
@@ -182,6 +198,7 @@ class CloseJobRequest(BaseModel):
     accessories_returned: List[str] = []
     payment_mode: str
     invoice_reference: Optional[str] = None
+
 
 class StatusUpdate(BaseModel):
     status: str
