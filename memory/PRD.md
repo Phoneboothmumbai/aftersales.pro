@@ -188,18 +188,29 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 
 ## Data Models
 
-### DeviceInfo (Updated)
+### DeviceInfo (Updated - January 21, 2026)
 ```python
 class DeviceInfo(BaseModel):
     device_type: str          # Laptop, Mobile, Tablet, Other
     brand: str
     model: str
-    serial_imei: str
-    condition: str            # Fresh, Active, Physical Damage, Dead, Liquid
+    serial_imei: Optional[str]     # OPTIONAL - Can be empty
+    condition: Optional[str]       # OPTIONAL - Fresh, Active, Physical Damage, Dead, Liquid
     condition_notes: Optional[str]
-    notes: Optional[str]      # NEW: Additional device notes
-    password: Optional[str]   # NEW: Device password/PIN
+    notes: Optional[str]           # Additional device notes
+    password: Optional[str]        # Device password/PIN
+    unlock_pattern: Optional[str]  # NEW: Android unlock pattern (e.g., "1-2-3-6-9")
 ```
+
+### Customer Credit/Ledger System (January 21, 2026)
+- ✅ **Outstanding Balance Tracking** - Track unpaid amounts per customer
+- ✅ **Customer Ledger Modal** - Shows Total Billed, Total Received, Outstanding
+- ✅ **Transactions Table** - View all jobs with billed, received, and credit amounts
+- ✅ **Record Payment Modal** - Accept full/partial payments against outstanding balance
+- ✅ **Credit Mode in Delivery** - Toggle switch to mark delivery as credit
+- ✅ **"With Outstanding" Stats** - Stats card showing customers with pending payments
+- ✅ **View Statement** - Three-dots menu option to view customer statement
+- ✅ **Ledger API** - GET /api/customers/{mobile}/ledger
 
 ## Deployment Status
 - **Domain**: aftersales.pro (DNS configured)
@@ -214,6 +225,8 @@ class DeviceInfo(BaseModel):
 - `/app/test_reports/iteration_5.json` - Universal Search, Device fields
 - `/app/test_reports/iteration_6.json` - Super Admin Subscription Management (31 tests)
 - `/app/test_reports/iteration_7.json` - Dynamic Plan Management (32 tests)
+- `/app/test_reports/iteration_9.json` - Super Admin New Features
+- `/app/test_reports/iteration_10.json` - Optional Fields, Unlock Pattern, Customer Ledger (17 tests)
 
 ## Prioritized Backlog
 
@@ -221,18 +234,29 @@ class DeviceInfo(BaseModel):
 - [x] Super Admin subscription management
 - [x] Dynamic plan creation with all parameters (users, branches, jobs, inventory, photos, storage, 18 features)
 - [x] Plan limit enforcement on all create endpoints
+- [x] Optional IMEI/Serial and Device Condition fields
+- [x] Unlock Pattern field (visual grid + text)
+- [x] Customer Credit/Ledger System
 
 ### P1 (High Priority)
+- [ ] Multi-language Support (i18n)
+- [ ] WhatsApp alerts for expiring subscriptions
+- [ ] Plan usage progress bars in tenant dashboard
 - [ ] SSL setup for aftersales.pro
 - [ ] Email notifications for status updates
 - [ ] AMC/repeat customer tagging
 
 ### P2 (Medium Priority)
+- [ ] Revenue forecasting
+- [ ] Churn report analytics
 - [ ] Invoice generation
 - [ ] Export to CSV/Excel
 - [ ] SMS notifications
 
 ### P3 (Nice to Have)
+- [ ] Refactor server.py into modular routers
+- [ ] Refactor SuperAdminDashboard.js (3500+ lines)
+- [ ] Dockerize the application
 - [ ] Mobile app (PWA)
 - [ ] WhatsApp Business API
 - [ ] Payment gateway
