@@ -2492,6 +2492,20 @@ export default function SuperAdminDashboard() {
                               {user.role === "admin" ? <Crown className="w-3 h-3 mr-1" /> : <Users className="w-3 h-3 mr-1" />}
                               {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                             </Badge>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-orange-500/50 text-orange-400 hover:bg-orange-500/20"
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setNewPassword("");
+                                setShowResetPasswordModal(true);
+                              }}
+                              data-testid={`reset-password-${user.id}`}
+                            >
+                              <Key className="w-3 h-3 mr-1" />
+                              Reset Password
+                            </Button>
                           </div>
                         </div>
                         <div className="mt-3 pt-3 border-t border-slate-600 grid grid-cols-3 gap-4 text-sm">
