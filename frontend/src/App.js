@@ -193,6 +193,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/profit-reports"
+        element={
+          <ProtectedRoute>
+            <ProfitReports />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Super Admin Routes */}
       <Route path="/super-admin" element={<SuperAdminLogin />} />
