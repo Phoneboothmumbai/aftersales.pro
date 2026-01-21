@@ -286,14 +286,13 @@ export default function JobCreate() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="device-serial">Serial / IMEI *</Label>
+                  <Label htmlFor="device-serial">Serial / IMEI (Optional)</Label>
                   <Input
                     id="device-serial"
                     name="serial_imei"
                     value={formData.device.serial_imei}
                     onChange={handleDeviceChange}
                     placeholder="Enter serial number or IMEI"
-                    required
                     className="font-mono"
                     data-testid="device-serial-input"
                   />
@@ -302,7 +301,7 @@ export default function JobCreate() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Device Condition *</Label>
+                  <Label>Device Condition (Optional)</Label>
                   <Select
                     value={formData.device.condition}
                     onValueChange={(v) => handleDeviceSelectChange("condition", v)}
