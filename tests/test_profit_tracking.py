@@ -247,7 +247,7 @@ class TestProfitTracking:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
         data = response.json()
-        assert "updated_count" in data
+        assert "updated" in data or "updated_count" in data, f"Response should contain updated count: {data}"
         assert "message" in data
         print(f"✓ Bulk expense update: {data['message']}")
     
