@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Layout from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
@@ -10,12 +11,13 @@ import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Switch } from "../components/ui/switch";
 import { Separator } from "../components/ui/separator";
-import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText, Key, Eye, EyeOff } from "lucide-react";
+import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText, Key, Eye, EyeOff, TrendingUp, Lock, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Settings() {
+  const navigate = useNavigate();
   const { tenant, updateTenant, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(false);
