@@ -947,15 +947,49 @@ export default function JobDetail() {
                 placeholder="Person who received the device"
               />
             </div>
+            
+            {/* Credit/Payment Toggle */}
+            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-base">Payment Type</Label>
+                  <p className="text-sm text-muted-foreground">Is this a credit or full payment?</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm ${!deliveryForm.is_credit ? 'font-medium' : 'text-muted-foreground'}`}>Full Payment</span>
+                  <Switch
+                    checked={deliveryForm.is_credit}
+                    onCheckedChange={(checked) => setDeliveryForm({ 
+                      ...deliveryForm, 
+                      is_credit: checked,
+                      amount_received: checked ? "0" : deliveryForm.amount_received 
+                    })}
+                  />
+                  <span className={`text-sm ${deliveryForm.is_credit ? 'font-medium text-orange-500' : 'text-muted-foreground'}`}>Credit</span>
+                </div>
+              </div>
+              {deliveryForm.is_credit && (
+                <div className="bg-orange-500/10 border border-orange-500/30 rounded p-3">
+                  <p className="text-sm text-orange-500">
+                    <strong>Credit Mode:</strong> The full amount of ₹{job.repair?.final_amount || 0} will be added to customer's outstanding balance.
+                  </p>
+                </div>
+              )}
+            </div>
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Amount Received (₹) *</Label>
+                <Label>Amount Received (₹) {!deliveryForm.is_credit && '*'}</Label>
                 <Input
                   type="number"
                   value={deliveryForm.amount_received}
                   onChange={(e) => setDeliveryForm({ ...deliveryForm, amount_received: e.target.value })}
                   placeholder="0"
+                  disabled={deliveryForm.is_credit}
                 />
+                {deliveryForm.is_credit && (
+                  <p className="text-xs text-muted-foreground">Disabled in credit mode</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>Payment Mode *</Label>
@@ -970,6 +1004,7 @@ export default function JobDetail() {
                     {PAYMENT_MODES.map((mode) => (
                       <SelectItem key={mode} value={mode}>{mode}</SelectItem>
                     ))}
+                    <SelectItem value="Credit">Credit (Pay Later)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
