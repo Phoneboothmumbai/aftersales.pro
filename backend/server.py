@@ -4900,6 +4900,401 @@ async def get_metrics_overview(user: dict = Depends(get_current_user)):
         "trend": trend
     }
 
+# ==================== PROFIT TRACKING ROUTES ====================
+
+@api_router.post("/settings/profit-password")
+async def set_profit_password(data: ProfitPasswordSet, user: dict = Depends(get_current_user)):
+    """Set or update the profit section password (Admin only)"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can set profit password")
+    
+    tenant_id = user["tenant_id"]
+    hashed = bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode()
+    
+    await db.tenants.update_one(
+        {"id": tenant_id},
+        {"$set": {"profit_password": hashed}}
+    )
+    
+    return {"message": "Profit password set successfully"}
+
+@api_router.post("/settings/verify-profit-password")
+async def verify_profit_password(data: ProfitPasswordVerify, user: dict = Depends(get_current_user)):
+    """Verify profit section password (Admin only)"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can access profit section")
+    
+    tenant_id = user["tenant_id"]
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    profit_password = tenant.get("profit_password")
+    if not profit_password:
+        raise HTTPException(status_code=400, detail="Profit password not set. Please set a password first.")
+    
+    if not bcrypt.checkpw(data.password.encode(), profit_password.encode()):
+        raise HTTPException(status_code=401, detail="Invalid password")
+    
+    return {"verified": True, "message": "Password verified successfully"}
+
+@api_router.get("/settings/profit-password-status")
+async def get_profit_password_status(user: dict = Depends(get_current_user)):
+    """Check if profit password is set"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can access this")
+    
+    tenant = await db.tenants.find_one({"id": user["tenant_id"]})
+    has_password = bool(tenant.get("profit_password")) if tenant else False
+    
+    return {"has_password": has_password}
+
+@api_router.get("/profit/pending-expenses")
+async def get_pending_expenses(user: dict = Depends(get_current_user)):
+    """Get delivered/closed jobs without expense entries"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can access profit data")
+    
+    tenant_id = user["tenant_id"]
+    
+    # Find jobs that are delivered or closed but don't have expense data
+    pipeline = [
+        {
+            "$match": {
+                "tenant_id": tenant_id,
+                "status": {"$in": ["delivered", "closed"]},
+                "$or": [
+                    {"delivery.expense_parts": None},
+                    {"delivery.expense_labor": None},
+                    {"delivery.expense_parts": {"$exists": False}},
+                    {"delivery.expense_labor": {"$exists": False}}
+                ]
+            }
+        },
+        {"$sort": {"delivery.delivered_at": -1}},
+        {
+            "$project": {
+                "_id": 0,
+                "id": 1,
+                "job_number": 1,
+                "customer": 1,
+                "device": 1,
+                "status": 1,
+                "delivery": 1,
+                "repair": 1,
+                "created_at": 1
+            }
+        }
+    ]
+    
+    jobs = await db.jobs.aggregate(pipeline).to_list(500)
+    return {"jobs": jobs, "count": len(jobs)}
+
+@api_router.put("/profit/bulk-expense")
+async def update_bulk_expenses(data: BulkExpenseRequest, user: dict = Depends(get_current_user)):
+    """Update expenses for multiple jobs at once"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can update expenses")
+    
+    tenant_id = user["tenant_id"]
+    now = datetime.now(timezone.utc).isoformat()
+    updated_count = 0
+    errors = []
+    
+    for expense in data.expenses:
+        job = await db.jobs.find_one({"id": expense.job_id, "tenant_id": tenant_id})
+        if not job:
+            errors.append(f"Job {expense.job_id} not found")
+            continue
+        
+        if job["status"] not in ["delivered", "closed"]:
+            errors.append(f"Job {job['job_number']} is not delivered yet")
+            continue
+        
+        result = await db.jobs.update_one(
+            {"id": expense.job_id, "tenant_id": tenant_id},
+            {
+                "$set": {
+                    "delivery.expense_parts": expense.expense_parts,
+                    "delivery.expense_labor": expense.expense_labor,
+                    "delivery.expense_updated_at": now,
+                    "delivery.expense_updated_by": user["id"]
+                }
+            }
+        )
+        if result.modified_count > 0:
+            updated_count += 1
+    
+    return {
+        "updated": updated_count,
+        "errors": errors,
+        "message": f"Updated expenses for {updated_count} jobs"
+    }
+
+@api_router.get("/profit/job-wise")
+async def get_job_wise_profit(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Get job-wise profit report"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can access profit data")
+    
+    tenant_id = user["tenant_id"]
+    
+    match_query = {
+        "tenant_id": tenant_id,
+        "status": {"$in": ["delivered", "closed"]},
+        "delivery": {"$exists": True}
+    }
+    
+    if date_from:
+        match_query["delivery.delivered_at"] = {"$gte": date_from}
+    if date_to:
+        if "delivery.delivered_at" in match_query:
+            match_query["delivery.delivered_at"]["$lte"] = date_to
+        else:
+            match_query["delivery.delivered_at"] = {"$lte": date_to}
+    
+    pipeline = [
+        {"$match": match_query},
+        {"$sort": {"delivery.delivered_at": -1}},
+        {
+            "$project": {
+                "_id": 0,
+                "id": 1,
+                "job_number": 1,
+                "customer_name": "$customer.name",
+                "customer_mobile": "$customer.mobile",
+                "device": {"$concat": ["$device.brand", " ", "$device.model"]},
+                "device_type": "$device.device_type",
+                "problem": "$problem_description",
+                "amount_received": {"$ifNull": ["$delivery.amount_received", 0]},
+                "expense_parts": {"$ifNull": ["$delivery.expense_parts", 0]},
+                "expense_labor": {"$ifNull": ["$delivery.expense_labor", 0]},
+                "total_expense": {
+                    "$add": [
+                        {"$ifNull": ["$delivery.expense_parts", 0]},
+                        {"$ifNull": ["$delivery.expense_labor", 0]}
+                    ]
+                },
+                "profit": {
+                    "$subtract": [
+                        {"$ifNull": ["$delivery.amount_received", 0]},
+                        {
+                            "$add": [
+                                {"$ifNull": ["$delivery.expense_parts", 0]},
+                                {"$ifNull": ["$delivery.expense_labor", 0]}
+                            ]
+                        }
+                    ]
+                },
+                "has_expense": {
+                    "$and": [
+                        {"$gt": [{"$ifNull": ["$delivery.expense_parts", 0]}, 0]},
+                        {"$gte": [{"$ifNull": ["$delivery.expense_labor", 0]}, 0]}
+                    ]
+                },
+                "delivered_at": "$delivery.delivered_at",
+                "status": 1
+            }
+        }
+    ]
+    
+    jobs = await db.jobs.aggregate(pipeline).to_list(1000)
+    
+    # Calculate totals
+    total_received = sum(j["amount_received"] for j in jobs)
+    total_expense = sum(j["total_expense"] for j in jobs)
+    total_profit = sum(j["profit"] for j in jobs)
+    jobs_with_expense = sum(1 for j in jobs if j["has_expense"])
+    
+    return {
+        "jobs": jobs,
+        "summary": {
+            "total_jobs": len(jobs),
+            "jobs_with_expense": jobs_with_expense,
+            "jobs_pending_expense": len(jobs) - jobs_with_expense,
+            "total_received": total_received,
+            "total_expense": total_expense,
+            "total_profit": total_profit,
+            "profit_margin": round((total_profit / total_received * 100), 2) if total_received > 0 else 0
+        }
+    }
+
+@api_router.get("/profit/party-wise")
+async def get_party_wise_profit(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """Get customer/party-wise profit report"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can access profit data")
+    
+    tenant_id = user["tenant_id"]
+    
+    match_query = {
+        "tenant_id": tenant_id,
+        "status": {"$in": ["delivered", "closed"]},
+        "delivery": {"$exists": True}
+    }
+    
+    if date_from:
+        match_query["delivery.delivered_at"] = {"$gte": date_from}
+    if date_to:
+        if "delivery.delivered_at" in match_query:
+            match_query["delivery.delivered_at"]["$lte"] = date_to
+        else:
+            match_query["delivery.delivered_at"] = {"$lte": date_to}
+    
+    pipeline = [
+        {"$match": match_query},
+        {
+            "$group": {
+                "_id": "$customer.mobile",
+                "customer_name": {"$first": "$customer.name"},
+                "customer_mobile": {"$first": "$customer.mobile"},
+                "total_jobs": {"$sum": 1},
+                "total_received": {"$sum": {"$ifNull": ["$delivery.amount_received", 0]}},
+                "total_expense_parts": {"$sum": {"$ifNull": ["$delivery.expense_parts", 0]}},
+                "total_expense_labor": {"$sum": {"$ifNull": ["$delivery.expense_labor", 0]}},
+                "last_visit": {"$max": "$delivery.delivered_at"}
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "customer_name": 1,
+                "customer_mobile": 1,
+                "total_jobs": 1,
+                "total_received": 1,
+                "total_expense_parts": 1,
+                "total_expense_labor": 1,
+                "total_expense": {"$add": ["$total_expense_parts", "$total_expense_labor"]},
+                "profit": {
+                    "$subtract": [
+                        "$total_received",
+                        {"$add": ["$total_expense_parts", "$total_expense_labor"]}
+                    ]
+                },
+                "last_visit": 1
+            }
+        },
+        {"$sort": {"profit": -1}}
+    ]
+    
+    parties = await db.jobs.aggregate(pipeline).to_list(500)
+    
+    # Calculate totals
+    total_received = sum(p["total_received"] for p in parties)
+    total_expense = sum(p["total_expense"] for p in parties)
+    total_profit = sum(p["profit"] for p in parties)
+    
+    return {
+        "parties": parties,
+        "summary": {
+            "total_customers": len(parties),
+            "total_received": total_received,
+            "total_expense": total_expense,
+            "total_profit": total_profit,
+            "profit_margin": round((total_profit / total_received * 100), 2) if total_received > 0 else 0
+        }
+    }
+
+@api_router.get("/profit/summary")
+async def get_profit_summary(
+    period: str = "month",  # day, week, month, year
+    user: dict = Depends(get_current_user)
+):
+    """Get profit summary for dashboard"""
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can access profit data")
+    
+    tenant_id = user["tenant_id"]
+    now = datetime.now(timezone.utc)
+    
+    # Calculate date range based on period
+    if period == "day":
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif period == "week":
+        start_date = now - timedelta(days=now.weekday())
+        start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif period == "month":
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    elif period == "year":
+        start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    else:
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    pipeline = [
+        {
+            "$match": {
+                "tenant_id": tenant_id,
+                "status": {"$in": ["delivered", "closed"]},
+                "delivery.delivered_at": {"$gte": start_date.isoformat()}
+            }
+        },
+        {
+            "$group": {
+                "_id": None,
+                "total_jobs": {"$sum": 1},
+                "total_received": {"$sum": {"$ifNull": ["$delivery.amount_received", 0]}},
+                "total_expense_parts": {"$sum": {"$ifNull": ["$delivery.expense_parts", 0]}},
+                "total_expense_labor": {"$sum": {"$ifNull": ["$delivery.expense_labor", 0]}},
+                "jobs_with_expense": {
+                    "$sum": {
+                        "$cond": [
+                            {"$and": [
+                                {"$gt": [{"$ifNull": ["$delivery.expense_parts", 0]}, 0]},
+                                {"$gte": [{"$ifNull": ["$delivery.expense_labor", 0]}, 0]}
+                            ]},
+                            1,
+                            0
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+    
+    result = await db.jobs.aggregate(pipeline).to_list(1)
+    
+    if not result:
+        return {
+            "period": period,
+            "start_date": start_date.isoformat(),
+            "total_jobs": 0,
+            "jobs_with_expense": 0,
+            "jobs_pending_expense": 0,
+            "total_received": 0,
+            "total_expense_parts": 0,
+            "total_expense_labor": 0,
+            "total_expense": 0,
+            "total_profit": 0,
+            "profit_margin": 0
+        }
+    
+    data = result[0]
+    total_expense = data["total_expense_parts"] + data["total_expense_labor"]
+    total_profit = data["total_received"] - total_expense
+    
+    return {
+        "period": period,
+        "start_date": start_date.isoformat(),
+        "total_jobs": data["total_jobs"],
+        "jobs_with_expense": data["jobs_with_expense"],
+        "jobs_pending_expense": data["total_jobs"] - data["jobs_with_expense"],
+        "total_received": data["total_received"],
+        "total_expense_parts": data["total_expense_parts"],
+        "total_expense_labor": data["total_expense_labor"],
+        "total_expense": total_expense,
+        "total_profit": total_profit,
+        "profit_margin": round((total_profit / data["total_received"] * 100), 2) if data["total_received"] > 0 else 0
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
