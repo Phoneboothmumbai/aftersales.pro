@@ -1904,6 +1904,97 @@ export default function SuperAdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Change Admin Password */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Key className="w-5 h-5" />
+                  Change Your Password
+                </CardTitle>
+                <p className="text-sm text-slate-400">
+                  Update your Super Admin account password
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Current Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={showAdminPasswords.current ? "text" : "password"}
+                        value={adminPasswordForm.currentPassword}
+                        onChange={(e) => setAdminPasswordForm({ ...adminPasswordForm, currentPassword: e.target.value })}
+                        placeholder="Enter current password"
+                        className="bg-slate-700 border-slate-600 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAdminPasswords({ ...showAdminPasswords, current: !showAdminPasswords.current })}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      >
+                        {showAdminPasswords.current ? <X className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>New Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={showAdminPasswords.new ? "text" : "password"}
+                        value={adminPasswordForm.newPassword}
+                        onChange={(e) => setAdminPasswordForm({ ...adminPasswordForm, newPassword: e.target.value })}
+                        placeholder="Min 6 characters"
+                        className="bg-slate-700 border-slate-600 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAdminPasswords({ ...showAdminPasswords, new: !showAdminPasswords.new })}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      >
+                        {showAdminPasswords.new ? <X className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Confirm New Password</Label>
+                    <div className="relative">
+                      <Input
+                        type={showAdminPasswords.confirm ? "text" : "password"}
+                        value={adminPasswordForm.confirmPassword}
+                        onChange={(e) => setAdminPasswordForm({ ...adminPasswordForm, confirmPassword: e.target.value })}
+                        placeholder="Confirm password"
+                        className="bg-slate-700 border-slate-600 pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAdminPasswords({ ...showAdminPasswords, confirm: !showAdminPasswords.confirm })}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      >
+                        {showAdminPasswords.confirm ? <X className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleAdminPasswordChange}
+                  disabled={passwordChangeLoading || !adminPasswordForm.currentPassword || !adminPasswordForm.newPassword || !adminPasswordForm.confirmPassword}
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  {passwordChangeLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Changing...
+                    </>
+                  ) : (
+                    <>
+                      <Key className="w-4 h-4 mr-2" />
+                      Change Password
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>
