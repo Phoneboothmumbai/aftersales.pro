@@ -978,7 +978,7 @@ export default function JobDetail() {
               {deliveryForm.is_credit && (
                 <div className="bg-orange-500/10 border border-orange-500/30 rounded p-3">
                   <p className="text-sm text-orange-500">
-                    <strong>Credit Mode:</strong> The full amount of ₹{job.repair?.final_amount || 0} will be added to customer's outstanding balance.
+                    <strong>Credit Mode:</strong> The full amount of ₹{job.repair?.final_amount || 0} will be added to customer&apos;s outstanding balance.
                   </p>
                 </div>
               )}
