@@ -416,13 +416,19 @@ export default function JobDetail() {
                     )}
                   </div>
                 </div>
-                {/* Device Password and Notes */}
-                {(job.device.password || job.device.notes) && (
-                  <div className="grid sm:grid-cols-2 gap-6 pt-4 border-t">
+                {/* Device Password, Unlock Pattern and Notes */}
+                {(job.device.password || job.device.unlock_pattern || job.device.notes) && (
+                  <div className="grid sm:grid-cols-3 gap-6 pt-4 border-t">
                     {job.device.password && (
                       <div>
                         <h4 className="text-sm font-medium text-muted-foreground mb-1">Device Password</h4>
                         <p className="font-mono bg-muted px-2 py-1 rounded inline-block">{job.device.password}</p>
+                      </div>
+                    )}
+                    {job.device.unlock_pattern && (
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Unlock Pattern</h4>
+                        <p className="font-mono bg-muted px-2 py-1 rounded inline-block">{job.device.unlock_pattern}</p>
                       </div>
                     )}
                     {job.device.notes && (
