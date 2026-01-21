@@ -49,6 +49,7 @@ export default function JobCreate() {
       condition_notes: "",
       notes: "",
       password: "",
+      unlock_pattern: "",
     },
     accessories: [...DEFAULT_ACCESSORIES],
     problem_description: "",
