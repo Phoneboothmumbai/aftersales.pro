@@ -162,6 +162,16 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `GET /api/customers/{mobile}/ledger` - **Customer ledger with transactions** (NEW)
 - `POST /api/customers/{mobile}/payment` - **Record payment against outstanding** (NEW)
 
+### Profit Tracking (NEW - Admin Only)
+- `GET /api/settings/profit-password-status` - Check if profit password is set
+- `POST /api/settings/profit-password` - Set/update profit password
+- `POST /api/settings/verify-profit-password` - Verify profit password
+- `GET /api/profit/summary?period={day|week|month|year}` - Profit summary
+- `GET /api/profit/job-wise?date_from=&date_to=` - Job-wise profit report
+- `GET /api/profit/party-wise?date_from=&date_to=` - Customer-wise profit report
+- `GET /api/profit/pending-expenses` - Jobs without expense data
+- `PUT /api/profit/bulk-expense` - Update expenses for multiple jobs
+
 ### Inventory
 - `POST /api/inventory` - Create item
 - `GET /api/inventory` - List items
