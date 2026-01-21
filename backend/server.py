@@ -3035,6 +3035,62 @@ async def unsuspend_tenant(
     
     return {"message": "Shop unsuspended successfully"}
 
+# ==================== PASSWORD RESET ====================
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
+@api_router.post("/super-admin/tenants/{tenant_id}/users/{user_id}/reset-password")
+async def reset_user_password(
+    tenant_id: str,
+    user_id: str,
+    data: ResetPasswordRequest,
+    admin: dict = Depends(get_super_admin)
+):
+    """Reset a shop user's password"""
+    # Verify tenant exists
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    # Verify user exists and belongs to tenant
+    user = await db.users.find_one({"id": user_id, "tenant_id": tenant_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Validate password
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    # Update password
+    new_hash = hash_password(data.new_password)
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"password": new_hash}}
+    )
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Log the action
+    await db.admin_action_logs.insert_one({
+        "id": str(uuid.uuid4()),
+        "admin_id": admin["id"],
+        "admin_email": admin["email"],
+        "tenant_id": tenant_id,
+        "action": "reset_password",
+        "details": {
+            "user_id": user_id,
+            "user_email": user["email"],
+            "user_name": user["name"]
+        },
+        "created_at": now
+    })
+    
+    return {
+        "message": "Password reset successfully",
+        "user_email": user["email"]
+    }
+
 # ==================== ANNOUNCEMENTS ====================
 
 class AnnouncementCreate(BaseModel):
