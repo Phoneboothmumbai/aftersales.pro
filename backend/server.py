@@ -2501,6 +2501,34 @@ async def super_admin_login(data: SuperAdminLogin):
 async def get_super_admin_me(admin: dict = Depends(get_super_admin)):
     return SuperAdminResponse(**admin)
 
+@api_router.post("/super-admin/change-password")
+async def change_super_admin_password(data: ChangePasswordRequest, admin: dict = Depends(get_super_admin)):
+    """Change password for logged-in super admin"""
+    # Get super admin from database to verify current password
+    db_admin = await db.super_admins.find_one({"id": admin["id"]})
+    if not db_admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    
+    # Verify current password
+    if not verify_password(data.current_password, db_admin["password"]):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Validate new password
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+    
+    if data.current_password == data.new_password:
+        raise HTTPException(status_code=400, detail="New password must be different from current password")
+    
+    # Update password
+    new_hash = hash_password(data.new_password)
+    await db.super_admins.update_one(
+        {"id": admin["id"]},
+        {"$set": {"password": new_hash}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
 @api_router.get("/super-admin/stats")
 async def get_platform_stats(admin: dict = Depends(get_super_admin)):
     total_tenants = await db.tenants.count_documents({})
