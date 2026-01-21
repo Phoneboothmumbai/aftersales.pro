@@ -196,6 +196,11 @@ export default function SuperAdminDashboard() {
   const [showSuspendModal, setShowSuspendModal] = useState(false);
   const [suspendReason, setSuspendReason] = useState("");
   
+  // Password Reset state
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+  
   // Announcements state
   const [announcements, setAnnouncements] = useState([]);
   const [showCreateAnnouncement, setShowCreateAnnouncement] = useState(false);
