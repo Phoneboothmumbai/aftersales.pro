@@ -106,6 +106,7 @@ export default function JobDetail() {
     payment_mode: "",
     payment_reference: "",
     delivery_notes: "",
+    is_credit: false,
   });
 
   useEffect(() => {
