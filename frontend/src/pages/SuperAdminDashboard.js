@@ -3178,6 +3178,54 @@ export default function SuperAdminDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Reset Password Modal */}
+      <Dialog open={showResetPasswordModal} onOpenChange={setShowResetPasswordModal}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-orange-400">
+              <Key className="w-5 h-5" />
+              Reset Password
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {selectedUser && (
+              <div className="bg-slate-700/50 rounded-lg p-4">
+                <p className="text-sm text-slate-400">Resetting password for:</p>
+                <p className="font-medium text-white">{selectedUser.name}</p>
+                <p className="text-sm text-slate-400">{selectedUser.email}</p>
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label>New Password *</Label>
+              <Input
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password (min 6 characters)"
+                className="bg-slate-700 border-slate-600"
+              />
+              <p className="text-xs text-slate-400">
+                The user will need to use this password to login. Make sure to share it with them securely.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => { setShowResetPasswordModal(false); setNewPassword(""); setSelectedUser(null); }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={!newPassword || newPassword.length < 6 || actionLoading}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Key className="w-4 h-4 mr-2" />}
+              Reset Password
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
