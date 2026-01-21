@@ -164,53 +164,6 @@ export default function Landing() {
     },
   ];
 
-  const pricing = [
-    {
-      name: "Starter",
-      price: "Free",
-      period: "14-day trial",
-      features: [
-        "Up to 50 jobs/month",
-        "1 Branch",
-        "2 Team members",
-        "WhatsApp messaging",
-        "PDF job sheets",
-      ],
-      cta: "Start Free Trial",
-      popular: false,
-    },
-    {
-      name: "Professional",
-      price: "₹999",
-      period: "/month",
-      features: [
-        "Unlimited jobs",
-        "Up to 3 Branches",
-        "10 Team members",
-        "WhatsApp messaging",
-        "PDF job sheets",
-        "Priority support",
-      ],
-      cta: "Get Started",
-      popular: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "contact us",
-      features: [
-        "Unlimited everything",
-        "Unlimited Branches",
-        "Unlimited Team members",
-        "API access",
-        "Custom integrations",
-        "Dedicated support",
-      ],
-      cta: "Contact Sales",
-      popular: false,
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
