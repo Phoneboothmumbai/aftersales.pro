@@ -313,7 +313,7 @@ export default function Landing() {
               Everything you need to run a modern repair shop
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              From job creation to delivery, we've got every step covered.
+              From job creation to delivery, we&apos;ve got every step covered.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
