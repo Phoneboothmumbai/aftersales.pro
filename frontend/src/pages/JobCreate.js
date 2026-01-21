@@ -333,7 +333,7 @@ export default function JobCreate() {
               </div>
 
               {/* Password, Unlock Pattern and Notes */}
-              <div className="grid sm:grid-cols-3 gap-4 mt-4">
+              <div className="grid sm:grid-cols-2 gap-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="device-password">Device Password / PIN</Label>
                   <Input
@@ -347,21 +347,6 @@ export default function JobCreate() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="unlock-pattern">Unlock Pattern (Android)</Label>
-                  <Input
-                    id="unlock-pattern"
-                    name="unlock_pattern"
-                    value={formData.device.unlock_pattern}
-                    onChange={handleDeviceChange}
-                    placeholder="e.g., L-shape, Z, 1-2-3-6-9"
-                    type="text"
-                    data-testid="unlock-pattern-input"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Describe the pattern or use dot numbers (1-9)
-                  </p>
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="device-notes">Additional Notes</Label>
                   <Textarea
                     id="device-notes"
@@ -373,6 +358,21 @@ export default function JobCreate() {
                     data-testid="device-notes-input"
                   />
                 </div>
+              </div>
+
+              {/* Unlock Pattern - Visual and Text */}
+              <div className="mt-4 p-4 border rounded-lg bg-muted/30">
+                <Label className="text-base font-medium">Unlock Pattern (Android)</Label>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Optional: Draw the pattern on the grid or describe it
+                </p>
+                <PatternLock
+                  value={formData.device.unlock_pattern}
+                  onChange={(value) => setFormData((prev) => ({
+                    ...prev,
+                    device: { ...prev.device, unlock_pattern: value }
+                  }))}
+                />
               </div>
             </CardContent>
           </Card>
