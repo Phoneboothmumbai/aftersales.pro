@@ -964,6 +964,68 @@ async def login(data: LoginRequest):
 async def get_me(user: dict = Depends(get_current_user)):
     return UserResponse(**user)
 
+# ==================== PASSWORD CHANGE ====================
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@api_router.post("/auth/change-password")
+async def change_password(data: ChangePasswordRequest, user: dict = Depends(get_current_user)):
+    """Change password for logged-in shop user"""
+    # Get user from database to verify current password
+    db_user = await db.users.find_one({"id": user["id"]})
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify current password
+    if not verify_password(data.current_password, db_user["password"]):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Validate new password
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+    
+    if data.current_password == data.new_password:
+        raise HTTPException(status_code=400, detail="New password must be different from current password")
+    
+    # Update password
+    new_hash = hash_password(data.new_password)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"password": new_hash}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
+@api_router.post("/super-admin/change-password")
+async def change_super_admin_password(data: ChangePasswordRequest, admin: dict = Depends(get_super_admin)):
+    """Change password for logged-in super admin"""
+    # Get super admin from database to verify current password
+    db_admin = await db.super_admins.find_one({"id": admin["id"]})
+    if not db_admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    
+    # Verify current password
+    if not verify_password(data.current_password, db_admin["password"]):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Validate new password
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+    
+    if data.current_password == data.new_password:
+        raise HTTPException(status_code=400, detail="New password must be different from current password")
+    
+    # Update password
+    new_hash = hash_password(data.new_password)
+    await db.super_admins.update_one(
+        {"id": admin["id"]},
+        {"$set": {"password": new_hash}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
 # ==================== USER ROUTES ====================
 
 @api_router.post("/users", response_model=UserResponse)
