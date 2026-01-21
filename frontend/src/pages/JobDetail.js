@@ -108,6 +108,8 @@ export default function JobDetail() {
     payment_reference: "",
     delivery_notes: "",
     is_credit: false,
+    expense_parts: "",
+    expense_labor: "",
   });
 
   useEffect(() => {
