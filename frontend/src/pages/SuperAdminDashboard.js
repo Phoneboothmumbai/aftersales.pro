@@ -75,7 +75,6 @@ import {
   UserCheck,
   Ticket,
   Key,
-  Eye,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
