@@ -273,7 +273,13 @@ export default function JobDetail() {
     }
     setActionLoading(true);
     try {
-      await axios.put(`${API}/jobs/${id}/deliver`, deliveryForm);
+      const payload = {
+        ...deliveryForm,
+        amount_received: parseFloat(deliveryForm.amount_received) || 0,
+        expense_parts: deliveryForm.expense_parts ? parseFloat(deliveryForm.expense_parts) : null,
+        expense_labor: deliveryForm.expense_labor ? parseFloat(deliveryForm.expense_labor) : null,
+      };
+      await axios.put(`${API}/jobs/${id}/deliver`, payload);
       toast.success("Delivery recorded");
       setDeliveryModal(false);
       await fetchJob();
