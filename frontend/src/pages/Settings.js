@@ -51,6 +51,36 @@ export default function Settings() {
     }
   };
 
+  const handlePasswordChange = async () => {
+    // Validation
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+    
+    setPasswordLoading(true);
+    try {
+      await axios.post(`${API}/auth/change-password`, {
+        current_password: passwordForm.currentPassword,
+        new_password: passwordForm.newPassword,
+      });
+      toast.success("Password changed successfully");
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to change password");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-3xl mx-auto space-y-6 animate-in" data-testid="settings-page">
