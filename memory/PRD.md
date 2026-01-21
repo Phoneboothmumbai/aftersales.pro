@@ -236,6 +236,18 @@ class DeviceInfo(BaseModel):
 - ✅ **View Statement** - Three-dots menu option to view customer statement
 - ✅ **Ledger API** - GET /api/customers/{mobile}/ledger
 
+### Profit Tracking System (January 21, 2026)
+- ✅ **Password Protected Access** - Separate password for profit section (Admin only)
+- ✅ **Expense Fields in Delivery** - Optional Parts Cost and Labor Cost fields
+- ✅ **Estimated Profit Preview** - Shows profit calculation when expenses entered
+- ✅ **Profit Summary Dashboard** - Total Received, Total Expense, Net Profit, Profit Margin
+- ✅ **Period Selector** - Filter by Day, Week, Month, Year
+- ✅ **Job-wise Profit Report** - Profit per job with date filters
+- ✅ **Party-wise Profit Report** - Profit per customer aggregation
+- ✅ **Bulk Expense Entry** - Tabular format to add expenses for multiple jobs at once
+- ✅ **Pending Expense Badge** - Shows count of jobs without expense data
+- ✅ **Change Password & Lock** - Security controls in header
+
 ## Deployment Status
 - **Domain**: aftersales.pro (DNS configured)
 - **Server**: Ubuntu at 65.20.70.245
