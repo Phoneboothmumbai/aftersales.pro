@@ -155,10 +155,12 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `POST /api/jobs/{id}/photos` - Upload photo
 
 ### Customers
-- `GET /api/customers` - List customers (aggregated from jobs)
-- `GET /api/customers/stats` - Customer statistics
+- `GET /api/customers` - List customers (with outstanding_balance field)
+- `GET /api/customers/stats` - Customer statistics (includes customers_with_credit)
 - `GET /api/customers/{mobile}/devices` - Customer's devices
 - `GET /api/customers/{mobile}/devices/{serial}/history` - Device history
+- `GET /api/customers/{mobile}/ledger` - **Customer ledger with transactions** (NEW)
+- `POST /api/customers/{mobile}/payment` - **Record payment against outstanding** (NEW)
 
 ### Inventory
 - `POST /api/inventory` - Create item
