@@ -10,7 +10,7 @@ import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Switch } from "../components/ui/switch";
 import { Separator } from "../components/ui/separator";
-import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText } from "lucide-react";
+import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText, Key, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -19,6 +19,16 @@ export default function Settings() {
   const { tenant, updateTenant, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const [formData, setFormData] = useState({
     company_name: tenant?.company_name || "",
