@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import {
@@ -13,11 +14,116 @@ import {
   Check,
   Menu,
   X,
+  Loader2,
 } from "lucide-react";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Landing() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [plans, setPlans] = useState([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await axios.get(`${API}/public/plans`);
+        // Filter and sort plans for display
+        const displayPlans = response.data
+          .filter(p => p.is_active !== false && !p.is_deleted)
+          .sort((a, b) => (a.price || 0) - (b.price || 0))
+          .slice(0, 4); // Show max 4 plans
+        setPlans(displayPlans);
+      } catch (error) {
+        console.error("Failed to fetch plans:", error);
+        // Fallback to default plans if API fails
+        setPlans([
+          {
+            name: "Starter",
+            price: 0,
+            billing_cycle: "month",
+            max_jobs_per_month: 50,
+            max_branches: 1,
+            max_users: 2,
+            features: { whatsapp_messages: true, pdf_job_sheet: true }
+          },
+          {
+            name: "Professional",
+            price: 999,
+            billing_cycle: "month",
+            max_jobs_per_month: -1,
+            max_branches: 3,
+            max_users: 10,
+            features: { whatsapp_messages: true, pdf_job_sheet: true, priority_support: true }
+          },
+          {
+            name: "Enterprise",
+            price: -1,
+            billing_cycle: "month",
+            max_jobs_per_month: -1,
+            max_branches: -1,
+            max_users: -1,
+            features: { api_access: true, dedicated_account_manager: true }
+          }
+        ]);
+      } finally {
+        setLoadingPlans(false);
+      }
+    };
+    fetchPlans();
+  }, []);
+
+  const formatPrice = (plan) => {
+    if (plan.price === 0) return "Free";
+    if (plan.price === -1 || plan.price === null) return "Custom";
+    return `₹${plan.price}`;
+  };
+
+  const formatPeriod = (plan) => {
+    if (plan.price === 0) return "forever";
+    if (plan.price === -1 || plan.price === null) return "contact us";
+    return `/${plan.billing_cycle || "month"}`;
+  };
+
+  const getPlanFeatures = (plan) => {
+    const features = [];
+    if (plan.max_jobs_per_month === -1) {
+      features.push("Unlimited jobs");
+    } else {
+      features.push(`Up to ${plan.max_jobs_per_month} jobs/month`);
+    }
+    if (plan.max_branches === -1) {
+      features.push("Unlimited Branches");
+    } else {
+      features.push(`${plan.max_branches} Branch${plan.max_branches > 1 ? 'es' : ''}`);
+    }
+    if (plan.max_users === -1) {
+      features.push("Unlimited Team members");
+    } else {
+      features.push(`${plan.max_users} Team member${plan.max_users > 1 ? 's' : ''}`);
+    }
+    if (plan.features?.whatsapp_messages) features.push("WhatsApp messaging");
+    if (plan.features?.pdf_job_sheet) features.push("PDF job sheets");
+    if (plan.features?.photo_upload) features.push("Photo uploads");
+    if (plan.features?.inventory_management) features.push("Inventory management");
+    if (plan.features?.advanced_analytics) features.push("Advanced analytics");
+    if (plan.features?.priority_support) features.push("Priority support");
+    if (plan.features?.api_access) features.push("API access");
+    if (plan.features?.dedicated_account_manager) features.push("Dedicated support");
+    return features.slice(0, 6); // Max 6 features displayed
+  };
+
+  const getCta = (plan) => {
+    if (plan.price === 0) return "Start Free";
+    if (plan.price === -1 || plan.price === null) return "Contact Sales";
+    return "Get Started";
+  };
+
+  const isPopular = (plan, index) => {
+    // Mark the second plan (index 1) or "Pro" plan as popular
+    return index === 1 || plan.name?.toLowerCase().includes("pro");
+  };
 
   const features = [
     {
