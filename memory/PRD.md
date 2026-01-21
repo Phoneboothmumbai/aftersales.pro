@@ -107,6 +107,28 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Enable/Disable Pages** - Toggle visibility of each page
 - ✅ **Reset to Default** - One-click restore to default compliant templates
 
+### Optional Fields & Unlock Pattern (January 21, 2026)
+- ✅ **Optional IMEI/Serial Number** - Field marked "(Optional)", accepts empty value
+- ✅ **Optional Device Condition** - Field marked "(Optional)", accepts empty value
+- ✅ **Unlock Pattern Field** - New field for Android devices
+- ✅ **Visual Pattern Grid** - 3x3 grid with dots 1-9, tap or draw to set pattern
+- ✅ **Pattern Lines** - SVG lines connecting selected dots
+- ✅ **Pattern Status** - Shows "Pattern: 1 → 2 → 3 → 6 → 9" format
+- ✅ **Text Input Mode** - Toggle to switch between grid and text input
+- ✅ **Pattern Display** - Shows pattern on job detail page in styled box
+
+### Customer Credit/Ledger System (January 21, 2026)
+- ✅ **Outstanding Balance Tracking** - Calculate and display per-customer balance
+- ✅ **Outstanding Column** - Shows balance in orange badge on customer list
+- ✅ **"With Outstanding" Stats** - New stats card showing count
+- ✅ **Three-Dots Menu** - Customer row has View Statement and Record Payment options
+- ✅ **Customer Statement Modal** - Shows Total Billed, Total Received, Outstanding
+- ✅ **Transactions Table** - Lists all jobs with billed, received, credit amounts
+- ✅ **Record Payment Modal** - Accept payments against outstanding balance
+- ✅ **Payment Modes** - Cash, UPI, Card, Bank Transfer
+- ✅ **Credit Mode Switch** - Toggle in delivery modal to mark as credit
+- ✅ **Credit Alert** - Shows warning when credit mode is enabled
+
 ## Navigation Structure
 - Dashboard - Overview stats
 - Jobs - All repair jobs with date range filter
