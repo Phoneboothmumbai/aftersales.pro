@@ -369,45 +369,51 @@ export default function Landing() {
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Simple, transparent pricing</h2>
             <p className="text-lg text-muted-foreground">Start free, scale as you grow</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {pricing.map((plan, index) => (
-              <Card
-                key={index}
-                className={`relative ${plan.popular ? "border-primary shadow-lg scale-105" : ""}`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-full">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground">{plan.period}</span>
-                  </div>
-                  <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-500" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    className="w-full"
-                    variant={plan.popular ? "default" : "outline"}
-                    onClick={() => navigate("/signup")}
-                    data-testid={`pricing-${plan.name.toLowerCase()}-btn`}
-                  >
-                    {plan.cta}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {loadingPlans ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className={`grid gap-8 max-w-6xl mx-auto ${plans.length <= 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'}`}>
+              {plans.map((plan, index) => (
+                <Card
+                  key={plan.id || index}
+                  className={`relative ${isPopular(plan, index) ? "border-primary shadow-lg scale-105" : ""}`}
+                >
+                  {isPopular(plan, index) && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-full">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
+                    <div className="mb-6">
+                      <span className="text-4xl font-bold">{formatPrice(plan)}</span>
+                      <span className="text-muted-foreground text-sm ml-1">{formatPeriod(plan)}</span>
+                    </div>
+                    <ul className="space-y-3 mb-6">
+                      {getPlanFeatures(plan).map((feature, i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      className="w-full"
+                      variant={isPopular(plan, index) ? "default" : "outline"}
+                      onClick={() => navigate("/signup")}
+                      data-testid={`pricing-${plan.name?.toLowerCase().replace(/\s+/g, '-')}-btn`}
+                    >
+                      {getCta(plan)}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
