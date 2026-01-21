@@ -4227,6 +4227,213 @@ async def get_customer_stats(user: dict = Depends(get_current_user)):
         "repeat_rate": round((repeat_customers / total_customers * 100), 1) if total_customers > 0 else 0
     }
 
+# ==================== CUSTOMER LEDGER ROUTES ====================
+
+@api_router.get("/customers/{mobile}/ledger")
+async def get_customer_ledger(mobile: str, user: dict = Depends(get_current_user)):
+    """Get customer ledger showing all transactions and outstanding balance"""
+    tenant_id = user["tenant_id"]
+    
+    # Get all jobs for this customer
+    jobs = await db.jobs.find(
+        {"tenant_id": tenant_id, "customer.mobile": mobile},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Get all payments from ledger
+    payments = await db.customer_ledger.find(
+        {"tenant_id": tenant_id, "customer_mobile": mobile},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Calculate totals
+    total_billed = 0
+    total_received = 0
+    total_credit = 0
+    
+    transactions = []
+    
+    # Add job transactions
+    for job in jobs:
+        final_amount = 0
+        amount_received = 0
+        
+        if job.get("delivery"):
+            final_amount = job["delivery"].get("final_amount") or job["repair"].get("final_amount", 0) if job.get("repair") else 0
+            amount_received = job["delivery"].get("amount_received", 0)
+            is_credit = job["delivery"].get("is_credit", False)
+            
+            if final_amount > 0:
+                total_billed += final_amount
+                total_received += amount_received
+                
+                if is_credit or amount_received < final_amount:
+                    credit_amt = final_amount - amount_received
+                    total_credit += credit_amt
+                
+                transactions.append({
+                    "id": job["id"],
+                    "type": "job",
+                    "date": job["delivery"].get("delivered_at") or job.get("updated_at"),
+                    "job_number": job["job_number"],
+                    "device": f"{job['device']['brand']} {job['device']['model']}",
+                    "problem": job["problem_description"][:50] + "..." if len(job["problem_description"]) > 50 else job["problem_description"],
+                    "billed_amount": final_amount,
+                    "received_amount": amount_received,
+                    "credit_amount": final_amount - amount_received if final_amount > amount_received else 0,
+                    "status": "paid" if amount_received >= final_amount else "credit"
+                })
+        elif job.get("repair"):
+            final_amount = job["repair"].get("final_amount", 0)
+            if final_amount > 0 and job.get("status") in ["repaired", "ready_for_delivery"]:
+                transactions.append({
+                    "id": job["id"],
+                    "type": "job_pending",
+                    "date": job.get("updated_at"),
+                    "job_number": job["job_number"],
+                    "device": f"{job['device']['brand']} {job['device']['model']}",
+                    "problem": job["problem_description"][:50] + "..." if len(job["problem_description"]) > 50 else job["problem_description"],
+                    "billed_amount": final_amount,
+                    "received_amount": 0,
+                    "credit_amount": 0,
+                    "status": "pending_delivery"
+                })
+    
+    # Add direct payments
+    for payment in payments:
+        if payment.get("type") == "payment":
+            total_received += payment["amount"]
+            total_credit -= payment["amount"]
+            transactions.append({
+                "id": payment["id"],
+                "type": "payment",
+                "date": payment["created_at"],
+                "job_number": payment.get("job_number"),
+                "device": payment.get("device_info", "-"),
+                "problem": payment.get("notes", "Direct payment received"),
+                "billed_amount": 0,
+                "received_amount": payment["amount"],
+                "credit_amount": 0,
+                "payment_mode": payment.get("payment_mode"),
+                "status": "payment_received"
+            })
+    
+    # Sort transactions by date
+    transactions.sort(key=lambda x: x["date"] if x["date"] else "", reverse=True)
+    
+    return {
+        "customer_mobile": mobile,
+        "customer_name": jobs[0]["customer"]["name"] if jobs else "Unknown",
+        "total_billed": total_billed,
+        "total_received": total_received,
+        "outstanding_balance": max(0, total_credit),
+        "transactions": transactions
+    }
+
+@api_router.post("/customers/{mobile}/payment")
+async def record_customer_payment(mobile: str, data: CustomerPayment, user: dict = Depends(get_current_user)):
+    """Record a payment from customer (full or partial)"""
+    tenant_id = user["tenant_id"]
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Get customer info from latest job
+    latest_job = await db.jobs.find_one(
+        {"tenant_id": tenant_id, "customer.mobile": mobile},
+        {"_id": 0, "customer": 1, "device": 1, "job_number": 1}
+    )
+    
+    if not latest_job:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    payment_id = str(uuid.uuid4())
+    
+    payment_record = {
+        "id": payment_id,
+        "tenant_id": tenant_id,
+        "customer_mobile": mobile,
+        "customer_name": latest_job["customer"]["name"],
+        "amount": data.amount,
+        "payment_mode": data.payment_mode,
+        "payment_reference": data.payment_reference,
+        "notes": data.notes,
+        "job_id": data.job_id,
+        "job_number": None,
+        "device_info": None,
+        "type": "payment",
+        "recorded_by": user["id"],
+        "created_at": now
+    }
+    
+    # If linked to a job, get job details
+    if data.job_id:
+        job = await db.jobs.find_one({"id": data.job_id, "tenant_id": tenant_id}, {"_id": 0})
+        if job:
+            payment_record["job_number"] = job["job_number"]
+            payment_record["device_info"] = f"{job['device']['brand']} {job['device']['model']}"
+            
+            # Update job's delivery record if exists
+            if job.get("delivery"):
+                new_received = job["delivery"].get("amount_received", 0) + data.amount
+                await db.jobs.update_one(
+                    {"id": data.job_id},
+                    {"$set": {"delivery.amount_received": new_received, "updated_at": now}}
+                )
+    
+    await db.customer_ledger.insert_one(payment_record)
+    
+    return {
+        "message": "Payment recorded successfully",
+        "payment_id": payment_id,
+        "amount": data.amount
+    }
+
+@api_router.get("/customers/with-outstanding")
+async def get_customers_with_outstanding(user: dict = Depends(get_current_user)):
+    """Get all customers with outstanding balance"""
+    tenant_id = user["tenant_id"]
+    
+    # Get all delivered jobs with credit
+    pipeline = [
+        {"$match": {"tenant_id": tenant_id, "delivery": {"$exists": True}}},
+        {"$group": {
+            "_id": "$customer.mobile",
+            "customer_name": {"$first": "$customer.name"},
+            "total_billed": {"$sum": {"$ifNull": ["$delivery.final_amount", {"$ifNull": ["$repair.final_amount", 0]}]}},
+            "total_received": {"$sum": {"$ifNull": ["$delivery.amount_received", 0]}},
+            "job_count": {"$sum": 1},
+            "last_job_date": {"$max": "$updated_at"}
+        }},
+        {"$project": {
+            "mobile": "$_id",
+            "customer_name": 1,
+            "total_billed": 1,
+            "total_received": 1,
+            "outstanding": {"$subtract": ["$total_billed", "$total_received"]},
+            "job_count": 1,
+            "last_job_date": 1
+        }},
+        {"$match": {"outstanding": {"$gt": 0}}},
+        {"$sort": {"outstanding": -1}}
+    ]
+    
+    customers = await db.jobs.aggregate(pipeline).to_list(100)
+    
+    # Also get direct payments to adjust outstanding
+    for customer in customers:
+        payments = await db.customer_ledger.find(
+            {"tenant_id": tenant_id, "customer_mobile": customer["mobile"], "type": "payment"},
+            {"_id": 0, "amount": 1}
+        ).to_list(100)
+        
+        total_direct_payments = sum(p["amount"] for p in payments)
+        customer["total_received"] += total_direct_payments
+        customer["outstanding"] = max(0, customer["total_billed"] - customer["total_received"])
+    
+    # Filter out customers with no outstanding
+    customers = [c for c in customers if c["outstanding"] > 0]
+    
+    return customers
+
 # ==================== INVENTORY ROUTES ====================
 
 @api_router.post("/inventory", response_model=InventoryItemResponse)
