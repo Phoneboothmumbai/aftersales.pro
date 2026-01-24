@@ -467,6 +467,9 @@ export default function Landing() {
                 </span>
               </div>
               <div className="flex flex-wrap justify-center gap-4 text-sm">
+                <a href="/contact" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+                  Contact Us
+                </a>
                 <a href="/legal/privacy_policy" className="text-muted-foreground hover:text-foreground transition-colors">
                   Privacy Policy
                 </a>
@@ -483,7 +486,7 @@ export default function Landing() {
             </div>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} AfterSales.pro. All rights reserved.
+                © {new Date().getFullYear()} The Good Men Enterprise. All rights reserved.
               </p>
             </div>
           </div>
