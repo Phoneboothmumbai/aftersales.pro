@@ -214,6 +214,9 @@ function AppRoutes() {
       {/* Legal Pages (Public) */}
       <Route path="/legal/:pageType" element={<LegalPage />} />
 
+      {/* Contact Page (Public) */}
+      <Route path="/contact" element={<Contact />} />
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
