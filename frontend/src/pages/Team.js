@@ -71,7 +71,11 @@ export default function Team() {
 
     setActionLoading(true);
     try {
-      const response = await axios.post(`${API}/users`, formData);
+      const payload = {
+        ...formData,
+        branch_id: formData.branch_id === "all" ? "" : formData.branch_id,
+      };
+      const response = await axios.post(`${API}/users`, payload);
       setUsers([...users, response.data]);
       setCreateModal(false);
       setFormData({ name: "", email: "", password: "", phone: "", role: "technician", branch_id: "" });
