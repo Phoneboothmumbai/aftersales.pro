@@ -2066,11 +2066,19 @@ async def get_public_plans():
         {"is_deleted": {"$ne": True}},
         {"_id": 0}
     ).sort("sort_order", 1).to_list(20)
+    
+    # Debug logging
+    import logging
+    logging.info(f"Public plans query returned {len(plans)} plans")
+    
     # Filter out inactive plans and plans not shown on pricing page
+    # Default to showing if show_on_pricing is not set (None)
     visible_plans = [
         p for p in plans 
-        if p.get("is_active", True) != False and p.get("show_on_pricing", True) != False
+        if p.get("is_active", True) is not False and p.get("show_on_pricing", True) is not False
     ]
+    
+    logging.info(f"After filtering: {len(visible_plans)} visible plans")
     return visible_plans
 
 @api_router.get("/public/track/{job_number}/{tracking_token}", response_model=PublicJobStatus)
