@@ -227,6 +227,7 @@ export default function Team() {
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     )}
+                  </div>
                 </div>
                 <div className="mt-4 flex items-center gap-2">
                   <Badge variant={member.role === "admin" ? "default" : "secondary"}>
