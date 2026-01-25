@@ -1231,6 +1231,93 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Technician Selection Modal */}
+      <Dialog open={technicianModal} onOpenChange={setTechnicianModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-500" />
+              Inform Technician
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              Select a technician to notify about this job via WhatsApp.
+              Customer details will NOT be shared.
+            </p>
+
+            {loadingTechnicians ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin" />
+              </div>
+            ) : technicians.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p>No team members found</p>
+                <p className="text-xs mt-1">Add technicians in Team settings</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {technicians.map((tech) => (
+                  <div
+                    key={tech.id}
+                    onClick={() => setSelectedTechnician(tech.id)}
+                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                      selectedTechnician === tech.id
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                        : "border-border hover:border-blue-300"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{tech.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {tech.phone || "No phone number"}
+                        </p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        tech.role === "admin" 
+                          ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" 
+                          : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                      }`}>
+                        {tech.role}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {job && selectedTechnician && (
+              <div className="bg-muted/50 rounded-lg p-3 text-xs">
+                <p className="font-medium mb-1">Message Preview:</p>
+                <pre className="whitespace-pre-wrap text-muted-foreground max-h-32 overflow-y-auto">
+                  {generateTechnicianMessage()}
+                </pre>
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setTechnicianModal(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSendToTechnician}
+                disabled={!selectedTechnician || !technicians.find(t => t.id === selectedTechnician)?.phone}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                Send WhatsApp
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
