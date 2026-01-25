@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Plus, Trash2, Loader2, User, Shield } from "lucide-react";
+import { Plus, Trash2, Loader2, User, Shield, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -39,6 +39,7 @@ export default function Team() {
     name: "",
     email: "",
     password: "",
+    phone: "",
     role: "technician",
     branch_id: "",
   });
