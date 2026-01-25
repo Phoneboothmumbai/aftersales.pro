@@ -730,8 +730,8 @@ async def signup_tenant(data: TenantCreate):
             "theme": "light",
             "language": "en",
             "logo_url": None,
-            "address": "",
-            "phone": "",
+            "address": data.address or "",
+            "phone": data.phone or "",
             "email": data.admin_email,
             "footer_text": f"Thank you for choosing {data.company_name}"
         },
@@ -750,6 +750,7 @@ async def signup_tenant(data: TenantCreate):
         "password": hash_password(data.admin_password),
         "role": "admin",
         "branch_id": None,
+        "phone": data.phone or "",
         "created_at": now
     }
     await db.users.insert_one(user)
@@ -760,8 +761,8 @@ async def signup_tenant(data: TenantCreate):
         "id": branch_id,
         "tenant_id": tenant_id,
         "name": "Main Branch",
-        "address": "",
-        "phone": "",
+        "address": data.address or "",
+        "phone": data.phone or "",
         "created_at": now
     }
     await db.branches.insert_one(branch)
