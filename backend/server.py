@@ -4799,6 +4799,33 @@ async def delete_inventory_item(item_id: str, user: dict = Depends(require_admin
         raise HTTPException(status_code=404, detail="Item not found")
     return {"message": "Item deleted"}
 
+@api_router.get("/inventory/{item_id}/usage-history")
+async def get_inventory_usage_history(item_id: str, user: dict = Depends(get_current_user)):
+    """Get usage history for an inventory item - which jobs used this part"""
+    tenant_id = user["tenant_id"]
+    
+    # Verify item exists
+    item = await db.inventory.find_one({"id": item_id, "tenant_id": tenant_id})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    # Get usage records
+    usage_records = await db.inventory_usage.find(
+        {"inventory_id": item_id, "tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("used_at", -1).to_list(100)
+    
+    return {
+        "item": {
+            "id": item["id"],
+            "name": item["name"],
+            "sku": item.get("sku"),
+            "current_quantity": item["quantity"]
+        },
+        "usage_history": usage_records,
+        "total_used": sum(r["quantity_used"] for r in usage_records)
+    }
+
 # ==================== TECHNICIAN METRICS ROUTES ====================
 
 @api_router.get("/metrics/technicians")
