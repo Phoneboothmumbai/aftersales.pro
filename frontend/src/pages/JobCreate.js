@@ -610,12 +610,12 @@ Please check and update the status once diagnosed.`;
               )}
               
               <div className="text-center text-sm text-muted-foreground">
-                Would you like to notify the customer via WhatsApp?
+                Notify customer or technician via WhatsApp
               </div>
 
               {whatsappData && (
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                  <pre className="whitespace-pre-wrap text-xs text-green-800 dark:text-green-200 max-h-40 overflow-y-auto">
+                  <pre className="whitespace-pre-wrap text-xs text-green-800 dark:text-green-200 max-h-32 overflow-y-auto">
                     {whatsappData.message}
                   </pre>
                 </div>
@@ -629,44 +629,142 @@ Please check and update the status once diagnosed.`;
                   data-testid="send-whatsapp-btn"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
-                  Send WhatsApp Message
+                  Notify Customer (WhatsApp)
                   <ExternalLink className="w-3 h-3 ml-2" />
                 </Button>
                 <Button 
-                  onClick={handleViewJob} 
+                  onClick={handleOpenTechnicianModal}
                   variant="outline"
-                  className="w-full"
-                  data-testid="view-job-btn"
+                  className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                  data-testid="inform-technician-btn"
                 >
-                  <FileText className="w-4 h-4 mr-2" />
-                  View Job Details
+                  <Users className="w-4 h-4 mr-2" />
+                  Inform Technician
                 </Button>
-                <Button 
-                  onClick={() => {
-                    setShowSuccessModal(false);
-                    setCreatedJob(null);
-                    setWhatsappData(null);
-                    // Reset form
-                    setFormData({
-                      customer: { name: "", mobile: "", email: "" },
-                      device: { device_type: "", brand: "", model: "", serial_imei: "", condition: "", condition_notes: "", notes: "", password: "" },
-                      accessories: [...DEFAULT_ACCESSORIES],
-                      problem_description: "",
-                      technician_observation: "",
-                      branch_id: branches.length === 1 ? branches[0].id : "",
-                    });
-                  }} 
-                  variant="ghost"
-                  className="w-full"
-                  data-testid="create-another-btn"
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleViewJob} 
+                    variant="outline"
+                    className="flex-1"
+                    data-testid="view-job-btn"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    View Job
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setShowSuccessModal(false);
+                      setCreatedJob(null);
+                      setWhatsappData(null);
+                      // Reset form
+                      setFormData({
+                        customer: { name: "", mobile: "", email: "" },
+                        device: { device_type: "", brand: "", model: "", serial_imei: "", condition: "", condition_notes: "", notes: "", password: "", unlock_pattern: "" },
+                        accessories: [...DEFAULT_ACCESSORIES],
+                        problem_description: "",
+                        technician_observation: "",
+                        branch_id: branches.length === 1 ? branches[0].id : "",
+                      });
+                    }} 
+                    variant="ghost"
+                    className="flex-1"
+                    data-testid="create-another-btn"
+                  >
+                    Create Another
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Technician Selection Modal */}
+        <Dialog open={showTechnicianModal} onOpenChange={setShowTechnicianModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-500" />
+                Inform Technician
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-muted-foreground">
+                Select a technician to notify about this job via WhatsApp.
+                Customer details will NOT be shared.
+              </p>
+
+              {loadingTechnicians ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                </div>
+              ) : technicians.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>No team members found</p>
+                  <p className="text-xs mt-1">Add technicians in Team settings</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {technicians.map((tech) => (
+                    <div
+                      key={tech.id}
+                      onClick={() => setSelectedTechnician(tech.id)}
+                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                        selectedTechnician === tech.id
+                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                          : "border-border hover:border-blue-300"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{tech.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {tech.phone || "No phone number"}
+                          </p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          tech.role === "admin" 
+                            ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" 
+                            : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                        }`}>
+                          {tech.role}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {createdJob && selectedTechnician && (
+                <div className="bg-muted/50 rounded-lg p-3 text-xs">
+                  <p className="font-medium mb-1">Message Preview:</p>
+                  <pre className="whitespace-pre-wrap text-muted-foreground max-h-32 overflow-y-auto">
+                    {generateTechnicianMessage()}
+                  </pre>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowTechnicianModal(false)}
+                  className="flex-1"
                 >
-                  Create Another Job
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSendToTechnician}
+                  disabled={!selectedTechnician || !technicians.find(t => t.id === selectedTechnician)?.phone}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Send WhatsApp
                 </Button>
               </div>
             </div>
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>
+    </Layout>>
   );
 }
