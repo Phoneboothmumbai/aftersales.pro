@@ -2535,6 +2535,7 @@ class SubscriptionPlanCreate(BaseModel):
     max_storage_mb: int = 500  # -1 for unlimited
     features: dict = {}
     is_active: bool = True
+    show_on_pricing: bool = True  # Show on public pricing page
     sort_order: int = 99
 
 class SubscriptionPlanUpdate(BaseModel):
@@ -2551,6 +2552,7 @@ class SubscriptionPlanUpdate(BaseModel):
     max_storage_mb: Optional[int] = None
     features: Optional[dict] = None
     is_active: Optional[bool] = None
+    show_on_pricing: Optional[bool] = None  # Show on public pricing page
     sort_order: Optional[int] = None
 
 class SubscriptionPlanResponse(BaseModel):
@@ -2569,6 +2571,7 @@ class SubscriptionPlanResponse(BaseModel):
     max_storage_mb: int
     features: dict
     is_active: bool
+    show_on_pricing: bool = True  # Show on public pricing page
     is_default: bool = False
     sort_order: int
     created_at: Optional[str] = None
