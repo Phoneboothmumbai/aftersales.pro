@@ -256,6 +256,31 @@ export default function Inventory() {
     }
   };
 
+  const openUsageModal = async (item) => {
+    setSelectedItem(item);
+    setUsageModal(true);
+    setLoadingUsage(true);
+    try {
+      const response = await axios.get(`${API}/inventory/${item.id}/usage-history`);
+      setUsageHistory(response.data);
+    } catch (error) {
+      toast.error("Failed to load usage history");
+      console.error(error);
+    } finally {
+      setLoadingUsage(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <Layout>
       <div className="space-y-6 animate-in" data-testid="inventory-page">
