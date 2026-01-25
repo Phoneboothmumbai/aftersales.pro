@@ -198,6 +198,23 @@ export default function Team() {
                 />
               </div>
               <div className="space-y-2">
+                <Label>Phone Number (for WhatsApp)</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="9876543210"
+                    className="pl-10"
+                    data-testid="member-phone-input"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Required for sending job updates via WhatsApp
+                </p>
+              </div>
+              <div className="space-y-2">
                 <Label>Password *</Label>
                 <Input
                   type="password"
