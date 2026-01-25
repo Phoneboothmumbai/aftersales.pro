@@ -1576,17 +1576,74 @@ async def mark_pending_parts(job_id: str, notes: Optional[str] = None, user: dic
 @api_router.put("/jobs/{job_id}/repair")
 async def update_repair(job_id: str, data: RepairUpdate, user: dict = Depends(get_current_user)):
     now = datetime.now(timezone.utc).isoformat()
+    tenant_id = user["tenant_id"]
     
-    job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]})
+    job = await db.jobs.find_one({"id": job_id, "tenant_id": tenant_id})
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
     if job["status"] == "closed":
         raise HTTPException(status_code=400, detail="Cannot update closed job")
     
+    # Process parts from inventory
+    parts_used_data = []
+    total_parts_cost = 0
+    
+    if data.parts_used:
+        for part in data.parts_used:
+            # Check inventory item exists and has enough quantity
+            inv_item = await db.inventory.find_one({
+                "id": part.inventory_id,
+                "tenant_id": tenant_id
+            })
+            
+            if not inv_item:
+                raise HTTPException(status_code=400, detail=f"Inventory item {part.item_name} not found")
+            
+            if inv_item["quantity"] < part.quantity:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Insufficient stock for {part.item_name}. Available: {inv_item['quantity']}, Requested: {part.quantity}"
+                )
+            
+            # Deduct from inventory
+            await db.inventory.update_one(
+                {"id": part.inventory_id},
+                {"$inc": {"quantity": -part.quantity}}
+            )
+            
+            # Record the part usage
+            part_record = {
+                "inventory_id": part.inventory_id,
+                "item_name": part.item_name,
+                "quantity": part.quantity,
+                "unit_price": inv_item.get("unit_cost", 0),
+                "total_cost": part.quantity * inv_item.get("unit_cost", 0)
+            }
+            parts_used_data.append(part_record)
+            total_parts_cost += part_record["total_cost"]
+            
+            # Log inventory usage
+            usage_log = {
+                "id": str(uuid.uuid4()),
+                "tenant_id": tenant_id,
+                "inventory_id": part.inventory_id,
+                "job_id": job_id,
+                "job_number": job["job_number"],
+                "quantity_used": part.quantity,
+                "device": f"{job['device']['brand']} {job['device']['model']}",
+                "customer_name": job["customer"]["name"],
+                "used_by": user["id"],
+                "used_by_name": user["name"],
+                "used_at": now
+            }
+            await db.inventory_usage.insert_one(usage_log)
+    
     repair = {
         "work_done": data.work_done,
-        "parts_replaced": data.parts_replaced,
+        "parts_used": parts_used_data,
+        "parts_replaced": data.parts_replaced,  # Legacy text field
+        "parts_cost": total_parts_cost,
         "final_amount": data.final_amount,
         "warranty_info": data.warranty_info,
         "updated_at": now,
