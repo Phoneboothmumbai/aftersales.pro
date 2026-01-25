@@ -1176,14 +1176,40 @@ export default function SuperAdminDashboard() {
                 <h2 className="text-2xl font-bold text-white">Subscription Plans</h2>
                 <p className="text-slate-400">Manage subscription plans and their features</p>
               </div>
-              <Button
-                onClick={() => { resetPlanForm(); setShowCreatePlan(true); }}
-                className="bg-blue-600 hover:bg-blue-700"
-                data-testid="create-plan-btn"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Plan
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    fetchPlans();
+                    alert("Plans synced! Changes will now reflect on the pricing page.");
+                  }}
+                  variant="outline"
+                  className="border-green-600 text-green-400 hover:bg-green-600/20"
+                  data-testid="sync-plans-btn"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Sync to Pricing Page
+                </Button>
+                <Button
+                  onClick={() => { resetPlanForm(); setShowCreatePlan(true); }}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  data-testid="create-plan-btn"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Plan
+                </Button>
+              </div>
+            </div>
+
+            {/* Visibility Info */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-slate-300 text-sm">
+                <Eye className="w-4 h-4 text-green-400" />
+                <span>Plans marked as &quot;Show on Pricing&quot; will appear on the public pricing page.</span>
+                <span className="text-slate-500">•</span>
+                <span className="text-slate-400">
+                  Currently showing: {plans.filter(p => p.show_on_pricing !== false && p.is_active !== false).length} plans
+                </span>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1201,6 +1227,17 @@ export default function SuperAdminDashboard() {
                         )}
                         {!plan.is_active && (
                           <Badge className="ml-2 bg-red-600/20 text-red-400">Inactive</Badge>
+                        )}
+                        {plan.show_on_pricing !== false ? (
+                          <Badge className="ml-2 bg-green-600/20 text-green-400 text-xs">
+                            <Eye className="w-3 h-3 mr-1" />
+                            Visible
+                          </Badge>
+                        ) : (
+                          <Badge className="ml-2 bg-slate-600/20 text-slate-400 text-xs">
+                            <EyeOff className="w-3 h-3 mr-1" />
+                            Hidden
+                          </Badge>
                         )}
                       </div>
                       <div className="flex gap-1">
