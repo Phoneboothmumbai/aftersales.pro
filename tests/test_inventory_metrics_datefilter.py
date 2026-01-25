@@ -9,7 +9,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://aftersales-repair.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://repairinv-sync.preview.emergentagent.com')
 
 # Test credentials from the review request
 TEST_TENANT = {

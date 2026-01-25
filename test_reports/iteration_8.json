@@ -206,7 +206,7 @@
   "test_credentials": {
     "super_admin_email": "superadmin@aftersales.pro",
     "super_admin_password": "SuperAdmin@123",
-    "super_admin_url": "https://aftersales-repair.preview.emergentagent.com/super-admin"
+    "super_admin_url": "https://repairinv-sync.preview.emergentagent.com/super-admin"
   },
   "seed_data_creation": "Created multiple test shops during testing (prefixed with TEST_) for testing create shop, assign plan, extend validity, and record payment features",
   "retest_needed": false,

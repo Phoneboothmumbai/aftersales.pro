@@ -133,7 +133,7 @@
   "test_credentials": {
     "super_admin_email": "superadmin@aftersales.pro",
     "super_admin_password": "SuperAdmin@123",
-    "super_admin_url": "https://aftersales-repair.preview.emergentagent.com/super-admin"
+    "super_admin_url": "https://repairinv-sync.preview.emergentagent.com/super-admin"
   },
   "seed_data_creation": "Created test tenant (TEST_ImpersonateSuspend_*) for testing impersonation and suspend/unsuspend features. Created test announcements with different types and targets.",
   "retest_needed": false,
