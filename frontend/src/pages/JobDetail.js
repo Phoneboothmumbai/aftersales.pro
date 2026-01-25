@@ -800,6 +800,17 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
                       Close Job
                     </Button>
                   )}
+                  
+                  {/* Inform Technician - Always visible for non-closed jobs */}
+                  <Button 
+                    className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20" 
+                    variant="outline"
+                    onClick={handleOpenTechnicianModal}
+                    data-testid="inform-technician-btn"
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Inform Technician
+                  </Button>
                 </CardContent>
               </Card>
             )}
