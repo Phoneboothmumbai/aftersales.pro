@@ -161,6 +161,15 @@ export default function JobDetail() {
           final_amount: response.data.repair.final_amount || "",
           warranty_info: response.data.repair.warranty_info || "",
         });
+        // Pre-fill selected parts if previously saved
+        if (response.data.repair.parts_used?.length > 0) {
+          setSelectedParts(response.data.repair.parts_used.map(p => ({
+            inventory_id: p.inventory_id,
+            item_name: p.item_name,
+            quantity: p.quantity,
+            unit_price: p.unit_price || 0
+          })));
+        }
       }
       if (response.data.delivery) {
         setDeliveryForm({
@@ -177,6 +186,56 @@ export default function JobDetail() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchInventoryItems = async (searchQuery = "") => {
+    setLoadingInventory(true);
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery) params.append("search", searchQuery);
+      const response = await axios.get(`${API}/inventory?${params.toString()}`);
+      setInventoryItems(response.data);
+    } catch (error) {
+      console.error("Failed to load inventory:", error);
+    } finally {
+      setLoadingInventory(false);
+    }
+  };
+
+  const handleAddPart = (item) => {
+    // Check if already added
+    const existing = selectedParts.find(p => p.inventory_id === item.id);
+    if (existing) {
+      toast.error("Part already added");
+      return;
+    }
+    if (item.quantity < 1) {
+      toast.error("Part is out of stock");
+      return;
+    }
+    setSelectedParts([...selectedParts, {
+      inventory_id: item.id,
+      item_name: item.name,
+      quantity: 1,
+      unit_price: item.selling_price || 0,
+      available_stock: item.quantity
+    }]);
+    setShowPartsSelector(false);
+    setPartsSearchQuery("");
+  };
+
+  const handleRemovePart = (inventoryId) => {
+    setSelectedParts(selectedParts.filter(p => p.inventory_id !== inventoryId));
+  };
+
+  const handlePartQuantityChange = (inventoryId, newQuantity) => {
+    setSelectedParts(selectedParts.map(p => {
+      if (p.inventory_id === inventoryId) {
+        const qty = Math.max(1, Math.min(newQuantity, p.available_stock || 999));
+        return { ...p, quantity: qty };
+      }
+      return p;
+    }));
   };
 
   const fetchTrackingLink = async () => {
