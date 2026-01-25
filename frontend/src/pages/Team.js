@@ -32,6 +32,8 @@ export default function Team() {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createModal, setCreateModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -41,6 +43,14 @@ export default function Team() {
     password: "",
     phone: "",
     role: "technician",
+    branch_id: "",
+  });
+
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
     branch_id: "",
   });
 
