@@ -155,9 +155,16 @@ class ApprovalUpdate(BaseModel):
     approved_amount: float
     approval_notes: Optional[str] = None
 
+class PartUsed(BaseModel):
+    inventory_id: str
+    item_name: str
+    quantity: int = 1
+    unit_price: float = 0
+
 class RepairUpdate(BaseModel):
     work_done: str
-    parts_replaced: Optional[str] = None
+    parts_used: Optional[List[PartUsed]] = None  # Parts from inventory
+    parts_replaced: Optional[str] = None  # Legacy text field
     final_amount: float
     warranty_info: Optional[str] = None
 
