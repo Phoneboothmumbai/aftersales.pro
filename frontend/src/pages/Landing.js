@@ -29,10 +29,13 @@ export default function Landing() {
     const fetchPlans = async () => {
       try {
         const response = await axios.get(`${API}/public/plans`);
-        // Filter and sort plans for display
+        // Plans are already filtered by show_on_pricing in the API
+        // Sort by sort_order first, then by price
         const displayPlans = response.data
-          .filter(p => p.is_active !== false && !p.is_deleted)
-          .sort((a, b) => (a.price || 0) - (b.price || 0))
+          .sort((a, b) => {
+            if (a.sort_order !== b.sort_order) return (a.sort_order || 99) - (b.sort_order || 99);
+            return (a.price || 0) - (b.price || 0);
+          })
           .slice(0, 4); // Show max 4 plans
         
         if (displayPlans.length > 0) {
