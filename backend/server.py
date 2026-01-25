@@ -88,6 +88,7 @@ class UserResponse(BaseModel):
     name: str
     email: str
     role: str
+    phone: Optional[str] = None
     branch_id: Optional[str] = None
     created_at: str
 
