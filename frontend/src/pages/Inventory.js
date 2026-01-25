@@ -41,6 +41,9 @@ import {
   Loader2,
   Box,
   DollarSign,
+  History,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../context/AuthContext";
