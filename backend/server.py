@@ -2061,14 +2061,17 @@ class PublicJobStatus(BaseModel):
 
 @api_router.get("/public/plans")
 async def get_public_plans():
-    """Public endpoint to get available subscription plans (no auth required)"""
+    """Public endpoint to get available subscription plans for pricing page (no auth required)"""
     plans = await db.plans.find(
         {"is_deleted": {"$ne": True}},
         {"_id": 0}
-    ).sort("price", 1).to_list(10)
-    # Filter out inactive plans
-    active_plans = [p for p in plans if p.get("is_active", True) != False]
-    return active_plans
+    ).sort("sort_order", 1).to_list(20)
+    # Filter out inactive plans and plans not shown on pricing page
+    visible_plans = [
+        p for p in plans 
+        if p.get("is_active", True) != False and p.get("show_on_pricing", True) != False
+    ]
+    return visible_plans
 
 @api_router.get("/public/track/{job_number}/{tracking_token}", response_model=PublicJobStatus)
 async def public_track_job(job_number: str, tracking_token: str):
