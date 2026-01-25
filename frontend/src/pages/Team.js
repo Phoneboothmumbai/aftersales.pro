@@ -74,7 +74,7 @@ export default function Team() {
       const response = await axios.post(`${API}/users`, formData);
       setUsers([...users, response.data]);
       setCreateModal(false);
-      setFormData({ name: "", email: "", password: "", role: "technician", branch_id: "" });
+      setFormData({ name: "", email: "", password: "", phone: "", role: "technician", branch_id: "" });
       toast.success("Team member added successfully");
     } catch (error) {
       toast.error(error.response?.data?.detail || "Failed to create user");
