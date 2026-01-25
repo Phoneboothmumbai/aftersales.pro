@@ -235,6 +235,32 @@ export default function Signup() {
                   )}
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Mobile Number</Label>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="9876543210"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    data-testid="signup-phone-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address">Shop Address</Label>
+                  <Input
+                    id="address"
+                    name="address"
+                    type="text"
+                    placeholder="123, Main Street, City"
+                    value={formData.address}
+                    onChange={handleChange}
+                    data-testid="signup-address-input"
+                  />
+                </div>
+
                 <Button
                   type="button"
                   className="w-full"
