@@ -1617,8 +1617,8 @@ async def update_repair(job_id: str, data: RepairUpdate, user: dict = Depends(ge
                 "inventory_id": part.inventory_id,
                 "item_name": part.item_name,
                 "quantity": part.quantity,
-                "unit_price": inv_item.get("unit_cost", 0),
-                "total_cost": part.quantity * inv_item.get("unit_cost", 0)
+                "unit_price": inv_item.get("cost_price", 0),
+                "total_cost": part.quantity * inv_item.get("cost_price", 0)
             }
             parts_used_data.append(part_record)
             total_parts_cost += part_record["total_cost"]
