@@ -315,6 +315,91 @@ export default function JobDetail() {
     }
   };
 
+  // Technician notification functions
+  const fetchTechnicians = async () => {
+    setLoadingTechnicians(true);
+    try {
+      const response = await axios.get(`${API}/users`);
+      const techList = response.data.filter(u => u.role === "technician" || u.role === "admin");
+      setTechnicians(techList);
+    } catch (error) {
+      console.error("Failed to fetch technicians:", error);
+      toast.error("Failed to load team members");
+    } finally {
+      setLoadingTechnicians(false);
+    }
+  };
+
+  const handleOpenTechnicianModal = () => {
+    setTechnicianModal(true);
+    setSelectedTechnician(null);
+    fetchTechnicians();
+  };
+
+  const generateTechnicianMessage = () => {
+    if (!job) return "";
+    
+    const accessories = job.accessories?.filter(a => a.checked).map(a => a.name).join(", ") || "None";
+    const status = getStatusLabel(job.status);
+    
+    // Message WITHOUT customer personal details
+    let message = `🔧 *Job Update - ${job.job_number}*
+
+*Status:* ${status}
+
+*Device Details:*
+• Type: ${job.device?.device_type || "N/A"}
+• Brand: ${job.device?.brand || "N/A"}
+• Model: ${job.device?.model || "N/A"}
+${job.device?.serial_imei ? `• IMEI/Serial: ${job.device.serial_imei}` : ""}
+${job.device?.condition ? `• Condition: ${job.device.condition}` : ""}
+
+*Problem:*
+${job.problem_description || "N/A"}
+
+*Accessories:*
+${accessories}`;
+
+    if (job.device?.password) {
+      message += `\n\n*Device Password:* ${job.device.password}`;
+    }
+    if (job.device?.unlock_pattern) {
+      message += `\n*Unlock Pattern:* ${job.device.unlock_pattern}`;
+    }
+
+    if (job.diagnosis) {
+      message += `\n\n*Diagnosis:*
+${job.diagnosis.diagnosis}
+Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
+    }
+
+    message += `\n\nPlease check and update the status.`;
+
+    return message;
+  };
+
+  const handleSendToTechnician = () => {
+    if (!selectedTechnician) {
+      toast.error("Please select a technician");
+      return;
+    }
+
+    const tech = technicians.find(t => t.id === selectedTechnician);
+    if (!tech?.phone) {
+      toast.error("Technician phone number not available");
+      return;
+    }
+
+    const message = generateTechnicianMessage();
+    const encodedMessage = encodeURIComponent(message);
+    const phone = tech.phone.replace(/[^0-9]/g, "");
+    const whatsappUrl = `https://wa.me/${phone.startsWith("91") ? phone : "91" + phone}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, "_blank");
+    toast.success(`WhatsApp opened for ${tech.name}`);
+    setTechnicianModal(false);
+  };
+
   // WhatsApp
   const openWhatsApp = async (messageType) => {
     try {
