@@ -1069,6 +1069,48 @@ async def list_users(user: dict = Depends(get_current_user)):
     ).to_list(1000)
     return [UserResponse(**u) for u in users]
 
+@api_router.put("/users/{user_id}")
+async def update_user(user_id: str, data: UserUpdate, admin: dict = Depends(require_admin)):
+    """Update a team member's details"""
+    # Check if user exists
+    existing = await db.users.find_one({
+        "id": user_id,
+        "tenant_id": admin["tenant_id"]
+    })
+    
+    if not existing:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Build update data
+    update_data = {}
+    if data.name:
+        update_data["name"] = data.name
+    if data.email:
+        # Check if email is already taken by another user
+        email_exists = await db.users.find_one({
+            "email": data.email,
+            "tenant_id": admin["tenant_id"],
+            "id": {"$ne": user_id}
+        })
+        if email_exists:
+            raise HTTPException(status_code=400, detail="Email already in use")
+        update_data["email"] = data.email
+    if data.phone is not None:
+        update_data["phone"] = data.phone
+    if data.role:
+        update_data["role"] = data.role
+    if data.branch_id is not None:
+        update_data["branch_id"] = data.branch_id if data.branch_id else None
+    
+    if update_data:
+        await db.users.update_one(
+            {"id": user_id, "tenant_id": admin["tenant_id"]},
+            {"$set": update_data}
+        )
+    
+    updated = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+    return UserResponse(**updated)
+
 @api_router.delete("/users/{user_id}")
 async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
     if user_id == admin["id"]:
