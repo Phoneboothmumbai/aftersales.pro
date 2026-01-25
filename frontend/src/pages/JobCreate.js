@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import { ArrowLeft, Save, Loader2, MessageSquare, CheckCircle, ExternalLink, FileText } from "lucide-react";
+import { ArrowLeft, Save, Loader2, MessageSquare, CheckCircle, ExternalLink, FileText, Users, Send } from "lucide-react";
 import { toast } from "sonner";
 import { DEVICE_TYPES, DEVICE_CONDITIONS, DEFAULT_ACCESSORIES } from "../lib/utils";
 
@@ -35,6 +35,13 @@ export default function JobCreate() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdJob, setCreatedJob] = useState(null);
   const [whatsappData, setWhatsappData] = useState(null);
+  
+  // Technician notification state
+  const [showTechnicianModal, setShowTechnicianModal] = useState(false);
+  const [technicians, setTechnicians] = useState([]);
+  const [selectedTechnician, setSelectedTechnician] = useState(null);
+  const [loadingTechnicians, setLoadingTechnicians] = useState(false);
+  
   const [formData, setFormData] = useState({
     customer: {
       name: "",
