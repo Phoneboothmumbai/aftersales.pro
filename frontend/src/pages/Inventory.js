@@ -718,6 +718,100 @@ export default function Inventory() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Usage History Modal */}
+      <Dialog open={usageModal} onOpenChange={setUsageModal}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-blue-500" />
+              Usage History
+            </DialogTitle>
+          </DialogHeader>
+          {loadingUsage ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : usageHistory ? (
+            <div className="space-y-4">
+              {/* Item Summary */}
+              <div className="bg-muted rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-lg">{usageHistory.item.name}</p>
+                    {usageHistory.item.sku && (
+                      <p className="text-sm text-muted-foreground font-mono">{usageHistory.item.sku}</p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Current Stock</p>
+                    <p className="text-2xl font-bold">{usageHistory.item.current_quantity}</p>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Total Used in Repairs</span>
+                  <Badge variant="secondary" className="text-base">
+                    {usageHistory.total_used} units
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Usage Records */}
+              {usageHistory.usage_history.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No usage records yet</p>
+                  <p className="text-sm">This part hasn&apos;t been used in any repairs</p>
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Usage History ({usageHistory.usage_history.length} records)
+                  </p>
+                  {usageHistory.usage_history.map((record, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-background border rounded-lg p-3 flex items-center justify-between"
+                      data-testid={`usage-record-${idx}`}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {record.job_number}
+                          </Badge>
+                          <span className="font-medium">{record.customer_name}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {record.device} • by {record.used_by_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(record.used_at)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-lg text-blue-600">
+                          -{record.quantity_used}
+                        </p>
+                        <a
+                          href={`/jobs/${record.job_id}`}
+                          className="text-xs text-blue-500 hover:underline flex items-center gap-1 justify-end"
+                        >
+                          View Job <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : null}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUsageModal(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
