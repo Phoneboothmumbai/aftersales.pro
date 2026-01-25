@@ -144,6 +144,12 @@ export default function Team() {
                     <div>
                       <p className="font-semibold">{member.name}</p>
                       <p className="text-sm text-muted-foreground">{member.email}</p>
+                      {member.phone && (
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Phone className="w-3 h-3" />
+                          {member.phone}
+                        </p>
+                      )}
                     </div>
                   </div>
                   {member.id !== currentUser.id && (
@@ -165,6 +171,11 @@ export default function Team() {
                   <span className="text-sm text-muted-foreground">
                     {getBranchName(member.branch_id)}
                   </span>
+                  {!member.phone && (
+                    <Badge variant="outline" className="text-orange-500 border-orange-500 text-xs">
+                      No WhatsApp
+                    </Badge>
+                  )}
                 </div>
               </CardContent>
             </Card>
