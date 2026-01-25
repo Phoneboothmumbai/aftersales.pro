@@ -129,6 +129,20 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - ✅ **Credit Mode Switch** - Toggle in delivery modal to mark as credit
 - ✅ **Credit Alert** - Shows warning when credit mode is enabled
 
+### Inventory-Linked Parts System (January 25, 2026)
+- ✅ **Parts Selection in Repair Modal** - Enhanced repair modal with "Parts from Inventory" section
+- ✅ **Inventory Dropdown** - Search and select parts from inventory with stock/price display
+- ✅ **Quantity Input** - Specify quantity for each selected part
+- ✅ **Real-time Total** - Shows "Total Parts Cost" calculated from selected parts
+- ✅ **Stock Deduction** - Automatically deducts inventory stock when repair is submitted
+- ✅ **Parts Used Display** - Job detail page shows "Parts Used (from Inventory)" section
+- ✅ **Itemized Costs** - Shows each part with quantity × unit price = total
+- ✅ **Usage History API** - `GET /api/inventory/{id}/usage-history` returns all jobs using a part
+- ✅ **Usage History Modal** - Click history icon on inventory page to see usage records
+- ✅ **Job Links** - Usage history shows job number, customer, device, with "View Job" links
+- ✅ **Out of Stock Check** - Prevents selecting parts with 0 stock
+- ✅ **Other Parts Field** - Legacy text field for parts not in inventory system
+
 ## Navigation Structure
 - Dashboard - Overview stats
 - Jobs - All repair jobs with date range filter
