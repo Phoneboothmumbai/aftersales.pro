@@ -207,17 +207,26 @@ export default function Team() {
                       )}
                     </div>
                   </div>
-                  {member.id !== currentUser.id && (
+                  <div className="flex gap-1">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => setDeleteId(member.id)}
-                      data-testid={`delete-member-${member.email}`}
+                      onClick={() => openEditModal(member)}
+                      data-testid={`edit-member-${member.email}`}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Pencil className="w-4 h-4" />
                     </Button>
-                  )}
+                    {member.id !== currentUser.id && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => setDeleteId(member.id)}
+                        data-testid={`delete-member-${member.email}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
                 </div>
                 <div className="mt-4 flex items-center gap-2">
                   <Badge variant={member.role === "admin" ? "default" : "secondary"}>
