@@ -763,10 +763,35 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
                     <h4 className="text-sm font-medium text-muted-foreground mb-1">Work Done</h4>
                     <p>{job.repair.work_done}</p>
                   </div>
+
+                  {/* Parts Used from Inventory */}
+                  {job.repair.parts_used && job.repair.parts_used.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                        <Package className="w-4 h-4" />
+                        Parts Used (from Inventory)
+                      </h4>
+                      <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                        {job.repair.parts_used.map((part, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm">
+                            <span className="font-medium">{part.item_name}</span>
+                            <span className="text-muted-foreground">
+                              {part.quantity} × {formatCurrency(part.unit_price || 0)} = {formatCurrency((part.quantity || 1) * (part.unit_price || 0))}
+                            </span>
+                          </div>
+                        ))}
+                        <div className="border-t pt-2 mt-2 flex justify-between font-medium">
+                          <span>Total Parts Cost</span>
+                          <span className="text-blue-600">{formatCurrency(job.repair.parts_cost || 0)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid sm:grid-cols-3 gap-4">
                     {job.repair.parts_replaced && (
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Parts Replaced</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Other Parts</h4>
                         <p>{job.repair.parts_replaced}</p>
                       </div>
                     )}
