@@ -17,6 +17,8 @@ export default function Signup() {
   const [formData, setFormData] = useState({
     company_name: "",
     subdomain: "",
+    phone: "",
+    address: "",
     admin_name: "",
     admin_email: "",
     admin_password: "",
