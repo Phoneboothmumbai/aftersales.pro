@@ -188,11 +188,13 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 
 ### Inventory
 - `POST /api/inventory` - Create item
-- `GET /api/inventory` - List items
+- `GET /api/inventory` - List items (with search param)
+- `GET /api/inventory/{id}` - Get single item
 - `PUT /api/inventory/{id}` - Update item
 - `DELETE /api/inventory/{id}` - Delete item
 - `POST /api/inventory/{id}/adjust` - Adjust stock
 - `GET /api/inventory/stats` - Inventory statistics
+- `GET /api/inventory/{id}/usage-history` - **Get part usage history across jobs** (NEW)
 
 ### Metrics
 - `GET /api/metrics/technicians` - Technician performance
