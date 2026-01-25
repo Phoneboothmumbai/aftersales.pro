@@ -347,6 +347,97 @@ export default function Team() {
           </DialogContent>
         </Dialog>
 
+        {/* Edit Modal */}
+        <Dialog open={editModal} onOpenChange={setEditModal}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Team Member</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Name *</Label>
+                <Input
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                  placeholder="John Doe"
+                  data-testid="edit-member-name-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Email *</Label>
+                <Input
+                  type="email"
+                  value={editFormData.email}
+                  onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                  placeholder="john@example.com"
+                  data-testid="edit-member-email-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Phone Number (for WhatsApp) *</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    type="tel"
+                    value={editFormData.phone}
+                    onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                    placeholder="9876543210"
+                    className="pl-10"
+                    data-testid="edit-member-phone-input"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Required for sending job updates via WhatsApp
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Role</Label>
+                <Select
+                  value={editFormData.role}
+                  onValueChange={(v) => setEditFormData({ ...editFormData, role: v })}
+                >
+                  <SelectTrigger data-testid="edit-member-role-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="technician">Technician</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {branches.length > 1 && (
+                <div className="space-y-2">
+                  <Label>Assigned Branch</Label>
+                  <Select
+                    value={editFormData.branch_id || "all"}
+                    onValueChange={(v) => setEditFormData({ ...editFormData, branch_id: v })}
+                  >
+                    <SelectTrigger data-testid="edit-member-branch-select">
+                      <SelectValue placeholder="All Branches" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Branches</SelectItem>
+                      {branches.map((branch) => (
+                        <SelectItem key={branch.id} value={branch.id}>
+                          {branch.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdate} disabled={actionLoading} data-testid="update-member-btn">
+                {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Delete Confirmation */}
         <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
           <DialogContent>
