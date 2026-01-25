@@ -1068,8 +1068,13 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
       </Dialog>
 
       {/* Repair Modal */}
-      <Dialog open={repairModal} onOpenChange={setRepairModal}>
-        <DialogContent className="sm:max-w-[500px]">
+      <Dialog open={repairModal} onOpenChange={(open) => {
+        setRepairModal(open);
+        if (open) {
+          fetchInventoryItems();
+        }
+      }}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Repair Details</DialogTitle>
           </DialogHeader>
@@ -1081,16 +1086,146 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
                 onChange={(e) => setRepairForm({ ...repairForm, work_done: e.target.value })}
                 placeholder="Describe the repair work..."
                 rows={3}
+                data-testid="repair-work-done"
               />
             </div>
+            
+            {/* Parts from Inventory Section */}
+            <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-medium flex items-center gap-2">
+                  <Package className="w-4 h-4" />
+                  Parts from Inventory
+                </Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowPartsSelector(!showPartsSelector);
+                    if (!showPartsSelector) fetchInventoryItems();
+                  }}
+                  data-testid="add-parts-btn"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Part
+                </Button>
+              </div>
+
+              {/* Parts Search/Selector */}
+              {showPartsSelector && (
+                <div className="border rounded-lg p-3 bg-background space-y-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search inventory..."
+                      value={partsSearchQuery}
+                      onChange={(e) => {
+                        setPartsSearchQuery(e.target.value);
+                        fetchInventoryItems(e.target.value);
+                      }}
+                      className="pl-10"
+                      data-testid="parts-search-input"
+                    />
+                  </div>
+                  <div className="max-h-40 overflow-y-auto space-y-1">
+                    {loadingInventory ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      </div>
+                    ) : inventoryItems.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No items found
+                      </p>
+                    ) : (
+                      inventoryItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-2 rounded hover:bg-muted cursor-pointer"
+                          onClick={() => handleAddPart(item)}
+                          data-testid={`inventory-item-${item.id}`}
+                        >
+                          <div>
+                            <p className="font-medium text-sm">{item.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Stock: {item.quantity} • {formatCurrency(item.selling_price)}
+                            </p>
+                          </div>
+                          <Badge variant={item.quantity > 0 ? "secondary" : "destructive"}>
+                            {item.quantity > 0 ? "In Stock" : "Out"}
+                          </Badge>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Selected Parts List */}
+              {selectedParts.length > 0 ? (
+                <div className="space-y-2">
+                  {selectedParts.map((part) => (
+                    <div
+                      key={part.inventory_id}
+                      className="flex items-center justify-between bg-background rounded-lg p-3 border"
+                      data-testid={`selected-part-${part.inventory_id}`}
+                    >
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{part.item_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatCurrency(part.unit_price)} each
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min="1"
+                          max={part.available_stock || 999}
+                          value={part.quantity}
+                          onChange={(e) => handlePartQuantityChange(part.inventory_id, parseInt(e.target.value) || 1)}
+                          className="w-16 text-center"
+                          data-testid={`part-qty-${part.inventory_id}`}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => handleRemovePart(part.inventory_id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded p-2 text-sm">
+                    <span className="text-muted-foreground">Total Parts Cost: </span>
+                    <span className="font-bold text-blue-600">
+                      {formatCurrency(selectedParts.reduce((sum, p) => sum + (p.quantity * p.unit_price), 0))}
+                    </span>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      (Stock will be deducted)
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-2">
+                  No parts selected. Click &quot;Add Part&quot; to select from inventory.
+                </p>
+              )}
+            </div>
+
+            {/* Legacy Text Field for Parts not in Inventory */}
             <div className="space-y-2">
-              <Label>Parts Replaced</Label>
+              <Label>Other Parts (not in inventory)</Label>
               <Input
                 value={repairForm.parts_replaced}
                 onChange={(e) => setRepairForm({ ...repairForm, parts_replaced: e.target.value })}
-                placeholder="e.g., Screen, Battery"
+                placeholder="e.g., Screws, Adhesive"
+                data-testid="repair-parts-text"
               />
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Final Amount (₹) *</Label>
@@ -1099,6 +1234,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
                   value={repairForm.final_amount}
                   onChange={(e) => setRepairForm({ ...repairForm, final_amount: e.target.value })}
                   placeholder="0"
+                  data-testid="repair-final-amount"
                 />
               </div>
               <div className="space-y-2">
@@ -1107,13 +1243,14 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
                   value={repairForm.warranty_info}
                   onChange={(e) => setRepairForm({ ...repairForm, warranty_info: e.target.value })}
                   placeholder="e.g., 3 months"
+                  data-testid="repair-warranty"
                 />
               </div>
             </div>
           </div>
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setRepairModal(false)}>Cancel</Button>
-            <Button variant="outline" onClick={() => handleRepair(false)} disabled={actionLoading}>
+            <Button variant="outline" onClick={() => handleRepair(false)} disabled={actionLoading} data-testid="save-repair-btn">
               {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Only"}
             </Button>
             <Button onClick={() => handleRepair(true)} disabled={actionLoading} className="bg-green-600 hover:bg-green-700">
