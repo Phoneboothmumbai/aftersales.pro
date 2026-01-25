@@ -1804,8 +1804,8 @@ def generate_qr_code(data: str) -> BytesIO:
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
+        box_size=8,
+        border=2,
     )
     qr.add_data(data)
     qr.make(fit=True)
@@ -1815,120 +1815,440 @@ def generate_qr_code(data: str) -> BytesIO:
     buffer.seek(0)
     return buffer
 
+def draw_rounded_rect(canvas, x, y, width, height, radius, fill_color=None, stroke_color=None, stroke_width=1):
+    """Draw a rounded rectangle on the canvas"""
+    from reportlab.lib.colors import Color
+    path = canvas.beginPath()
+    path.moveTo(x + radius, y)
+    path.lineTo(x + width - radius, y)
+    path.arcTo(x + width - radius, y, x + width, y + radius, -90, 90)
+    path.lineTo(x + width, y + height - radius)
+    path.arcTo(x + width - radius, y + height - radius, x + width, y + height, 0, 90)
+    path.lineTo(x + radius, y + height)
+    path.arcTo(x, y + height - radius, x + radius, y + height, 90, 90)
+    path.lineTo(x, y + radius)
+    path.arcTo(x, y, x + radius, y + radius, 180, 90)
+    path.close()
+    
+    if fill_color:
+        canvas.setFillColor(fill_color)
+        canvas.drawPath(path, fill=1, stroke=0)
+    if stroke_color:
+        canvas.setStrokeColor(stroke_color)
+        canvas.setLineWidth(stroke_width)
+        canvas.drawPath(path, fill=0, stroke=1)
+
 @api_router.get("/jobs/{job_id}/pdf")
 async def generate_job_pdf(job_id: str, user: dict = Depends(get_current_user)):
+    from reportlab.lib.colors import HexColor, Color, black, white, lightgrey
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+    from reportlab.platypus import HRFlowable
+    
     job = await db.jobs.find_one({"id": job_id, "tenant_id": user["tenant_id"]}, {"_id": 0})
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
     tenant = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0})
+    settings = tenant.get("settings", {})
     
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=20*mm, leftMargin=20*mm, topMargin=20*mm, bottomMargin=20*mm)
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4, 
+        rightMargin=15*mm, 
+        leftMargin=15*mm, 
+        topMargin=15*mm, 
+        bottomMargin=15*mm
+    )
     
+    # Define colors
+    primary_color = HexColor("#2563eb")  # Blue
+    dark_color = HexColor("#1e293b")  # Dark slate
+    muted_color = HexColor("#64748b")  # Slate
+    light_bg = HexColor("#f8fafc")  # Light background
+    border_color = HexColor("#e2e8f0")  # Border
+    success_color = HexColor("#22c55e")  # Green
+    
+    # Define styles
     styles = getSampleStyleSheet()
-    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=18, spaceAfter=10)
-    heading_style = ParagraphStyle('Heading', parent=styles['Heading2'], fontSize=12, spaceBefore=15, spaceAfter=5)
-    normal_style = styles['Normal']
-    small_style = ParagraphStyle('Small', parent=styles['Normal'], fontSize=8)
+    
+    company_style = ParagraphStyle(
+        'CompanyName',
+        parent=styles['Heading1'],
+        fontSize=22,
+        textColor=dark_color,
+        spaceAfter=2,
+        fontName='Helvetica-Bold'
+    )
+    
+    job_number_style = ParagraphStyle(
+        'JobNumber',
+        parent=styles['Normal'],
+        fontSize=11,
+        textColor=white,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    section_title_style = ParagraphStyle(
+        'SectionTitle',
+        parent=styles['Heading2'],
+        fontSize=11,
+        textColor=primary_color,
+        spaceBefore=12,
+        spaceAfter=6,
+        fontName='Helvetica-Bold',
+        borderPadding=5
+    )
+    
+    label_style = ParagraphStyle(
+        'Label',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=muted_color,
+        fontName='Helvetica'
+    )
+    
+    value_style = ParagraphStyle(
+        'Value',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=dark_color,
+        fontName='Helvetica-Bold'
+    )
+    
+    normal_style = ParagraphStyle(
+        'NormalText',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=dark_color,
+        fontName='Helvetica'
+    )
+    
+    small_style = ParagraphStyle(
+        'SmallText',
+        parent=styles['Normal'],
+        fontSize=8,
+        textColor=muted_color,
+        fontName='Helvetica'
+    )
+    
+    footer_style = ParagraphStyle(
+        'Footer',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=muted_color,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Oblique'
+    )
     
     elements = []
     
+    # ============ HEADER SECTION ============
     # Generate QR code for public tracking
     tracking_token = job.get("tracking_token", "")
-    tracking_url = f"Track Status: {job['job_number']} | Token: {tracking_token}"
+    job_number = job['job_number']
+    tracking_url = f"{job_number}|{tracking_token}"
     qr_buffer = generate_qr_code(tracking_url)
-    qr_image = Image(qr_buffer, width=25*mm, height=25*mm)
+    qr_image = Image(qr_buffer, width=22*mm, height=22*mm)
     
-    # Header with QR code
-    header_data = [
-        [Paragraph(tenant["company_name"], title_style), qr_image],
-        [Paragraph(f"Job Sheet: {job['job_number']}", heading_style), ""],
-        [Paragraph(f"Date: {job['created_at'][:10]}", normal_style), Paragraph(f"Tracking: {tracking_token}", small_style)]
+    # Shop details
+    shop_name = tenant["company_name"]
+    shop_address = settings.get("address", "")
+    shop_phone = settings.get("phone", "")
+    shop_email = settings.get("email", "")
+    
+    shop_details_parts = []
+    if shop_address:
+        shop_details_parts.append(shop_address)
+    if shop_phone:
+        shop_details_parts.append(f"📞 {shop_phone}")
+    if shop_email:
+        shop_details_parts.append(f"✉ {shop_email}")
+    shop_details = " | ".join(shop_details_parts) if shop_details_parts else ""
+    
+    # Header layout: Shop info on left, QR + Job number on right
+    header_left = [
+        [Paragraph(shop_name, company_style)],
+        [Paragraph(shop_details, small_style)] if shop_details else [Spacer(1, 1)],
     ]
-    header_table = Table(header_data, colWidths=[135*mm, 30*mm])
-    header_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-        ('SPAN', (1, 0), (1, 1)),
+    header_left_table = Table(header_left, colWidths=[120*mm])
+    
+    # Job number badge
+    job_badge_style = ParagraphStyle(
+        'JobBadge',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=white,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold',
+        leading=14
+    )
+    
+    # Create job number and date display
+    job_date = job['created_at'][:10] if job.get('created_at') else ""
+    
+    header_right_content = [
+        [qr_image],
+        [Paragraph(f"<b>{job_number}</b>", ParagraphStyle('JN', fontSize=9, textColor=dark_color, alignment=TA_CENTER, fontName='Helvetica-Bold'))],
+        [Paragraph(f"{job_date}", ParagraphStyle('JD', fontSize=8, textColor=muted_color, alignment=TA_CENTER))]
+    ]
+    header_right_table = Table(header_right_content, colWidths=[28*mm])
+    header_right_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
-    elements.append(header_table)
-    elements.append(Spacer(1, 5*mm))
     
-    # Customer Info
-    elements.append(Paragraph("Customer Information", heading_style))
+    # Combine header
+    main_header = Table(
+        [[header_left_table, header_right_table]],
+        colWidths=[145*mm, 30*mm]
+    )
+    main_header.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+    ]))
+    elements.append(main_header)
+    
+    # Divider line
+    elements.append(Spacer(1, 3*mm))
+    elements.append(HRFlowable(width="100%", thickness=1, color=border_color, spaceBefore=0, spaceAfter=8))
+    
+    # ============ STATUS BADGE ============
+    status_map = {
+        "received": ("📥 RECEIVED", "#3b82f6"),
+        "diagnosed": ("🔍 DIAGNOSED", "#8b5cf6"),
+        "waiting_for_approval": ("⏳ AWAITING APPROVAL", "#f59e0b"),
+        "in_progress": ("🔧 IN PROGRESS", "#06b6d4"),
+        "repaired": ("✅ REPAIRED", "#22c55e"),
+        "delivered": ("📦 DELIVERED", "#10b981"),
+        "closed": ("✔️ CLOSED", "#6b7280"),
+        "cancelled": ("❌ CANCELLED", "#ef4444"),
+    }
+    status_text, status_color = status_map.get(job.get("status", "received"), ("RECEIVED", "#3b82f6"))
+    
+    status_style = ParagraphStyle(
+        'Status',
+        fontSize=10,
+        textColor=HexColor(status_color),
+        fontName='Helvetica-Bold',
+        alignment=TA_RIGHT
+    )
+    
+    # ============ CUSTOMER & DEVICE SECTION (Side by Side) ============
     customer = job["customer"]
-    customer_data = [
-        ["Name:", customer["name"]],
-        ["Mobile:", customer["mobile"]],
-        ["Email:", customer.get("email", "N/A")]
-    ]
-    t = Table(customer_data, colWidths=[40*mm, 120*mm])
-    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), 'Helvetica'), ('FONTSIZE', (0, 0), (-1, -1), 10)]))
-    elements.append(t)
-    
-    # Device Info
-    elements.append(Paragraph("Device Information", heading_style))
     device = job["device"]
-    device_data = [
-        ["Type:", device["device_type"]],
-        ["Brand:", device["brand"]],
-        ["Model:", device["model"]],
-        ["Serial/IMEI:", device["serial_imei"]],
-        ["Condition:", device["condition"]],
-        ["Notes:", device.get("condition_notes", "N/A")]
+    
+    # Customer info card
+    customer_rows = [
+        [Paragraph("👤 CUSTOMER DETAILS", section_title_style)],
+        [Paragraph(f"<b>{customer['name']}</b>", value_style)],
+        [Paragraph(f"📱 {customer['mobile']}", normal_style)],
     ]
-    t = Table(device_data, colWidths=[40*mm, 120*mm])
-    t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), 'Helvetica'), ('FONTSIZE', (0, 0), (-1, -1), 10)]))
-    elements.append(t)
+    if customer.get("email"):
+        customer_rows.append([Paragraph(f"✉ {customer['email']}", normal_style)])
+    if customer.get("address"):
+        customer_rows.append([Paragraph(f"📍 {customer['address']}", small_style)])
     
-    # Accessories
-    elements.append(Paragraph("Accessories Collected", heading_style))
-    checked_accessories = [a["name"] for a in job["accessories"] if a["checked"]]
-    accessories_text = ", ".join(checked_accessories) if checked_accessories else "None"
-    elements.append(Paragraph(accessories_text, normal_style))
+    customer_table = Table(customer_rows, colWidths=[85*mm])
+    customer_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), light_bg),
+        ('BOX', (0, 0), (-1, -1), 0.5, border_color),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 8),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+    ]))
     
-    # Problem
-    elements.append(Paragraph("Problem Description", heading_style))
-    elements.append(Paragraph(job["problem_description"], normal_style))
+    # Device info card
+    device_rows = [
+        [Paragraph("📱 DEVICE DETAILS", section_title_style)],
+        [Paragraph(f"<b>{device['brand']} {device['model']}</b>", value_style)],
+        [Paragraph(f"Type: {device['device_type']}", normal_style)],
+    ]
+    if device.get("serial_imei"):
+        device_rows.append([Paragraph(f"IMEI/Serial: {device['serial_imei']}", small_style)])
+    if device.get("condition"):
+        device_rows.append([Paragraph(f"Condition: {device['condition']}", small_style)])
+    if device.get("password"):
+        device_rows.append([Paragraph(f"🔐 Password: {device['password']}", small_style)])
+    if device.get("unlock_pattern"):
+        device_rows.append([Paragraph(f"🔓 Pattern: {device['unlock_pattern']}", small_style)])
     
-    if job.get("technician_observation"):
-        elements.append(Paragraph("Technician Observation", heading_style))
-        elements.append(Paragraph(job["technician_observation"], normal_style))
+    device_table = Table(device_rows, colWidths=[85*mm])
+    device_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), light_bg),
+        ('BOX', (0, 0), (-1, -1), 0.5, border_color),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('LEFTPADDING', (0, 0), (-1, -1), 8),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+    ]))
     
-    # Diagnosis if available
+    # Side by side layout
+    side_by_side = Table(
+        [[customer_table, device_table]],
+        colWidths=[87*mm, 87*mm],
+        hAlign='LEFT'
+    )
+    side_by_side.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+    elements.append(side_by_side)
+    elements.append(Spacer(1, 4*mm))
+    
+    # ============ ACCESSORIES SECTION ============
+    checked_accessories = [a["name"] for a in job.get("accessories", []) if a.get("checked")]
+    if checked_accessories:
+        elements.append(Paragraph("🎒 ACCESSORIES RECEIVED", section_title_style))
+        acc_text = " • ".join(checked_accessories)
+        acc_table = Table([[Paragraph(acc_text, normal_style)]], colWidths=[174*mm])
+        acc_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), light_bg),
+            ('BOX', (0, 0), (-1, -1), 0.5, border_color),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+        ]))
+        elements.append(acc_table)
+        elements.append(Spacer(1, 4*mm))
+    
+    # ============ PROBLEM DESCRIPTION ============
+    elements.append(Paragraph("⚠️ PROBLEM DESCRIPTION", section_title_style))
+    problem_table = Table([[Paragraph(job.get("problem_description", "N/A"), normal_style)]], colWidths=[174*mm])
+    problem_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), HexColor("#fef3c7")),  # Amber light
+        ('BOX', (0, 0), (-1, -1), 0.5, HexColor("#f59e0b")),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LEFTPADDING', (0, 0), (-1, -1), 10),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+    ]))
+    elements.append(problem_table)
+    elements.append(Spacer(1, 4*mm))
+    
+    # ============ DIAGNOSIS SECTION ============
     if job.get("diagnosis"):
-        elements.append(Paragraph("Diagnosis", heading_style))
         diag = job["diagnosis"]
-        diag_data = [
-            ["Issue:", diag["diagnosis"]],
-            ["Estimated Cost:", f"₹{diag['estimated_cost']}"],
-            ["Timeline:", diag["estimated_timeline"]]
+        elements.append(Paragraph("🔍 DIAGNOSIS", section_title_style))
+        
+        diag_content = [
+            [Paragraph("Findings:", label_style), Paragraph(diag.get("diagnosis", "N/A"), normal_style)],
+            [Paragraph("Est. Cost:", label_style), Paragraph(f"<b>₹{diag.get('estimated_cost', 0):,.2f}</b>", value_style)],
+            [Paragraph("Timeline:", label_style), Paragraph(diag.get("estimated_timeline", "N/A"), normal_style)],
         ]
-        t = Table(diag_data, colWidths=[40*mm, 120*mm])
-        t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), 'Helvetica'), ('FONTSIZE', (0, 0), (-1, -1), 10)]))
-        elements.append(t)
+        if diag.get("parts_required"):
+            diag_content.append([Paragraph("Parts Needed:", label_style), Paragraph(diag.get("parts_required", ""), normal_style)])
+        
+        diag_table = Table(diag_content, colWidths=[30*mm, 144*mm])
+        diag_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), light_bg),
+            ('BOX', (0, 0), (-1, -1), 0.5, border_color),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        elements.append(diag_table)
+        elements.append(Spacer(1, 4*mm))
     
-    # Repair if available
+    # ============ REPAIR SECTION ============
     if job.get("repair"):
-        elements.append(Paragraph("Repair Details", heading_style))
         repair = job["repair"]
-        repair_data = [
-            ["Work Done:", repair["work_done"]],
-            ["Parts Replaced:", repair.get("parts_replaced", "N/A")],
-            ["Final Amount:", f"₹{repair['final_amount']}"],
-            ["Warranty:", repair.get("warranty_info", "N/A")]
+        elements.append(Paragraph("🔧 REPAIR DETAILS", section_title_style))
+        
+        repair_content = [
+            [Paragraph("Work Done:", label_style), Paragraph(repair.get("work_done", "N/A"), normal_style)],
         ]
-        t = Table(repair_data, colWidths=[40*mm, 120*mm])
-        t.setStyle(TableStyle([('FONTNAME', (0, 0), (-1, -1), 'Helvetica'), ('FONTSIZE', (0, 0), (-1, -1), 10)]))
-        elements.append(t)
+        
+        # Parts used from inventory
+        if repair.get("parts_used") and len(repair["parts_used"]) > 0:
+            parts_text = ", ".join([f"{p.get('item_name', 'Part')} (×{p.get('quantity', 1)})" for p in repair["parts_used"]])
+            repair_content.append([Paragraph("Parts Used:", label_style), Paragraph(parts_text, normal_style)])
+        
+        if repair.get("parts_replaced"):
+            repair_content.append([Paragraph("Other Parts:", label_style), Paragraph(repair.get("parts_replaced", ""), normal_style)])
+        
+        repair_content.append([Paragraph("Final Amount:", label_style), Paragraph(f"<b>₹{repair.get('final_amount', 0):,.2f}</b>", ParagraphStyle('Amount', fontSize=12, textColor=success_color, fontName='Helvetica-Bold'))])
+        
+        if repair.get("warranty_info"):
+            repair_content.append([Paragraph("Warranty:", label_style), Paragraph(repair.get("warranty_info", ""), normal_style)])
+        
+        repair_table = Table(repair_content, colWidths=[30*mm, 144*mm])
+        repair_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), HexColor("#dcfce7")),  # Green light
+            ('BOX', (0, 0), (-1, -1), 0.5, success_color),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        elements.append(repair_table)
+        elements.append(Spacer(1, 4*mm))
     
-    # Footer
-    elements.append(Spacer(1, 20*mm))
-    elements.append(Paragraph("_________________________          _________________________", normal_style))
-    elements.append(Paragraph("Customer Signature                         Technician Signature", normal_style))
+    # ============ DELIVERY SECTION ============
+    if job.get("delivery"):
+        delivery = job["delivery"]
+        elements.append(Paragraph("📦 DELIVERY DETAILS", section_title_style))
+        
+        delivery_content = [
+            [Paragraph("Delivered To:", label_style), Paragraph(delivery.get("delivered_to", "N/A"), normal_style)],
+            [Paragraph("Amount Received:", label_style), Paragraph(f"<b>₹{delivery.get('amount_received', 0):,.2f}</b>", value_style)],
+            [Paragraph("Payment Mode:", label_style), Paragraph(delivery.get("payment_mode", "N/A").upper(), normal_style)],
+        ]
+        if delivery.get("payment_reference"):
+            delivery_content.append([Paragraph("Reference:", label_style), Paragraph(delivery.get("payment_reference", ""), normal_style)])
+        if delivery.get("delivery_notes"):
+            delivery_content.append([Paragraph("Notes:", label_style), Paragraph(delivery.get("delivery_notes", ""), normal_style)])
+        
+        delivery_table = Table(delivery_content, colWidths=[35*mm, 139*mm])
+        delivery_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), light_bg),
+            ('BOX', (0, 0), (-1, -1), 0.5, border_color),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            ('LEFTPADDING', (0, 0), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ]))
+        elements.append(delivery_table)
+        elements.append(Spacer(1, 4*mm))
+    
+    # ============ TERMS & CONDITIONS ============
+    elements.append(Spacer(1, 6*mm))
+    terms_style = ParagraphStyle('Terms', fontSize=7, textColor=muted_color, fontName='Helvetica', leading=9)
+    terms_text = """
+    <b>Terms & Conditions:</b> 1. Please collect your device within 30 days of repair completion. 
+    2. Warranty covers only the specific repair performed. 3. Data backup is the customer's responsibility. 
+    4. We are not responsible for any pre-existing damage or defects. 5. Payment is due upon delivery.
+    """
+    elements.append(Paragraph(terms_text.strip(), terms_style))
+    
+    # ============ SIGNATURE SECTION ============
     elements.append(Spacer(1, 10*mm))
-    elements.append(Paragraph(tenant["settings"].get("footer_text", "Thank you for your business!"), normal_style))
+    
+    sig_label_style = ParagraphStyle('SigLabel', fontSize=8, textColor=muted_color, alignment=TA_CENTER)
+    sig_line_style = ParagraphStyle('SigLine', fontSize=10, textColor=dark_color, alignment=TA_CENTER)
+    
+    sig_data = [
+        [Paragraph("_" * 30, sig_line_style), Paragraph("_" * 30, sig_line_style)],
+        [Paragraph("Customer Signature", sig_label_style), Paragraph("Authorized Signature", sig_label_style)],
+    ]
+    sig_table = Table(sig_data, colWidths=[87*mm, 87*mm])
+    sig_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+    ]))
+    elements.append(sig_table)
+    
+    # ============ FOOTER ============
+    elements.append(Spacer(1, 8*mm))
+    elements.append(HRFlowable(width="100%", thickness=0.5, color=border_color, spaceBefore=0, spaceAfter=4))
+    
+    footer_text = settings.get("footer_text", "Thank you for choosing us!")
+    elements.append(Paragraph(footer_text, footer_style))
+    elements.append(Paragraph(f"Generated on {datetime.now(timezone.utc).strftime('%d %b %Y, %H:%M')} UTC", ParagraphStyle('GenDate', fontSize=7, textColor=lightgrey, alignment=TA_CENTER)))
     
     doc.build(elements)
     buffer.seek(0)
