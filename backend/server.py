@@ -64,6 +64,8 @@ class TenantCreate(BaseModel):
     admin_name: str
     admin_email: EmailStr
     admin_password: str
+    phone: Optional[str] = None
+    address: Optional[str] = None
 
 class TenantResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
