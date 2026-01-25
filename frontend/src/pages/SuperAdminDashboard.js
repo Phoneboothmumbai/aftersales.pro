@@ -2292,6 +2292,23 @@ export default function SuperAdminDashboard() {
                 />
               </div>
             </div>
+
+            {/* Visibility Settings */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-between bg-green-600/10 border border-green-600/30 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-green-400" />
+                  <Label className="text-green-300">Show on Pricing Page</Label>
+                </div>
+                <Switch
+                  checked={planForm.show_on_pricing}
+                  onCheckedChange={(checked) => setPlanForm({ ...planForm, show_on_pricing: checked })}
+                />
+              </div>
+              <div className="flex items-center text-sm text-slate-400 bg-slate-700/30 rounded-lg p-3">
+                <span>When enabled, this plan will appear on the public pricing page for customers.</span>
+              </div>
+            </div>
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => { setShowCreatePlan(false); setShowEditPlan(false); setEditingPlan(null); }}>
