@@ -111,6 +111,47 @@ export default function Team() {
     }
   };
 
+  const openEditModal = (member) => {
+    setEditingUser(member);
+    setEditFormData({
+      name: member.name || "",
+      email: member.email || "",
+      phone: member.phone || "",
+      role: member.role || "technician",
+      branch_id: member.branch_id || "",
+    });
+    setEditModal(true);
+  };
+
+  const handleUpdate = async () => {
+    if (!editFormData.name || !editFormData.email) {
+      toast.error("Name and email are required");
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const payload = {
+        ...editFormData,
+        branch_id: editFormData.branch_id === "all" ? "" : editFormData.branch_id,
+      };
+      await axios.put(`${API}/users/${editingUser.id}`, payload);
+      
+      // Update local state
+      setUsers(users.map(u => 
+        u.id === editingUser.id ? { ...u, ...payload } : u
+      ));
+      
+      setEditModal(false);
+      setEditingUser(null);
+      toast.success("Team member updated successfully");
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update user");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const getBranchName = (branchId) => {
     const branch = branches.find((b) => b.id === branchId);
     return branch?.name || "All Branches";
