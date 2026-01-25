@@ -1,0 +1,143 @@
+{
+  "summary": "Completed comprehensive testing of Inventory-Linked Parts System for repairs. Backend API tests: 12 passed, 2 skipped (100% of applicable tests). Frontend UI testing confirmed all features working: repair modal parts selection, inventory dropdown with search, parts list with quantity input, stock deduction on repair, job detail parts display, and inventory usage history modal.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_inventory_parts.py",
+    "/app/test_reports/pytest/pytest_inventory_parts.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Repair endpoint correctly validates inventory stock before deduction",
+    "Parts usage is logged to inventory_usage collection with full job context",
+    "Usage history endpoint returns comprehensive data including job_number, customer_name, device, used_by_name",
+    "Frontend repair modal properly shows 'Parts from Inventory' section with Add Part button",
+    "Inventory dropdown shows item name, stock quantity, and price with In Stock/Out badges",
+    "Selected parts list shows quantity input and trash icon for removal",
+    "Total Parts Cost is calculated and displayed in real-time",
+    "Job detail page shows 'Parts Used (from Inventory)' section with itemized costs",
+    "Inventory page Usage History modal shows all jobs that used the part with View Job links"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_inventory_parts.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "features_tested": {
+    "repair_modal_parts_ui": {
+      "status": "PASS",
+      "tests": [
+        "Parts from Inventory section visible in repair modal",
+        "Add Part button opens inventory dropdown",
+        "Inventory items show name, stock, price, and In Stock badge",
+        "Search functionality in parts dropdown works",
+        "Clicking item adds it to selected parts list"
+      ]
+    },
+    "selected_parts_list": {
+      "status": "PASS",
+      "tests": [
+        "Selected part shows item name and unit price",
+        "Quantity input allows changing quantity",
+        "Trash icon removes part from list",
+        "Total Parts Cost calculated correctly"
+      ]
+    },
+    "repair_with_parts_api": {
+      "status": "PASS",
+      "tests": [
+        "POST /api/jobs/{id}/repair accepts parts_used array",
+        "Inventory stock is deducted on repair submission",
+        "Usage record created in inventory_usage collection",
+        "Insufficient stock returns 400 error"
+      ]
+    },
+    "job_detail_parts_display": {
+      "status": "PASS",
+      "tests": [
+        "Parts Used (from Inventory) section shows on job detail",
+        "Each part shows name, quantity, unit price, and total",
+        "Total Parts Cost displayed at bottom of section"
+      ]
+    },
+    "usage_history_api": {
+      "status": "PASS",
+      "tests": [
+        "GET /api/inventory/{id}/usage-history returns correct structure",
+        "Response includes item info, usage_history array, total_used",
+        "Usage records include job_number, customer_name, device, used_by_name, used_at",
+        "Invalid item ID returns 404"
+      ]
+    },
+    "usage_history_modal": {
+      "status": "PASS",
+      "tests": [
+        "Usage History modal opens from inventory page",
+        "Shows item name, SKU, current stock",
+        "Shows total used in repairs",
+        "Lists all usage records with job details",
+        "View Job link navigates to job detail",
+        "Shows 'No usage records yet' for unused items"
+      ]
+    },
+    "inventory_stats": {
+      "status": "PASS",
+      "tests": [
+        "Stats show total items, low stock, out of stock counts",
+        "Stock value calculated correctly"
+      ]
+    }
+  },
+  "test_credentials": {
+    "shop_subdomain": "invtest1769339559",
+    "shop_email": "admin@test.example.com",
+    "shop_password": "Test@123"
+  },
+  "seed_data_creation": "Test tenant has 2 inventory items: iPhone 14 Screen (qty: 9, used 1 in JOB-2026-000001) and Samsung Battery (qty: 5, unused). Created JOB-2026-000003 for testing repair workflow.",
+  "inventory_state": {
+    "iPhone 14 Screen": {
+      "id": "53af3e47-3ecf-4ff7-b6cf-ab1ac15935da",
+      "quantity": 9,
+      "cost_price": 2500,
+      "selling_price": 4000,
+      "usage_count": 1
+    },
+    "Samsung Battery": {
+      "id": "a50ca85f-8067-4bd0-b001-d27326df3c62",
+      "quantity": 5,
+      "cost_price": 800,
+      "selling_price": 1500,
+      "usage_count": 0
+    }
+  },
+  "jobs_tested": {
+    "JOB-2026-000001": {
+      "status": "repaired",
+      "parts_used": ["iPhone 14 Screen (1 unit)"],
+      "parts_cost": 2500
+    },
+    "JOB-2026-000002": {
+      "status": "repaired",
+      "parts_used": [],
+      "parts_cost": 0
+    },
+    "JOB-2026-000003": {
+      "status": "repaired",
+      "parts_used": [],
+      "parts_cost": 0,
+      "note": "Created for testing, repaired without parts selection"
+    }
+  },
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Inventory-linked parts system fully implemented and tested. Test tenant 'invtest1769339559' has Pro plan with inventory feature enabled. Two inventory items exist with usage tracking. JOB-2026-000001 demonstrates full parts usage flow with iPhone 14 Screen. Usage history modal shows which jobs used each part. All API endpoints working correctly."
+}
