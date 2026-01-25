@@ -77,9 +77,12 @@ export default function Inventory() {
   const [itemModal, setItemModal] = useState(false);
   const [adjustModal, setAdjustModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [usageModal, setUsageModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [usageHistory, setUsageHistory] = useState(null);
+  const [loadingUsage, setLoadingUsage] = useState(false);
 
   // Form states
   const [itemForm, setItemForm] = useState({
