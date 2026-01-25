@@ -82,6 +82,12 @@ export default function JobDetail() {
   const [whatsappData, setWhatsappData] = useState(null);
   const [whatsappType, setWhatsappType] = useState("received");
 
+  // Technician notification state
+  const [technicianModal, setTechnicianModal] = useState(false);
+  const [technicians, setTechnicians] = useState([]);
+  const [selectedTechnician, setSelectedTechnician] = useState(null);
+  const [loadingTechnicians, setLoadingTechnicians] = useState(false);
+
   // Form states
   const [diagnosisForm, setDiagnosisForm] = useState({
     diagnosis: "",
