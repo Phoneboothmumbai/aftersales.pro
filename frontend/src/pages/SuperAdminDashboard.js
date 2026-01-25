@@ -704,7 +704,8 @@ export default function SuperAdminDashboard() {
       max_storage_mb: plan.max_storage_mb,
       features: { ...DEFAULT_FEATURES, ...plan.features },
       sort_order: plan.sort_order,
-      is_active: plan.is_active
+      is_active: plan.is_active,
+      show_on_pricing: plan.show_on_pricing !== false
     });
     setShowEditPlan(true);
   };
@@ -725,7 +726,8 @@ export default function SuperAdminDashboard() {
       max_storage_mb: 500,
       features: { ...DEFAULT_FEATURES },
       sort_order: 99,
-      is_active: true
+      is_active: true,
+      show_on_pricing: true
     });
   };
 
