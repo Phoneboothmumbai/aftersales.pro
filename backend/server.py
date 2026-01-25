@@ -239,6 +239,13 @@ class SettingsUpdate(BaseModel):
     email: Optional[str] = None
     footer_text: Optional[str] = None
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    role: Optional[str] = None
+    branch_id: Optional[str] = None
+
 # ==================== INVENTORY MODELS ====================
 
 class InventoryItemCreate(BaseModel):
