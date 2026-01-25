@@ -174,6 +174,81 @@ export default function JobCreate() {
     }
   };
 
+  // Fetch technicians for notification
+  const fetchTechnicians = async () => {
+    setLoadingTechnicians(true);
+    try {
+      const response = await axios.get(`${API}/users`);
+      // Filter only technicians (or include all team members)
+      const techList = response.data.filter(u => u.role === "technician" || u.role === "admin");
+      setTechnicians(techList);
+    } catch (error) {
+      console.error("Failed to fetch technicians:", error);
+      toast.error("Failed to load team members");
+    } finally {
+      setLoadingTechnicians(false);
+    }
+  };
+
+  const handleOpenTechnicianModal = () => {
+    setShowTechnicianModal(true);
+    fetchTechnicians();
+  };
+
+  const generateTechnicianMessage = () => {
+    if (!createdJob) return "";
+    
+    const job = createdJob;
+    const accessories = job.accessories?.filter(a => a.checked).map(a => a.name).join(", ") || "None";
+    
+    // Message WITHOUT customer personal details
+    const message = `🔧 *New Job Assigned*
+
+*Job #:* ${job.job_number}
+
+*Device Details:*
+• Type: ${job.device?.device_type || "N/A"}
+• Brand: ${job.device?.brand || "N/A"}
+• Model: ${job.device?.model || "N/A"}
+${job.device?.serial_imei ? `• IMEI/Serial: ${job.device.serial_imei}` : ""}
+${job.device?.condition ? `• Condition: ${job.device.condition}` : ""}
+
+*Problem:*
+${job.problem_description || "N/A"}
+
+*Accessories:*
+${accessories}
+
+${job.device?.password ? `*Device Password:* ${job.device.password}` : ""}
+${job.device?.unlock_pattern ? `*Unlock Pattern:* ${job.device.unlock_pattern}` : ""}
+
+Please check and update the status once diagnosed.`;
+
+    return message;
+  };
+
+  const handleSendToTechnician = () => {
+    if (!selectedTechnician) {
+      toast.error("Please select a technician");
+      return;
+    }
+
+    const tech = technicians.find(t => t.id === selectedTechnician);
+    if (!tech?.phone) {
+      toast.error("Technician phone number not available");
+      return;
+    }
+
+    const message = generateTechnicianMessage();
+    const encodedMessage = encodeURIComponent(message);
+    const phone = tech.phone.replace(/[^0-9]/g, "");
+    const whatsappUrl = `https://wa.me/${phone.startsWith("91") ? phone : "91" + phone}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, "_blank");
+    toast.success(`WhatsApp opened for ${tech.name}`);
+    setShowTechnicianModal(false);
+  };
+
   return (
     <Layout>
       <div className="max-w-4xl mx-auto space-y-6 animate-in" data-testid="job-create-page">
