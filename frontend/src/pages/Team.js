@@ -261,7 +261,7 @@ export default function Team() {
                       <SelectValue placeholder="All Branches" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Branches</SelectItem>
+                      <SelectItem value="all">All Branches</SelectItem>
                       {branches.map((branch) => (
                         <SelectItem key={branch.id} value={branch.id}>
                           {branch.name}
