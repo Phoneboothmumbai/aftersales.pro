@@ -88,6 +88,13 @@ export default function JobDetail() {
   const [selectedTechnician, setSelectedTechnician] = useState(null);
   const [loadingTechnicians, setLoadingTechnicians] = useState(false);
 
+  // Inventory parts state
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [selectedParts, setSelectedParts] = useState([]); // {inventory_id, item_name, quantity, unit_price}
+  const [partsSearchQuery, setPartsSearchQuery] = useState("");
+  const [showPartsSelector, setShowPartsSelector] = useState(false);
+  const [loadingInventory, setLoadingInventory] = useState(false);
+
   // Form states
   const [diagnosisForm, setDiagnosisForm] = useState({
     diagnosis: "",
