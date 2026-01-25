@@ -325,7 +325,18 @@ export default function JobDetail() {
     }
     setActionLoading(true);
     try {
-      await axios.put(`${API}/jobs/${id}/repair`, repairForm);
+      // Build payload with parts_used from inventory
+      const payload = {
+        ...repairForm,
+        final_amount: parseFloat(repairForm.final_amount),
+        parts_used: selectedParts.length > 0 ? selectedParts.map(p => ({
+          inventory_id: p.inventory_id,
+          item_name: p.item_name,
+          quantity: p.quantity,
+          unit_price: p.unit_price
+        })) : null
+      };
+      await axios.put(`${API}/jobs/${id}/repair`, payload);
       toast.success("Repair completed");
       setRepairModal(false);
       await fetchJob();
