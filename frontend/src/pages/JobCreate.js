@@ -765,6 +765,6 @@ Please check and update the status once diagnosed.`;
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>>
+    </Layout>
   );
 }
