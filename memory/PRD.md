@@ -163,7 +163,9 @@ Building a comprehensive SaaS Repair Job Lifecycle System for repair shops with:
 - `GET /api/jobs` - List jobs (with date_from, date_to filters)
 - `GET /api/jobs/{id}` - Get job (returns device.notes, device.password)
 - `PUT /api/jobs/{id}/diagnosis` - Add diagnosis
-- `PUT /api/jobs/{id}/repair` - Mark repaired
+- `PUT /api/jobs/{id}/approve` - Approve job
+- `PUT /api/jobs/{id}/repair` - Mark repaired (accepts parts_used array for inventory linking)
+- `PUT /api/jobs/{id}/deliver` - Mark delivered (accepts expense_parts, expense_labor)
 - `PUT /api/jobs/{id}/close` - Close job
 - `GET /api/jobs/{id}/pdf` - Generate PDF with QR
 - `POST /api/jobs/{id}/photos` - Upload photo
