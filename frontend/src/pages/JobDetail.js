@@ -47,6 +47,9 @@ import {
   ThumbsUp,
   Users,
   Send,
+  Plus,
+  Search,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateTime, formatCurrency, getStatusColor, getStatusLabel, PAYMENT_MODES } from "../lib/utils";
