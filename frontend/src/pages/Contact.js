@@ -116,7 +116,7 @@ export default function Contact() {
                     <h3 className="font-semibold text-lg mb-1">Email Us</h3>
                     <p className="text-xl font-bold text-primary">{contactInfo.email}</p>
                     <p className="text-sm text-muted-foreground mt-2">
-                      We'll respond within 24 hours
+                      We&apos;ll respond within 24 hours
                     </p>
                   </div>
                 </div>
