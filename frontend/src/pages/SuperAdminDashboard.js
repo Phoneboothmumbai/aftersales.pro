@@ -252,7 +252,8 @@ export default function SuperAdminDashboard() {
     max_storage_mb: 500,
     features: { ...DEFAULT_FEATURES },
     sort_order: 99,
-    is_active: true
+    is_active: true,
+    show_on_pricing: true
   });
   
   const [assignPlanForm, setAssignPlanForm] = useState({ plan: "", duration_months: 1, notes: "" });
