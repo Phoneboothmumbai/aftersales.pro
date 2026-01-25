@@ -467,6 +467,15 @@ export default function Inventory() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => openUsageModal(item)}
+                            title="View Usage History"
+                            data-testid={`usage-${item.id}`}
+                          >
+                            <History className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => openAdjustModal(item)}
                             data-testid={`adjust-${item.id}`}
                           >
