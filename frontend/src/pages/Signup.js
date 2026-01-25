@@ -114,6 +114,8 @@ export default function Signup() {
       await signup({
         company_name: formData.company_name,
         subdomain: formData.subdomain,
+        phone: formData.phone,
+        address: formData.address,
         admin_name: formData.admin_name,
         admin_email: formData.admin_email,
         admin_password: formData.admin_password,
