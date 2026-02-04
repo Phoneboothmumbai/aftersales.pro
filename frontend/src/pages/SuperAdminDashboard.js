@@ -204,6 +204,12 @@ export default function SuperAdminDashboard() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [newPassword, setNewPassword] = useState("");
   
+  // Quick Admin Password Reset state (from tenant list)
+  const [showQuickResetModal, setShowQuickResetModal] = useState(false);
+  const [quickResetTenant, setQuickResetTenant] = useState(null);
+  const [quickResetPassword, setQuickResetPassword] = useState("");
+  const [quickResetLoading, setQuickResetLoading] = useState(false);
+  
   // Super Admin Password Change state
   const [adminPasswordForm, setAdminPasswordForm] = useState({
     currentPassword: "",
