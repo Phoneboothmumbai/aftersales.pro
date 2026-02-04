@@ -530,6 +530,51 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  // Quick reset admin password from tenant list
+  const handleQuickResetPassword = async (tenant) => {
+    // First fetch the tenant details to get admin user
+    try {
+      const response = await axios.get(`${API}/super-admin/tenants/${tenant.id}`);
+      const adminUser = response.data.users?.find(u => u.role === "admin") || response.data.users?.[0];
+      if (!adminUser) {
+        alert("No admin user found for this shop");
+        return;
+      }
+      setQuickResetTenant({ ...tenant, adminUser });
+      setQuickResetPassword("");
+      setShowQuickResetModal(true);
+    } catch (error) {
+      alert("Failed to load shop details");
+    }
+  };
+
+  const handleQuickResetSubmit = async () => {
+    if (!quickResetPassword) {
+      alert("Please enter a new password");
+      return;
+    }
+    if (quickResetPassword.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+    setQuickResetLoading(true);
+    try {
+      await axios.post(
+        `${API}/super-admin/tenants/${quickResetTenant.id}/users/${quickResetTenant.adminUser.id}/reset-password`,
+        { new_password: quickResetPassword }
+      );
+      alert(`Password reset successfully!\n\nShop: ${quickResetTenant.company_name}\nEmail: ${quickResetTenant.adminUser.email}\nNew Password: ${quickResetPassword}`);
+      setShowQuickResetModal(false);
+      setQuickResetTenant(null);
+      setQuickResetPassword("");
+    } catch (error) {
+      console.error("Failed to reset password:", error);
+      alert(error.response?.data?.detail || "Failed to reset password");
+    } finally {
+      setQuickResetLoading(false);
+    }
+  };
+
   const handleAdminPasswordChange = async () => {
     if (!adminPasswordForm.currentPassword || !adminPasswordForm.newPassword || !adminPasswordForm.confirmPassword) {
       alert("Please fill in all password fields");
