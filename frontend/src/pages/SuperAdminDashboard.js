@@ -3480,6 +3480,82 @@ export default function SuperAdminDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Quick Reset Admin Password Modal (from tenant list) */}
+      <Dialog open={showQuickResetModal} onOpenChange={setShowQuickResetModal}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-orange-400">
+              <Key className="w-5 h-5" />
+              Reset Shop Admin Password
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {quickResetTenant && (
+              <div className="bg-slate-700/50 rounded-lg p-4 space-y-2">
+                <div>
+                  <p className="text-sm text-slate-400">Shop</p>
+                  <p className="font-medium text-white">{quickResetTenant.company_name}</p>
+                  <p className="text-xs text-slate-500">{quickResetTenant.subdomain}.aftersales.pro</p>
+                </div>
+                <div className="border-t border-slate-600 pt-2">
+                  <p className="text-sm text-slate-400">Admin User</p>
+                  <p className="font-medium text-white">{quickResetTenant.adminUser?.name}</p>
+                  <p className="text-sm text-blue-400">{quickResetTenant.adminUser?.email}</p>
+                </div>
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label>New Password *</Label>
+              <Input
+                type="text"
+                value={quickResetPassword}
+                onChange={(e) => setQuickResetPassword(e.target.value)}
+                placeholder="Enter new password (min 6 characters)"
+                className="bg-slate-700 border-slate-600"
+                data-testid="quick-reset-password-input"
+              />
+              <p className="text-xs text-slate-400">
+                Share this password securely with the shop owner. They can change it later from their settings.
+              </p>
+            </div>
+
+            {/* Quick password suggestions */}
+            <div className="space-y-2">
+              <p className="text-xs text-slate-500">Quick suggestions:</p>
+              <div className="flex flex-wrap gap-2">
+                {["Shop@123", "Reset@2026", "Welcome@123", `${quickResetTenant?.subdomain?.slice(0,4) || "Shop"}@123`].map((pwd) => (
+                  <Button
+                    key={pwd}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs border-slate-600 text-slate-300 hover:bg-slate-700"
+                    onClick={() => setQuickResetPassword(pwd)}
+                  >
+                    {pwd}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => { setShowQuickResetModal(false); setQuickResetPassword(""); setQuickResetTenant(null); }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleQuickResetSubmit}
+              disabled={!quickResetPassword || quickResetPassword.length < 6 || quickResetLoading}
+              className="bg-orange-600 hover:bg-orange-700"
+              data-testid="quick-reset-submit-btn"
+            >
+              {quickResetLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Key className="w-4 h-4 mr-2" />}
+              Reset Password
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
