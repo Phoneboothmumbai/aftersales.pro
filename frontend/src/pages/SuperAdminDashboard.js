@@ -1134,6 +1134,16 @@ export default function SuperAdminDashboard() {
                             <Button
                               size="sm"
                               variant="ghost"
+                              className="text-orange-400 hover:text-orange-300 hover:bg-orange-900/30"
+                              onClick={() => handleQuickResetPassword(tenant)}
+                              data-testid={`reset-password-${tenant.subdomain}`}
+                              title="Reset Admin Password"
+                            >
+                              <Key className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
                               className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/30"
                               onClick={() => handleLoginAsShop(tenant.id)}
                               title="Login as Shop"
