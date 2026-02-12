@@ -17,7 +17,7 @@
     "address": "Alamat",
     "submit": "Kirim",
     "back": "Kembali",
-    "next": "Berikutnya",
+    "next": "Selanjutnya",
     "previous": "Sebelumnya",
     "yes": "Ya",
     "no": "Tidak",
@@ -34,8 +34,8 @@
   },
   "landing": {
     "hero": {
-      "title": "Sederhanakan Operasi Toko Reparasi Anda",
-      "subtitle": "Solusi lengkap untuk mengelola pekerjaan reparasi, melacak inventaris, dan memuaskan pelanggan",
+      "title": "Manajemen toko reparasi, disederhanakan",
+      "subtitle": "Solusi lengkap untuk mengelola pekerjaan reparasi, melacak inventaris, dan memuaskan pelanggan Anda",
       "cta": "Mulai Gratis",
       "cta_login": "Login ke Dashboard"
     },
@@ -44,11 +44,11 @@
       "subtitle": "Fitur canggih yang dirancang khusus untuk bisnis reparasi",
       "job_management": {
         "title": "Manajemen Pekerjaan",
-        "description": "Lacak setiap reparasi dari penerimaan hingga pengiriman dengan sistem alur kerja intuitif"
+        "description": "Lacak setiap perbaikan dari penerimaan hingga pengiriman dengan sistem alur kerja intuitif kami"
       },
       "inventory": {
         "title": "Kontrol Inventaris",
-        "description": "Kelola suku cadang dengan pelacakan stok real-time dan peringatan stok rendah"
+        "description": "Kelola suku cadang dan persediaan dengan pelacakan stok real-time dan peringatan stok rendah"
       },
       "customer": {
         "title": "Manajemen Pelanggan",
@@ -56,7 +56,7 @@
       },
       "analytics": {
         "title": "Analitik & Laporan",
-        "description": "Buat keputusan berbasis data dengan wawasan bisnis komprehensif"
+        "description": "Buat keputusan berbasis data dengan wawasan bisnis yang komprehensif"
       },
       "whatsapp": {
         "title": "Integrasi WhatsApp",
@@ -80,7 +80,7 @@
       "users": "pengguna",
       "branches": "cabang",
       "jobs_month": "pekerjaan/bulan",
-      "unlimited": "Tak Terbatas"
+      "unlimited": "Tidak terbatas"
     },
     "testimonials": {
       "title": "Dipercaya oleh Toko Reparasi di Seluruh Dunia",
@@ -111,9 +111,9 @@
       "title": "Selamat Datang Kembali",
       "subtitle": "Masuk ke akun Anda",
       "subdomain": "Subdomain Toko",
-      "subdomain_placeholder": "yourshop",
+      "subdomain_placeholder": "tokoanda",
       "email": "Alamat Email",
-      "email_placeholder": "you@example.com",
+      "email_placeholder": "anda@contoh.com",
       "password": "Kata Sandi",
       "password_placeholder": "Masukkan kata sandi",
       "remember_me": "Ingat saya",
@@ -124,15 +124,15 @@
     },
     "signup": {
       "title": "Buat Akun Anda",
-      "subtitle": "Mulai uji coba gratis Anda hari ini",
+      "subtitle": "Mulai uji coba gratis hari ini",
       "step1": "Detail Toko",
       "step2": "Pengaturan Akun",
       "company_name": "Nama Toko / Perusahaan",
       "company_placeholder": "NeoStore Repairs",
       "subdomain": "Pilih subdomain Anda",
       "subdomain_suffix": ".aftersales.pro",
-      "phone": "Nomor HP",
-      "phone_placeholder": "08123456789",
+      "phone": "Nomor Telepon",
+      "phone_placeholder": "081234567890",
       "address": "Alamat Toko",
       "address_placeholder": "Jl. Utama No. 123, Kota",
       "your_name": "Nama Anda",
@@ -151,9 +151,9 @@
     "title": "Dashboard",
     "welcome": "Selamat datang kembali",
     "overview": "Ringkasan",
-    "today": "Hari Ini",
-    "this_week": "Minggu Ini",
-    "this_month": "Bulan Ini",
+    "today": "Hari ini",
+    "this_week": "Minggu ini",
+    "this_month": "Bulan ini",
     "stats": {
       "total_jobs": "Total Pekerjaan",
       "pending_jobs": "Pekerjaan Tertunda",
@@ -189,39 +189,6 @@
       "delivered": "Terkirim",
       "closed": "Ditutup",
       "cancelled": "Dibatalkan"
-    },
-    "create": {
-      "title": "Buat Pekerjaan Baru",
-      "customer_details": "Detail Pelanggan",
-      "device_details": "Detail Perangkat",
-      "problem_details": "Detail Masalah",
-      "accessories": "Aksesori",
-      "customer_name": "Nama Pelanggan",
-      "mobile": "Nomor HP",
-      "device_type": "Jenis Perangkat",
-      "brand": "Merek",
-      "model": "Model",
-      "serial_imei": "Serial/IMEI (Opsional)",
-      "condition": "Kondisi Perangkat (Opsional)",
-      "unlock_pattern": "Pola/Password Unlock",
-      "problem_description": "Deskripsi Masalah",
-      "submit": "Buat Pekerjaan"
-    },
-    "detail": {
-      "job_info": "Info Pekerjaan",
-      "timeline": "Timeline Status",
-      "photos": "Foto",
-      "diagnosis": "Diagnosis",
-      "approval": "Persetujuan",
-      "repair": "Detail Reparasi",
-      "delivery": "Pengiriman",
-      "actions": "Aksi",
-      "download_pdf": "Unduh PDF",
-      "send_whatsapp": "Kirim WhatsApp",
-      "mark_diagnosed": "Tandai Terdiagnosis",
-      "record_approval": "Catat Persetujuan",
-      "mark_repaired": "Tandai Diperbaiki",
-      "mark_delivered": "Tandai Terkirim"
     }
   },
   "customers": {
@@ -229,9 +196,9 @@
     "all_customers": "Semua Pelanggan",
     "search_placeholder": "Cari pelanggan...",
     "total_customers": "Total Pelanggan",
-    "with_outstanding": "Dengan Tagihan",
+    "with_outstanding": "Dengan Tunggakan",
     "total_jobs": "Total Pekerjaan",
-    "outstanding": "Tagihan",
+    "outstanding": "Tunggakan",
     "view_statement": "Lihat Laporan",
     "record_payment": "Catat Pembayaran"
   },
@@ -246,26 +213,11 @@
     "sku": "SKU",
     "category": "Kategori",
     "quantity": "Jumlah",
-    "cost_price": "Harga Modal",
+    "cost_price": "Harga Beli",
     "selling_price": "Harga Jual",
-    "min_stock": "Stok Minimum",
+    "min_stock": "Level Stok Minimum",
     "adjust_stock": "Sesuaikan Stok",
     "usage_history": "Riwayat Penggunaan"
-  },
-  "team": {
-    "title": "Tim",
-    "add_member": "Tambah Anggota",
-    "search_placeholder": "Cari anggota...",
-    "role": "Peran",
-    "branch": "Cabang",
-    "roles": {
-      "admin": "Admin",
-      "manager": "Manajer",
-      "technician": "Teknisi",
-      "receptionist": "Resepsionis"
-    },
-    "edit_member": "Edit Anggota",
-    "reset_password": "Reset Password"
   },
   "settings": {
     "title": "Pengaturan",
@@ -285,7 +237,7 @@
     "overview": "Ringkasan",
     "revenue": "Pendapatan",
     "jobs_completed": "Pekerjaan Selesai",
-    "avg_repair_time": "Rata-rata Waktu Reparasi",
+    "avg_repair_time": "Waktu Perbaikan Rata-rata",
     "customer_satisfaction": "Kepuasan Pelanggan",
     "top_services": "Layanan Teratas",
     "revenue_trend": "Tren Pendapatan",

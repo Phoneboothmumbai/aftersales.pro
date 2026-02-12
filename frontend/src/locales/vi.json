@@ -34,21 +34,21 @@
   },
   "landing": {
     "hero": {
-      "title": "Tối ưu hóa hoạt động cửa hàng sửa chữa",
-      "subtitle": "Giải pháp toàn diện để quản lý công việc sửa chữa, theo dõi kho hàng và làm hài lòng khách hàng",
+      "title": "Quản lý cửa hàng sửa chữa, đơn giản hóa",
+      "subtitle": "Giải pháp toàn diện để quản lý công việc sửa chữa, theo dõi kho và làm hài lòng khách hàng",
       "cta": "Bắt đầu miễn phí",
-      "cta_login": "Đăng nhập bảng điều khiển"
+      "cta_login": "Đăng nhập Dashboard"
     },
     "features": {
       "title": "Mọi thứ bạn cần để vận hành cửa hàng sửa chữa",
-      "subtitle": "Tính năng mạnh mẽ được thiết kế riêng cho doanh nghiệp sửa chữa",
+      "subtitle": "Tính năng mạnh mẽ được thiết kế đặc biệt cho doanh nghiệp sửa chữa",
       "job_management": {
         "title": "Quản lý công việc",
-        "description": "Theo dõi mọi sửa chữa từ tiếp nhận đến giao hàng với hệ thống quy trình trực quan"
+        "description": "Theo dõi mọi công việc sửa chữa từ tiếp nhận đến giao hàng với hệ thống quy trình trực quan"
       },
       "inventory": {
-        "title": "Kiểm soát kho hàng",
-        "description": "Quản lý phụ tùng với theo dõi tồn kho thời gian thực và cảnh báo hàng tồn thấp"
+        "title": "Kiểm soát kho",
+        "description": "Quản lý linh kiện và vật tư với theo dõi tồn kho thời gian thực và cảnh báo hết hàng"
       },
       "customer": {
         "title": "Quản lý khách hàng",
@@ -56,19 +56,19 @@
       },
       "analytics": {
         "title": "Phân tích & Báo cáo",
-        "description": "Ra quyết định dựa trên dữ liệu với thông tin chi tiết kinh doanh toàn diện"
+        "description": "Đưa ra quyết định dựa trên dữ liệu với thông tin kinh doanh toàn diện"
       },
       "whatsapp": {
         "title": "Tích hợp WhatsApp",
         "description": "Gửi cập nhật tự động cho khách hàng qua WhatsApp chỉ với một cú nhấp"
       },
       "multi_branch": {
-        "title": "Hỗ trợ đa chi nhánh",
+        "title": "Hỗ trợ nhiều chi nhánh",
         "description": "Quản lý nhiều địa điểm từ một bảng điều khiển duy nhất"
       }
     },
     "pricing": {
-      "title": "Giá đơn giản, minh bạch",
+      "title": "Giá cả đơn giản, minh bạch",
       "subtitle": "Chọn gói phù hợp với doanh nghiệp của bạn",
       "monthly": "hàng tháng",
       "yearly": "hàng năm",
@@ -83,12 +83,12 @@
       "unlimited": "Không giới hạn"
     },
     "testimonials": {
-      "title": "Được tin tưởng bởi các cửa hàng sửa chữa trên toàn thế giới",
+      "title": "Được tin tưởng bởi các cửa hàng sửa chữa toàn cầu",
       "subtitle": "Xem khách hàng nói gì về chúng tôi"
     },
     "cta": {
       "title": "Sẵn sàng chuyển đổi doanh nghiệp sửa chữa của bạn?",
-      "subtitle": "Tham gia cùng hàng ngàn cửa hàng sửa chữa đang sử dụng AfterSales Pro",
+      "subtitle": "Tham gia cùng hàng ngàn cửa hàng đang sử dụng AfterSales Pro",
       "button": "Bắt đầu dùng thử miễn phí"
     },
     "footer": {
@@ -103,19 +103,19 @@
       "support": "Hỗ trợ",
       "help": "Trung tâm trợ giúp",
       "documentation": "Tài liệu",
-      "copyright": "© 2026 AfterSales Pro. Bảo lưu mọi quyền."
+      "copyright": "© 2026 AfterSales Pro. Mọi quyền được bảo lưu."
     }
   },
   "auth": {
     "login": {
       "title": "Chào mừng trở lại",
       "subtitle": "Đăng nhập vào tài khoản của bạn",
-      "subdomain": "Tên miền phụ cửa hàng",
-      "subdomain_placeholder": "yourshop",
+      "subdomain": "Subdomain cửa hàng",
+      "subdomain_placeholder": "cuahangcuaban",
       "email": "Địa chỉ email",
       "email_placeholder": "you@example.com",
       "password": "Mật khẩu",
-      "password_placeholder": "Nhập mật khẩu của bạn",
+      "password_placeholder": "Nhập mật khẩu",
       "remember_me": "Ghi nhớ tôi",
       "forgot_password": "Quên mật khẩu?",
       "submit": "Đăng nhập",
@@ -123,18 +123,18 @@
       "signup_link": "Đăng ký ngay"
     },
     "signup": {
-      "title": "Tạo tài khoản của bạn",
+      "title": "Tạo tài khoản",
       "subtitle": "Bắt đầu dùng thử miễn phí hôm nay",
       "step1": "Chi tiết cửa hàng",
       "step2": "Thiết lập tài khoản",
       "company_name": "Tên cửa hàng / Công ty",
       "company_placeholder": "NeoStore Repairs",
-      "subdomain": "Chọn tên miền phụ của bạn",
+      "subdomain": "Chọn subdomain của bạn",
       "subdomain_suffix": ".aftersales.pro",
       "phone": "Số điện thoại",
-      "phone_placeholder": "0987654321",
+      "phone_placeholder": "0912345678",
       "address": "Địa chỉ cửa hàng",
-      "address_placeholder": "123 Đường Chính, Thành phố",
+      "address_placeholder": "123, Đường chính, Thành phố",
       "your_name": "Tên của bạn",
       "your_email": "Địa chỉ email",
       "password": "Mật khẩu",
@@ -143,7 +143,7 @@
       "have_account": "Đã có tài khoản?",
       "login_link": "Đăng nhập",
       "checking_availability": "Đang kiểm tra...",
-      "available": "Có sẵn!",
+      "available": "Khả dụng!",
       "taken": "Đã được sử dụng"
     }
   },
@@ -163,7 +163,7 @@
       "in_progress": "Đang xử lý"
     },
     "recent_jobs": "Công việc gần đây",
-    "quick_actions": "Hành động nhanh",
+    "quick_actions": "Thao tác nhanh",
     "new_job": "Công việc mới",
     "view_all_jobs": "Xem tất cả công việc"
   },
@@ -183,45 +183,12 @@
     "statuses": {
       "received": "Đã nhận",
       "diagnosed": "Đã chẩn đoán",
-      "waiting_approval": "Chờ duyệt",
+      "waiting_approval": "Chờ phê duyệt",
       "in_progress": "Đang xử lý",
-      "repaired": "Đã sửa",
+      "repaired": "Đã sửa xong",
       "delivered": "Đã giao",
       "closed": "Đã đóng",
       "cancelled": "Đã hủy"
-    },
-    "create": {
-      "title": "Tạo công việc mới",
-      "customer_details": "Thông tin khách hàng",
-      "device_details": "Thông tin thiết bị",
-      "problem_details": "Chi tiết vấn đề",
-      "accessories": "Phụ kiện",
-      "customer_name": "Tên khách hàng",
-      "mobile": "Số điện thoại",
-      "device_type": "Loại thiết bị",
-      "brand": "Hãng",
-      "model": "Model",
-      "serial_imei": "Serial/IMEI (Tùy chọn)",
-      "condition": "Tình trạng thiết bị (Tùy chọn)",
-      "unlock_pattern": "Mẫu/Mật khẩu mở khóa",
-      "problem_description": "Mô tả vấn đề",
-      "submit": "Tạo công việc"
-    },
-    "detail": {
-      "job_info": "Thông tin công việc",
-      "timeline": "Dòng thời gian",
-      "photos": "Ảnh",
-      "diagnosis": "Chẩn đoán",
-      "approval": "Phê duyệt",
-      "repair": "Chi tiết sửa chữa",
-      "delivery": "Giao hàng",
-      "actions": "Hành động",
-      "download_pdf": "Tải PDF",
-      "send_whatsapp": "Gửi WhatsApp",
-      "mark_diagnosed": "Đánh dấu đã chẩn đoán",
-      "record_approval": "Ghi nhận phê duyệt",
-      "mark_repaired": "Đánh dấu đã sửa",
-      "mark_delivered": "Đánh dấu đã giao"
     }
   },
   "customers": {
@@ -229,43 +196,28 @@
     "all_customers": "Tất cả khách hàng",
     "search_placeholder": "Tìm khách hàng...",
     "total_customers": "Tổng khách hàng",
-    "with_outstanding": "Có công nợ",
+    "with_outstanding": "Còn nợ",
     "total_jobs": "Tổng công việc",
     "outstanding": "Công nợ",
     "view_statement": "Xem sao kê",
     "record_payment": "Ghi nhận thanh toán"
   },
   "inventory": {
-    "title": "Kho hàng",
-    "add_item": "Thêm mặt hàng",
+    "title": "Kho",
+    "add_item": "Thêm mục",
     "search_placeholder": "Tìm trong kho...",
-    "total_items": "Tổng mặt hàng",
-    "low_stock": "Tồn kho thấp",
+    "total_items": "Tổng mục",
+    "low_stock": "Sắp hết hàng",
     "total_value": "Tổng giá trị",
-    "item_name": "Tên mặt hàng",
-    "sku": "SKU",
+    "item_name": "Tên mục",
+    "sku": "Mã SKU",
     "category": "Danh mục",
     "quantity": "Số lượng",
-    "cost_price": "Giá vốn",
+    "cost_price": "Giá gốc",
     "selling_price": "Giá bán",
-    "min_stock": "Tồn kho tối thiểu",
+    "min_stock": "Mức tồn kho tối thiểu",
     "adjust_stock": "Điều chỉnh tồn kho",
     "usage_history": "Lịch sử sử dụng"
-  },
-  "team": {
-    "title": "Nhóm",
-    "add_member": "Thêm thành viên",
-    "search_placeholder": "Tìm thành viên...",
-    "role": "Vai trò",
-    "branch": "Chi nhánh",
-    "roles": {
-      "admin": "Quản trị viên",
-      "manager": "Quản lý",
-      "technician": "Kỹ thuật viên",
-      "receptionist": "Lễ tân"
-    },
-    "edit_member": "Sửa thành viên",
-    "reset_password": "Đặt lại mật khẩu"
   },
   "settings": {
     "title": "Cài đặt",
@@ -274,9 +226,9 @@
     "address": "Địa chỉ",
     "phone": "Điện thoại",
     "email": "Email",
-    "footer_text": "Chân trang PDF",
+    "footer_text": "Chữ ký PDF",
     "language": "Ngôn ngữ",
-    "language_description": "Chọn ngôn ngữ ưa thích của bạn",
+    "language_description": "Chọn ngôn ngữ ưa thích",
     "theme": "Giao diện",
     "save_settings": "Lưu cài đặt"
   },
@@ -285,7 +237,7 @@
     "overview": "Tổng quan",
     "revenue": "Doanh thu",
     "jobs_completed": "Công việc hoàn thành",
-    "avg_repair_time": "Thời gian sửa TB",
+    "avg_repair_time": "Thời gian sửa chữa TB",
     "customer_satisfaction": "Hài lòng khách hàng",
     "top_services": "Dịch vụ hàng đầu",
     "revenue_trend": "Xu hướng doanh thu",
@@ -293,8 +245,8 @@
   },
   "notifications": {
     "job_created": "Đã tạo công việc mới",
-    "job_updated": "Đã cập nhật công việc",
+    "job_updated": "Công việc đã cập nhật",
     "payment_received": "Đã nhận thanh toán",
-    "low_stock_alert": "Cảnh báo tồn kho thấp"
+    "low_stock_alert": "Cảnh báo sắp hết hàng"
   }
 }

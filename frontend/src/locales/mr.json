@@ -1,7 +1,7 @@
 {
   "common": {
     "loading": "लोड होत आहे...",
-    "save": "सेव्ह करा",
+    "save": "जतन करा",
     "cancel": "रद्द करा",
     "delete": "हटवा",
     "edit": "संपादित करा",
@@ -27,40 +27,40 @@
     "view": "पहा",
     "download": "डाउनलोड",
     "upload": "अपलोड",
-    "success": "यशस्वी",
+    "success": "यश",
     "error": "त्रुटी",
-    "warning": "चेतावणी",
+    "warning": "इशारा",
     "info": "माहिती"
   },
   "landing": {
     "hero": {
-      "title": "तुमच्या दुरुस्ती दुकानाचे ऑपरेशन सोपे करा",
-      "subtitle": "दुरुस्ती कामे व्यवस्थापित करण्यासाठी, इन्व्हेंटरी ट्रॅक करण्यासाठी आणि ग्राहकांना आनंदी करण्यासाठी संपूर्ण समाधान",
+      "title": "रिपेर शॉप व्यवस्थापन, सोपे केले",
+      "subtitle": "रिपेर जॉब्स व्यवस्थापित करण्यासाठी, इन्व्हेंटरी ट्रॅक करण्यासाठी आणि ग्राहकांना आनंदित करण्यासाठी संपूर्ण उपाय",
       "cta": "मोफत सुरू करा",
       "cta_login": "डॅशबोर्डवर लॉगिन करा"
     },
     "features": {
-      "title": "तुमच्या दुरुस्ती दुकानासाठी आवश्यक सर्व काही",
-      "subtitle": "दुरुस्ती व्यवसायासाठी विशेष डिझाइन केलेली शक्तिशाली वैशिष्ट्ये",
+      "title": "तुमचे रिपेर शॉप चालवण्यासाठी सर्व काही",
+      "subtitle": "रिपेर व्यवसायांसाठी विशेषतः डिझाइन केलेली शक्तिशाली वैशिष्ट्ये",
       "job_management": {
-        "title": "कामाचे व्यवस्थापन",
-        "description": "आमच्या सोप्या वर्कफ्लो सिस्टमसह प्रत्येक दुरुस्ती ट्रॅक करा"
+        "title": "जॉब व्यवस्थापन",
+        "description": "आमच्या सहज वर्कफ्लो सिस्टमसह प्रत्येक रिपेरला स्वीकारण्यापासून डिलिव्हरीपर्यंत ट्रॅक करा"
       },
       "inventory": {
         "title": "इन्व्हेंटरी नियंत्रण",
-        "description": "रिअल-टाइम स्टॉक ट्रॅकिंग आणि कमी स्टॉक अलर्टसह पार्ट्स व्यवस्थापित करा"
+        "description": "रिअल-टाइम स्टॉक ट्रॅकिंग आणि कमी स्टॉक अलर्टसह पार्ट्स आणि पुरवठा व्यवस्थापित करा"
       },
       "customer": {
         "title": "ग्राहक व्यवस्थापन",
-        "description": "संपूर्ण ग्राहक इतिहास आणि संवाद साधनांसह संबंध तयार करा"
+        "description": "संपूर्ण ग्राहक इतिहास आणि संवाद साधनांसह दीर्घकालीन संबंध बांधा"
       },
       "analytics": {
-        "title": "अॅनालिटिक्स आणि रिपोर्ट्स",
-        "description": "सर्वसमावेशक व्यवसाय अंतर्दृष्टीसह डेटा-आधारित निर्णय घ्या"
+        "title": "विश्लेषण आणि अहवाल",
+        "description": "व्यापक व्यवसाय अंतर्दृष्टीसह डेटा-आधारित निर्णय घ्या"
       },
       "whatsapp": {
-        "title": "WhatsApp इंटिग्रेशन",
-        "description": "एका क्लिकवर ग्राहकांना WhatsApp द्वारे स्वयंचलित अपडेट्स पाठवा"
+        "title": "व्हाट्सअॅप इंटिग्रेशन",
+        "description": "एका क्लिकने व्हाट्सअॅपद्वारे ग्राहकांना स्वयंचलित अपडेट्स पाठवा"
       },
       "multi_branch": {
         "title": "मल्टी-ब्रांच सपोर्ट",
@@ -68,80 +68,80 @@
       }
     },
     "pricing": {
-      "title": "सोपी, पारदर्शक किंमत",
+      "title": "सोपे, पारदर्शक किंमत",
       "subtitle": "तुमच्या व्यवसायासाठी योग्य प्लॅन निवडा",
       "monthly": "मासिक",
       "yearly": "वार्षिक",
       "forever": "कायमचे",
       "popular": "सर्वात लोकप्रिय",
       "get_started": "सुरू करा",
-      "current_plan": "वर्तमान प्लॅन",
+      "current_plan": "सध्याचा प्लॅन",
       "features_included": "समाविष्ट वैशिष्ट्ये:",
-      "users": "यूजर्स",
+      "users": "वापरकर्ते",
       "branches": "शाखा",
-      "jobs_month": "कामे/महिना",
+      "jobs_month": "जॉब्स/महिना",
       "unlimited": "अमर्यादित"
     },
     "testimonials": {
-      "title": "जगभरातील दुरुस्ती दुकानांचा विश्वास",
+      "title": "जगभरातील रिपेर शॉप्सने विश्वासार्ह",
       "subtitle": "आमचे ग्राहक काय म्हणतात ते पहा"
     },
     "cta": {
-      "title": "तुमचा दुरुस्ती व्यवसाय बदलण्यास तयार आहात?",
-      "subtitle": "AfterSales Pro वापरणाऱ्या हजारो दुरुस्ती दुकानांमध्ये सामील व्हा",
+      "title": "तुमचा रिपेर व्यवसाय बदलण्यास तयार आहात?",
+      "subtitle": "हजारो रिपेर शॉप्समध्ये सामील व्हा जे आधीच AfterSales Pro वापरत आहेत",
       "button": "मोफत ट्रायल सुरू करा"
     },
     "footer": {
-      "product": "प्रोडक्ट",
+      "product": "उत्पादन",
       "features": "वैशिष्ट्ये",
       "pricing": "किंमत",
       "contact": "संपर्क",
       "company": "कंपनी",
       "about": "आमच्याबद्दल",
       "privacy": "गोपनीयता धोरण",
-      "terms": "सेवा अटी",
+      "terms": "सेवेच्या अटी",
       "support": "सपोर्ट",
       "help": "मदत केंद्र",
-      "documentation": "डॉक्युमेंटेशन",
+      "documentation": "दस्तऐवजीकरण",
       "copyright": "© 2026 AfterSales Pro. सर्व हक्क राखीव."
     }
   },
   "auth": {
     "login": {
       "title": "पुन्हा स्वागत आहे",
-      "subtitle": "तुमच्या खात्यात लॉगिन करा",
-      "subdomain": "दुकान सबडोमेन",
-      "subdomain_placeholder": "yourshop",
+      "subtitle": "तुमच्या खात्यात साइन इन करा",
+      "subdomain": "शॉप सबडोमेन",
+      "subdomain_placeholder": "तुमचीशॉप",
       "email": "ईमेल पत्ता",
       "email_placeholder": "you@example.com",
       "password": "पासवर्ड",
       "password_placeholder": "तुमचा पासवर्ड टाका",
       "remember_me": "मला लक्षात ठेवा",
       "forgot_password": "पासवर्ड विसरलात?",
-      "submit": "लॉगिन करा",
+      "submit": "साइन इन",
       "no_account": "खाते नाही?",
       "signup_link": "आता साइन अप करा"
     },
     "signup": {
       "title": "तुमचे खाते तयार करा",
-      "subtitle": "आजच तुमची मोफत ट्रायल सुरू करा",
-      "step1": "दुकान तपशील",
+      "subtitle": "आजच मोफत ट्रायल सुरू करा",
+      "step1": "शॉप तपशील",
       "step2": "खाते सेटअप",
-      "company_name": "दुकान / कंपनीचे नाव",
-      "company_placeholder": "निओस्टोर रिपेअर्स",
-      "subdomain": "तुमचे सबडोमेन निवडा",
+      "company_name": "शॉप / कंपनीचे नाव",
+      "company_placeholder": "निओस्टोर रिपेर्स",
+      "subdomain": "तुमचा सबडोमेन निवडा",
       "subdomain_suffix": ".aftersales.pro",
-      "phone": "मोबाईल नंबर",
+      "phone": "मोबाइल नंबर",
       "phone_placeholder": "9876543210",
-      "address": "दुकानाचा पत्ता",
-      "address_placeholder": "123, मेन स्ट्रीट, शहर",
+      "address": "शॉपचा पत्ता",
+      "address_placeholder": "123, मुख्य रस्ता, शहर",
       "your_name": "तुमचे नाव",
       "your_email": "ईमेल पत्ता",
       "password": "पासवर्ड",
-      "confirm_password": "पासवर्ड पुष्टी करा",
+      "confirm_password": "पासवर्डची पुष्टी करा",
       "submit": "खाते तयार करा",
       "have_account": "आधीच खाते आहे?",
-      "login_link": "लॉगिन करा",
+      "login_link": "साइन इन करा",
       "checking_availability": "उपलब्धता तपासत आहे...",
       "available": "उपलब्ध!",
       "taken": "आधीच घेतले"
@@ -150,27 +150,27 @@
   "dashboard": {
     "title": "डॅशबोर्ड",
     "welcome": "पुन्हा स्वागत आहे",
-    "overview": "आढावा",
+    "overview": "ओव्हरव्ह्यू",
     "today": "आज",
     "this_week": "या आठवड्यात",
     "this_month": "या महिन्यात",
     "stats": {
-      "total_jobs": "एकूण कामे",
-      "pending_jobs": "प्रलंबित कामे",
+      "total_jobs": "एकूण जॉब्स",
+      "pending_jobs": "प्रलंबित जॉब्स",
       "completed_today": "आज पूर्ण",
-      "revenue_today": "आजचा महसूल",
+      "revenue_today": "आजचे उत्पन्न",
       "ready_delivery": "डिलिव्हरीसाठी तयार",
-      "in_progress": "प्रगतीपथावर"
+      "in_progress": "प्रगतीत"
     },
-    "recent_jobs": "अलीकडील कामे",
-    "quick_actions": "जलद क्रिया",
-    "new_job": "नवीन काम",
-    "view_all_jobs": "सर्व कामे पहा"
+    "recent_jobs": "अलीकडील जॉब्स",
+    "quick_actions": "द्रुत क्रिया",
+    "new_job": "नवीन जॉब",
+    "view_all_jobs": "सर्व जॉब्स पहा"
   },
   "jobs": {
-    "title": "कामे",
-    "new_job": "नवीन काम",
-    "all_jobs": "सर्व कामे",
+    "title": "जॉब्स",
+    "new_job": "नवीन जॉब",
+    "all_jobs": "सर्व जॉब्स",
     "search_placeholder": "जॉब नंबर, ग्राहकाने शोधा...",
     "filter_status": "स्थितीनुसार फिल्टर करा",
     "filter_date": "तारखेनुसार फिल्टर करा",
@@ -183,45 +183,12 @@
     "statuses": {
       "received": "प्राप्त",
       "diagnosed": "निदान झाले",
-      "waiting_approval": "मंजुरीची वाट",
-      "in_progress": "प्रगतीपथावर",
+      "waiting_approval": "मंजुरीची वाट पाहत आहे",
+      "in_progress": "प्रगतीत",
       "repaired": "दुरुस्त झाले",
       "delivered": "डिलिव्हर झाले",
       "closed": "बंद",
       "cancelled": "रद्द"
-    },
-    "create": {
-      "title": "नवीन काम तयार करा",
-      "customer_details": "ग्राहक तपशील",
-      "device_details": "डिव्हाइस तपशील",
-      "problem_details": "समस्या तपशील",
-      "accessories": "अॅक्सेसरीज",
-      "customer_name": "ग्राहकाचे नाव",
-      "mobile": "मोबाईल नंबर",
-      "device_type": "डिव्हाइस प्रकार",
-      "brand": "ब्रँड",
-      "model": "मॉडेल",
-      "serial_imei": "सीरियल/IMEI (पर्यायी)",
-      "condition": "डिव्हाइस स्थिती (पर्यायी)",
-      "unlock_pattern": "अनलॉक पॅटर्न/पासवर्ड",
-      "problem_description": "समस्या वर्णन",
-      "submit": "काम तयार करा"
-    },
-    "detail": {
-      "job_info": "काम माहिती",
-      "timeline": "स्थिती टाइमलाइन",
-      "photos": "फोटो",
-      "diagnosis": "निदान",
-      "approval": "मंजुरी",
-      "repair": "दुरुस्ती तपशील",
-      "delivery": "डिलिव्हरी",
-      "actions": "क्रिया",
-      "download_pdf": "PDF डाउनलोड करा",
-      "send_whatsapp": "WhatsApp पाठवा",
-      "mark_diagnosed": "निदान झाले म्हणून चिन्हांकित करा",
-      "record_approval": "मंजुरी नोंदवा",
-      "mark_repaired": "दुरुस्त झाले म्हणून चिन्हांकित करा",
-      "mark_delivered": "डिलिव्हर झाले म्हणून चिन्हांकित करा"
     }
   },
   "customers": {
@@ -230,7 +197,7 @@
     "search_placeholder": "ग्राहक शोधा...",
     "total_customers": "एकूण ग्राहक",
     "with_outstanding": "थकबाकीसह",
-    "total_jobs": "एकूण कामे",
+    "total_jobs": "एकूण जॉब्स",
     "outstanding": "थकबाकी",
     "view_statement": "स्टेटमेंट पहा",
     "record_payment": "पेमेंट नोंदवा"
@@ -239,61 +206,46 @@
     "title": "इन्व्हेंटरी",
     "add_item": "आयटम जोडा",
     "search_placeholder": "इन्व्हेंटरी शोधा...",
-    "total_items": "एकूण आयटम",
+    "total_items": "एकूण आयटम्स",
     "low_stock": "कमी स्टॉक",
     "total_value": "एकूण मूल्य",
     "item_name": "आयटमचे नाव",
     "sku": "SKU",
-    "category": "वर्ग",
+    "category": "श्रेणी",
     "quantity": "प्रमाण",
     "cost_price": "खर्च किंमत",
     "selling_price": "विक्री किंमत",
-    "min_stock": "किमान स्टॉक",
+    "min_stock": "किमान स्टॉक पातळी",
     "adjust_stock": "स्टॉक समायोजित करा",
     "usage_history": "वापर इतिहास"
   },
-  "team": {
-    "title": "टीम",
-    "add_member": "सदस्य जोडा",
-    "search_placeholder": "सदस्य शोधा...",
-    "role": "भूमिका",
-    "branch": "शाखा",
-    "roles": {
-      "admin": "अॅडमिन",
-      "manager": "व्यवस्थापक",
-      "technician": "तंत्रज्ञ",
-      "receptionist": "रिसेप्शनिस्ट"
-    },
-    "edit_member": "सदस्य संपादित करा",
-    "reset_password": "पासवर्ड रीसेट करा"
-  },
   "settings": {
     "title": "सेटिंग्ज",
-    "shop_details": "दुकान तपशील",
+    "shop_details": "शॉप तपशील",
     "company_name": "कंपनीचे नाव",
     "address": "पत्ता",
     "phone": "फोन",
     "email": "ईमेल",
-    "footer_text": "PDF फूटर मजकूर",
+    "footer_text": "PDF फुटर मजकूर",
     "language": "भाषा",
     "language_description": "तुमची पसंतीची भाषा निवडा",
     "theme": "थीम",
-    "save_settings": "सेटिंग्ज सेव्ह करा"
+    "save_settings": "सेटिंग्ज जतन करा"
   },
   "analytics": {
-    "title": "अॅनालिटिक्स",
-    "overview": "आढावा",
-    "revenue": "महसूल",
-    "jobs_completed": "पूर्ण झालेली कामे",
+    "title": "विश्लेषण",
+    "overview": "ओव्हरव्ह्यू",
+    "revenue": "उत्पन्न",
+    "jobs_completed": "पूर्ण जॉब्स",
     "avg_repair_time": "सरासरी दुरुस्ती वेळ",
     "customer_satisfaction": "ग्राहक समाधान",
-    "top_services": "टॉप सेवा",
-    "revenue_trend": "महसूल ट्रेंड",
-    "job_status_distribution": "काम स्थिती वितरण"
+    "top_services": "शीर्ष सेवा",
+    "revenue_trend": "उत्पन्न ट्रेंड",
+    "job_status_distribution": "जॉब स्थिती वितरण"
   },
   "notifications": {
-    "job_created": "नवीन काम तयार झाले",
-    "job_updated": "काम अपडेट झाले",
+    "job_created": "नवीन जॉब तयार झाला",
+    "job_updated": "जॉब अपडेट झाला",
     "payment_received": "पेमेंट प्राप्त झाले",
     "low_stock_alert": "कमी स्टॉक अलर्ट"
   }
