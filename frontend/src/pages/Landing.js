@@ -204,16 +204,17 @@ export default function Landing() {
             {/* Desktop nav */}
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
-                Features
+                {t("landing.footer.features")}
               </a>
               <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-                Pricing
+                {t("landing.footer.pricing")}
               </a>
+              <LanguageSelector variant="ghost" />
               <Button variant="ghost" onClick={() => navigate("/login")} data-testid="nav-login-btn">
-                Login
+                {t("auth.login.submit")}
               </Button>
               <Button onClick={() => navigate("/signup")} data-testid="nav-signup-btn">
-                Start Free Trial
+                {t("landing.cta.button")}
               </Button>
             </div>
 
