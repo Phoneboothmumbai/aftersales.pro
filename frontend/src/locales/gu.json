@@ -1,0 +1,300 @@
+{
+  "common": {
+    "loading": "લોડ થઈ રહ્યું છે...",
+    "save": "સેવ કરો",
+    "cancel": "રદ કરો",
+    "delete": "કાઢી નાખો",
+    "edit": "સંપાદિત કરો",
+    "create": "બનાવો",
+    "search": "શોધો",
+    "filter": "ફિલ્ટર",
+    "actions": "ક્રિયાઓ",
+    "status": "સ્થિતિ",
+    "date": "તારીખ",
+    "name": "નામ",
+    "email": "ઇમેઇલ",
+    "phone": "ફોન",
+    "address": "સરનામું",
+    "submit": "સબમિટ કરો",
+    "back": "પાછા",
+    "next": "આગળ",
+    "previous": "પાછળ",
+    "yes": "હા",
+    "no": "ના",
+    "all": "બધા",
+    "none": "કોઈ નહીં",
+    "close": "બંધ કરો",
+    "view": "જુઓ",
+    "download": "ડાઉનલોડ",
+    "upload": "અપલોડ",
+    "success": "સફળ",
+    "error": "ભૂલ",
+    "warning": "ચેતવણી",
+    "info": "માહિતી"
+  },
+  "landing": {
+    "hero": {
+      "title": "તમારી રિપેર શોપને સુવ્યવસ્થિત કરો",
+      "subtitle": "રિપેર જોબ્સ મેનેજ કરવા, ઇન્વેન્ટરી ટ્રેક કરવા અને ગ્રાહકોને ખુશ રાખવા માટે સંપૂર્ણ ઉકેલ",
+      "cta": "મફત શરૂ કરો",
+      "cta_login": "ડેશબોર્ડમાં લોગિન કરો"
+    },
+    "features": {
+      "title": "તમારી રિપેર શોપ માટે બધું",
+      "subtitle": "રિપેર બિઝનેસ માટે ખાસ ડિઝાઇન કરેલી શક્તિશાળી સુવિધાઓ",
+      "job_management": {
+        "title": "જોબ મેનેજમેન્ટ",
+        "description": "અમારી સહજ વર્કફ્લો સિસ્ટમ સાથે દરેક રિપેરને ટ્રેક કરો"
+      },
+      "inventory": {
+        "title": "ઇન્વેન્ટરી કંટ્રોલ",
+        "description": "રિયલ-ટાઇમ સ્ટોક ટ્રેકિંગ અને લો-સ્ટોક એલર્ટ્સ સાથે પાર્ટ્સ મેનેજ કરો"
+      },
+      "customer": {
+        "title": "ગ્રાહક મેનેજમેન્ટ",
+        "description": "સંપૂર્ણ ગ્રાહક ઇતિહાસ અને સંદેશાવ્યવહાર સાધનો સાથે સંબંધો બનાવો"
+      },
+      "analytics": {
+        "title": "એનાલિટિક્સ અને રિપોર્ટ્સ",
+        "description": "વ્યાપક બિઝનેસ ઇનસાઇટ્સ સાથે ડેટા-આધારિત નિર્ણયો લો"
+      },
+      "whatsapp": {
+        "title": "WhatsApp ઇન્ટીગ્રેશન",
+        "description": "એક ક્લિકમાં ગ્રાહકોને WhatsApp પર અપડેટ્સ મોકલો"
+      },
+      "multi_branch": {
+        "title": "મલ્ટી-બ્રાંચ સપોર્ટ",
+        "description": "એક ડેશબોર્ડમાંથી બહુવિધ સ્થાનો મેનેજ કરો"
+      }
+    },
+    "pricing": {
+      "title": "સરળ, પારદર્શક કિંમત",
+      "subtitle": "તમારા બિઝનેસ માટે યોગ્ય પ્લાન પસંદ કરો",
+      "monthly": "માસિક",
+      "yearly": "વાર્ષિક",
+      "forever": "કાયમ માટે",
+      "popular": "સૌથી લોકપ્રિય",
+      "get_started": "શરૂ કરો",
+      "current_plan": "વર્તમાન પ્લાન",
+      "features_included": "સમાવિષ્ટ સુવિધાઓ:",
+      "users": "યુઝર્સ",
+      "branches": "શાખાઓ",
+      "jobs_month": "જોબ્સ/મહિનો",
+      "unlimited": "અમર્યાદિત"
+    },
+    "testimonials": {
+      "title": "વિશ્વભરની રિપેર શોપ્સનો વિશ્વાસ",
+      "subtitle": "જુઓ અમારા ગ્રાહકો શું કહે છે"
+    },
+    "cta": {
+      "title": "તમારા રિપેર બિઝનેસને બદલવા તૈયાર છો?",
+      "subtitle": "હજારો રિપેર શોપ્સ સાથે જોડાઓ જે પહેલાથી AfterSales Pro વાપરે છે",
+      "button": "મફત ટ્રાયલ શરૂ કરો"
+    },
+    "footer": {
+      "product": "પ્રોડક્ટ",
+      "features": "સુવિધાઓ",
+      "pricing": "કિંમત",
+      "contact": "સંપર્ક",
+      "company": "કંપની",
+      "about": "અમારા વિશે",
+      "privacy": "ગોપનીયતા નીતિ",
+      "terms": "સેવાની શરતો",
+      "support": "સપોર્ટ",
+      "help": "હેલ્પ સેન્ટર",
+      "documentation": "ડોક્યુમેન્ટેશન",
+      "copyright": "© 2026 AfterSales Pro. સર્વાધિકાર સુરક્ષિત."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "પાછા સ્વાગત છે",
+      "subtitle": "તમારા એકાઉન્ટમાં લોગિન કરો",
+      "subdomain": "શોપ સબડોમેન",
+      "subdomain_placeholder": "yourshop",
+      "email": "ઇમેઇલ એડ્રેસ",
+      "email_placeholder": "you@example.com",
+      "password": "પાસવર્ડ",
+      "password_placeholder": "તમારો પાસવર્ડ દાખલ કરો",
+      "remember_me": "મને યાદ રાખો",
+      "forgot_password": "પાસવર્ડ ભૂલી ગયા?",
+      "submit": "લોગિન કરો",
+      "no_account": "એકાઉન્ટ નથી?",
+      "signup_link": "હમણાં સાઇન અપ કરો"
+    },
+    "signup": {
+      "title": "તમારું એકાઉન્ટ બનાવો",
+      "subtitle": "આજે જ મફત ટ્રાયલ શરૂ કરો",
+      "step1": "શોપ વિગતો",
+      "step2": "એકાઉન્ટ સેટઅપ",
+      "company_name": "શોપ / કંપનીનું નામ",
+      "company_placeholder": "નિયોસ્ટોર રિપેર્સ",
+      "subdomain": "તમારો સબડોમેન પસંદ કરો",
+      "subdomain_suffix": ".aftersales.pro",
+      "phone": "મોબાઇલ નંબર",
+      "phone_placeholder": "9876543210",
+      "address": "શોપનું સરનામું",
+      "address_placeholder": "123, મેઇન સ્ટ્રીટ, શહેર",
+      "your_name": "તમારું નામ",
+      "your_email": "ઇમેઇલ એડ્રેસ",
+      "password": "પાસવર્ડ",
+      "confirm_password": "પાસવર્ડ કન્ફર્મ કરો",
+      "submit": "એકાઉન્ટ બનાવો",
+      "have_account": "પહેલેથી એકાઉન્ટ છે?",
+      "login_link": "લોગિન કરો",
+      "checking_availability": "ઉપલબ્ધતા તપાસી રહ્યા છીએ...",
+      "available": "ઉપલબ્ધ!",
+      "taken": "પહેલેથી લીધેલ"
+    }
+  },
+  "dashboard": {
+    "title": "ડેશબોર્ડ",
+    "welcome": "પાછા સ્વાગત છે",
+    "overview": "ઓવરવ્યુ",
+    "today": "આજે",
+    "this_week": "આ અઠવાડિયે",
+    "this_month": "આ મહિને",
+    "stats": {
+      "total_jobs": "કુલ જોબ્સ",
+      "pending_jobs": "પેન્ડિંગ જોબ્સ",
+      "completed_today": "આજે પૂર્ણ",
+      "revenue_today": "આજની આવક",
+      "ready_delivery": "ડિલિવરી માટે તૈયાર",
+      "in_progress": "પ્રગતિમાં"
+    },
+    "recent_jobs": "તાજેતરની જોબ્સ",
+    "quick_actions": "ઝડપી ક્રિયાઓ",
+    "new_job": "નવી જોબ",
+    "view_all_jobs": "બધી જોબ્સ જુઓ"
+  },
+  "jobs": {
+    "title": "જોબ્સ",
+    "new_job": "નવી જોબ",
+    "all_jobs": "બધી જોબ્સ",
+    "search_placeholder": "જોબ નંબર, ગ્રાહક દ્વારા શોધો...",
+    "filter_status": "સ્થિતિ દ્વારા ફિલ્ટર કરો",
+    "filter_date": "તારીખ દ્વારા ફિલ્ટર કરો",
+    "job_number": "જોબ નંબર",
+    "customer": "ગ્રાહક",
+    "device": "ડિવાઇસ",
+    "problem": "સમસ્યા",
+    "status": "સ્થિતિ",
+    "created": "બનાવ્યું",
+    "statuses": {
+      "received": "પ્રાપ્ત",
+      "diagnosed": "નિદાન થયું",
+      "waiting_approval": "મંજૂરીની રાહ",
+      "in_progress": "પ્રગતિમાં",
+      "repaired": "રિપેર થયું",
+      "delivered": "ડિલિવર થયું",
+      "closed": "બંધ",
+      "cancelled": "રદ"
+    },
+    "create": {
+      "title": "નવી જોબ બનાવો",
+      "customer_details": "ગ્રાહક વિગતો",
+      "device_details": "ડિવાઇસ વિગતો",
+      "problem_details": "સમસ્યા વિગતો",
+      "accessories": "એક્સેસરીઝ",
+      "customer_name": "ગ્રાહકનું નામ",
+      "mobile": "મોબાઇલ નંબર",
+      "device_type": "ડિવાઇસ પ્રકાર",
+      "brand": "બ્રાન્ડ",
+      "model": "મોડલ",
+      "serial_imei": "સીરિયલ/IMEI (વૈકલ્પિક)",
+      "condition": "ડિવાઇસ સ્થિતિ (વૈકલ્પિક)",
+      "unlock_pattern": "અનલોક પેટર્ન/પાસવર્ડ",
+      "problem_description": "સમસ્યાનું વર્ણન",
+      "submit": "જોબ બનાવો"
+    },
+    "detail": {
+      "job_info": "જોબ માહિતી",
+      "timeline": "સ્થિતિ ટાઇમલાઇન",
+      "photos": "ફોટા",
+      "diagnosis": "નિદાન",
+      "approval": "મંજૂરી",
+      "repair": "રિપેર વિગતો",
+      "delivery": "ડિલિવરી",
+      "actions": "ક્રિયાઓ",
+      "download_pdf": "PDF ડાઉનલોડ કરો",
+      "send_whatsapp": "WhatsApp મોકલો",
+      "mark_diagnosed": "નિદાન તરીકે ચિહ્નિત કરો",
+      "record_approval": "મંજૂરી રેકોર્ડ કરો",
+      "mark_repaired": "રિપેર થયું તરીકે ચિહ્નિત કરો",
+      "mark_delivered": "ડિલિવર થયું તરીકે ચિહ્નિત કરો"
+    }
+  },
+  "customers": {
+    "title": "ગ્રાહકો",
+    "all_customers": "બધા ગ્રાહકો",
+    "search_placeholder": "ગ્રાહકો શોધો...",
+    "total_customers": "કુલ ગ્રાહકો",
+    "with_outstanding": "બાકી સાથે",
+    "total_jobs": "કુલ જોબ્સ",
+    "outstanding": "બાકી",
+    "view_statement": "સ્ટેટમેન્ટ જુઓ",
+    "record_payment": "ચુકવણી રેકોર્ડ કરો"
+  },
+  "inventory": {
+    "title": "ઇન્વેન્ટરી",
+    "add_item": "આઇટમ ઉમેરો",
+    "search_placeholder": "ઇન્વેન્ટરી શોધો...",
+    "total_items": "કુલ આઇટમ્સ",
+    "low_stock": "ઓછો સ્ટોક",
+    "total_value": "કુલ મૂલ્ય",
+    "item_name": "આઇટમનું નામ",
+    "sku": "SKU",
+    "category": "કેટેગરી",
+    "quantity": "જથ્થો",
+    "cost_price": "કોસ્ટ પ્રાઇસ",
+    "selling_price": "સેલિંગ પ્રાઇસ",
+    "min_stock": "મિનિમમ સ્ટોક",
+    "adjust_stock": "સ્ટોક એડજસ્ટ કરો",
+    "usage_history": "વપરાશ ઇતિહાસ"
+  },
+  "team": {
+    "title": "ટીમ",
+    "add_member": "સભ્ય ઉમેરો",
+    "search_placeholder": "સભ્યો શોધો...",
+    "role": "ભૂમિકા",
+    "branch": "શાખા",
+    "roles": {
+      "admin": "એડમિન",
+      "manager": "મેનેજર",
+      "technician": "ટેકનિશિયન",
+      "receptionist": "રિસેપ્શનિસ્ટ"
+    },
+    "edit_member": "સભ્ય સંપાદિત કરો",
+    "reset_password": "પાસવર્ડ રીસેટ કરો"
+  },
+  "settings": {
+    "title": "સેટિંગ્સ",
+    "shop_details": "શોપ વિગતો",
+    "company_name": "કંપનીનું નામ",
+    "address": "સરનામું",
+    "phone": "ફોન",
+    "email": "ઇમેઇલ",
+    "footer_text": "PDF ફૂટર ટેક્સ્ટ",
+    "language": "ભાષા",
+    "language_description": "તમારી પસંદની ભાષા પસંદ કરો",
+    "theme": "થીમ",
+    "save_settings": "સેટિંગ્સ સેવ કરો"
+  },
+  "analytics": {
+    "title": "એનાલિટિક્સ",
+    "overview": "ઓવરવ્યુ",
+    "revenue": "આવક",
+    "jobs_completed": "પૂર્ણ જોબ્સ",
+    "avg_repair_time": "સરેરાશ રિપેર સમય",
+    "customer_satisfaction": "ગ્રાહક સંતોષ",
+    "top_services": "ટોપ સર્વિસિસ",
+    "revenue_trend": "આવક ટ્રેન્ડ",
+    "job_status_distribution": "જોબ સ્થિતિ વિતરણ"
+  },
+  "notifications": {
+    "job_created": "નવી જોબ બનાવી",
+    "job_updated": "જોબ અપડેટ થયું",
+    "payment_received": "ચુકવણી પ્રાપ્ત",
+    "low_stock_alert": "ઓછા સ્ટોક એલર્ટ"
+  }
+}
