@@ -1,0 +1,300 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "close": "Close",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "landing": {
+    "hero": {
+      "title": "Streamline Your Repair Shop Operations",
+      "subtitle": "The complete solution to manage repair jobs, track inventory, and delight your customers",
+      "cta": "Get Started Free",
+      "cta_login": "Login to Dashboard"
+    },
+    "features": {
+      "title": "Everything You Need to Run Your Repair Shop",
+      "subtitle": "Powerful features designed specifically for repair businesses",
+      "job_management": {
+        "title": "Job Management",
+        "description": "Track every repair from intake to delivery with our intuitive workflow system"
+      },
+      "inventory": {
+        "title": "Inventory Control",
+        "description": "Manage parts and supplies with real-time stock tracking and low-stock alerts"
+      },
+      "customer": {
+        "title": "Customer Management",
+        "description": "Build lasting relationships with complete customer history and communication tools"
+      },
+      "analytics": {
+        "title": "Analytics & Reports",
+        "description": "Make data-driven decisions with comprehensive business insights"
+      },
+      "whatsapp": {
+        "title": "WhatsApp Integration",
+        "description": "Send automated updates to customers via WhatsApp with one click"
+      },
+      "multi_branch": {
+        "title": "Multi-Branch Support",
+        "description": "Manage multiple locations from a single dashboard"
+      }
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Choose the plan that fits your business",
+      "monthly": "monthly",
+      "yearly": "yearly",
+      "forever": "forever",
+      "popular": "Most Popular",
+      "get_started": "Get Started",
+      "current_plan": "Current Plan",
+      "features_included": "Features included:",
+      "users": "users",
+      "branches": "branches",
+      "jobs_month": "jobs/month",
+      "unlimited": "Unlimited"
+    },
+    "testimonials": {
+      "title": "Trusted by Repair Shops Worldwide",
+      "subtitle": "See what our customers have to say"
+    },
+    "cta": {
+      "title": "Ready to Transform Your Repair Business?",
+      "subtitle": "Join thousands of repair shops already using AfterSales Pro",
+      "button": "Start Free Trial"
+    },
+    "footer": {
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "contact": "Contact",
+      "company": "Company",
+      "about": "About Us",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "support": "Support",
+      "help": "Help Center",
+      "documentation": "Documentation",
+      "copyright": "© 2026 AfterSales Pro. All rights reserved."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "subdomain": "Shop Subdomain",
+      "subdomain_placeholder": "yourshop",
+      "email": "Email Address",
+      "email_placeholder": "you@example.com",
+      "password": "Password",
+      "password_placeholder": "Enter your password",
+      "remember_me": "Remember me",
+      "forgot_password": "Forgot password?",
+      "submit": "Sign In",
+      "no_account": "Don't have an account?",
+      "signup_link": "Sign up now"
+    },
+    "signup": {
+      "title": "Create Your Account",
+      "subtitle": "Start your free trial today",
+      "step1": "Shop Details",
+      "step2": "Account Setup",
+      "company_name": "Shop / Company Name",
+      "company_placeholder": "NeoStore Repairs",
+      "subdomain": "Choose your subdomain",
+      "subdomain_suffix": ".aftersales.pro",
+      "phone": "Mobile Number",
+      "phone_placeholder": "9876543210",
+      "address": "Shop Address",
+      "address_placeholder": "123, Main Street, City",
+      "your_name": "Your Name",
+      "your_email": "Email Address",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "submit": "Create Account",
+      "have_account": "Already have an account?",
+      "login_link": "Sign in",
+      "checking_availability": "Checking availability...",
+      "available": "Available!",
+      "taken": "Already taken"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "today": "Today",
+    "this_week": "This Week",
+    "this_month": "This Month",
+    "stats": {
+      "total_jobs": "Total Jobs",
+      "pending_jobs": "Pending Jobs",
+      "completed_today": "Completed Today",
+      "revenue_today": "Revenue Today",
+      "ready_delivery": "Ready for Delivery",
+      "in_progress": "In Progress"
+    },
+    "recent_jobs": "Recent Jobs",
+    "quick_actions": "Quick Actions",
+    "new_job": "New Job",
+    "view_all_jobs": "View All Jobs"
+  },
+  "jobs": {
+    "title": "Jobs",
+    "new_job": "New Job",
+    "all_jobs": "All Jobs",
+    "search_placeholder": "Search by job number, customer...",
+    "filter_status": "Filter by Status",
+    "filter_date": "Filter by Date",
+    "job_number": "Job Number",
+    "customer": "Customer",
+    "device": "Device",
+    "problem": "Problem",
+    "status": "Status",
+    "created": "Created",
+    "statuses": {
+      "received": "Received",
+      "diagnosed": "Diagnosed",
+      "waiting_approval": "Waiting for Approval",
+      "in_progress": "In Progress",
+      "repaired": "Repaired",
+      "delivered": "Delivered",
+      "closed": "Closed",
+      "cancelled": "Cancelled"
+    },
+    "create": {
+      "title": "Create New Job",
+      "customer_details": "Customer Details",
+      "device_details": "Device Details",
+      "problem_details": "Problem Details",
+      "accessories": "Accessories",
+      "customer_name": "Customer Name",
+      "mobile": "Mobile Number",
+      "device_type": "Device Type",
+      "brand": "Brand",
+      "model": "Model",
+      "serial_imei": "Serial/IMEI (Optional)",
+      "condition": "Device Condition (Optional)",
+      "unlock_pattern": "Unlock Pattern/Password",
+      "problem_description": "Problem Description",
+      "submit": "Create Job"
+    },
+    "detail": {
+      "job_info": "Job Information",
+      "timeline": "Status Timeline",
+      "photos": "Photos",
+      "diagnosis": "Diagnosis",
+      "approval": "Approval",
+      "repair": "Repair Details",
+      "delivery": "Delivery",
+      "actions": "Actions",
+      "download_pdf": "Download PDF",
+      "send_whatsapp": "Send WhatsApp",
+      "mark_diagnosed": "Mark as Diagnosed",
+      "record_approval": "Record Approval",
+      "mark_repaired": "Mark as Repaired",
+      "mark_delivered": "Mark as Delivered"
+    }
+  },
+  "customers": {
+    "title": "Customers",
+    "all_customers": "All Customers",
+    "search_placeholder": "Search customers...",
+    "total_customers": "Total Customers",
+    "with_outstanding": "With Outstanding",
+    "total_jobs": "Total Jobs",
+    "outstanding": "Outstanding",
+    "view_statement": "View Statement",
+    "record_payment": "Record Payment"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "add_item": "Add Item",
+    "search_placeholder": "Search inventory...",
+    "total_items": "Total Items",
+    "low_stock": "Low Stock",
+    "total_value": "Total Value",
+    "item_name": "Item Name",
+    "sku": "SKU",
+    "category": "Category",
+    "quantity": "Quantity",
+    "cost_price": "Cost Price",
+    "selling_price": "Selling Price",
+    "min_stock": "Min Stock Level",
+    "adjust_stock": "Adjust Stock",
+    "usage_history": "Usage History"
+  },
+  "team": {
+    "title": "Team",
+    "add_member": "Add Team Member",
+    "search_placeholder": "Search team members...",
+    "role": "Role",
+    "branch": "Branch",
+    "roles": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "technician": "Technician",
+      "receptionist": "Receptionist"
+    },
+    "edit_member": "Edit Member",
+    "reset_password": "Reset Password"
+  },
+  "settings": {
+    "title": "Settings",
+    "shop_details": "Shop Details",
+    "company_name": "Company Name",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "footer_text": "PDF Footer Text",
+    "language": "Language",
+    "language_description": "Select your preferred language",
+    "theme": "Theme",
+    "save_settings": "Save Settings"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "overview": "Overview",
+    "revenue": "Revenue",
+    "jobs_completed": "Jobs Completed",
+    "avg_repair_time": "Avg Repair Time",
+    "customer_satisfaction": "Customer Satisfaction",
+    "top_services": "Top Services",
+    "revenue_trend": "Revenue Trend",
+    "job_status_distribution": "Job Status Distribution"
+  },
+  "notifications": {
+    "job_created": "New job created",
+    "job_updated": "Job updated",
+    "payment_received": "Payment received",
+    "low_stock_alert": "Low stock alert"
+  }
+}
