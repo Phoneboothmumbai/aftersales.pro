@@ -233,15 +233,18 @@ export default function Landing() {
             <div className="md:hidden py-4 border-t border-border">
               <div className="flex flex-col gap-4">
                 <a href="#features" className="text-muted-foreground hover:text-foreground">
-                  Features
+                  {t("landing.footer.features")}
                 </a>
                 <a href="#pricing" className="text-muted-foreground hover:text-foreground">
-                  Pricing
+                  {t("landing.footer.pricing")}
                 </a>
+                <div className="flex items-center gap-2">
+                  <LanguageSelector showLabel />
+                </div>
                 <Button variant="ghost" onClick={() => navigate("/login")} className="justify-start">
-                  Login
+                  {t("auth.login.submit")}
                 </Button>
-                <Button onClick={() => navigate("/signup")}>Start Free Trial</Button>
+                <Button onClick={() => navigate("/signup")}>{t("landing.cta.button")}</Button>
               </div>
             </div>
           )}
