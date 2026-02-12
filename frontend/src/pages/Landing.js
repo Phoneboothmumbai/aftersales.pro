@@ -391,8 +391,8 @@ export default function Landing() {
       <section id="pricing" className="py-20 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Simple, transparent pricing</h2>
-            <p className="text-lg text-muted-foreground">Start free, scale as you grow</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t("landing.pricing.title")}</h2>
+            <p className="text-lg text-muted-foreground">{t("landing.pricing.subtitle")}</p>
           </div>
           {loadingPlans ? (
             <div className="flex justify-center items-center py-12">
