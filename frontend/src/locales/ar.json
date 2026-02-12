@@ -34,21 +34,21 @@
   },
   "landing": {
     "hero": {
-      "title": "بسّط عمليات متجر الإصلاح الخاص بك",
+      "title": "إدارة ورشة الإصلاح, بسهولة",
       "subtitle": "الحل الشامل لإدارة أعمال الإصلاح وتتبع المخزون وإسعاد عملائك",
       "cta": "ابدأ مجاناً",
-      "cta_login": "تسجيل الدخول للوحة التحكم"
+      "cta_login": "تسجيل الدخول"
     },
     "features": {
-      "title": "كل ما تحتاجه لتشغيل متجر الإصلاح",
+      "title": "كل ما تحتاجه لتشغيل ورشة الإصلاح",
       "subtitle": "ميزات قوية مصممة خصيصاً لأعمال الإصلاح",
       "job_management": {
         "title": "إدارة الأعمال",
-        "description": "تتبع كل عملية إصلاح من الاستلام إلى التسليم بنظام سير عمل بديهي"
+        "description": "تتبع كل إصلاح من الاستلام حتى التسليم مع نظام سير العمل البديهي"
       },
       "inventory": {
         "title": "التحكم في المخزون",
-        "description": "إدارة القطع والمستلزمات مع تتبع المخزون في الوقت الفعلي"
+        "description": "إدارة القطع واللوازم مع تتبع المخزون الفوري وتنبيهات انخفاض المخزون"
       },
       "customer": {
         "title": "إدارة العملاء",
@@ -56,11 +56,11 @@
       },
       "analytics": {
         "title": "التحليلات والتقارير",
-        "description": "اتخذ قرارات مبنية على البيانات برؤى أعمال شاملة"
+        "description": "اتخذ قرارات مبنية على البيانات مع رؤى الأعمال الشاملة"
       },
       "whatsapp": {
         "title": "تكامل واتساب",
-        "description": "إرسال تحديثات تلقائية للعملاء عبر واتساب بنقرة واحدة"
+        "description": "أرسل تحديثات تلقائية للعملاء عبر واتساب بنقرة واحدة"
       },
       "multi_branch": {
         "title": "دعم الفروع المتعددة",
@@ -76,19 +76,19 @@
       "popular": "الأكثر شعبية",
       "get_started": "ابدأ الآن",
       "current_plan": "الخطة الحالية",
-      "features_included": "الميزات المشمولة:",
+      "features_included": "الميزات المتضمنة:",
       "users": "مستخدمين",
       "branches": "فروع",
-      "jobs_month": "أعمال/شهر",
+      "jobs_month": "عمل/شهر",
       "unlimited": "غير محدود"
     },
     "testimonials": {
-      "title": "موثوق به من متاجر الإصلاح حول العالم",
+      "title": "موثوق به من ورش الإصلاح حول العالم",
       "subtitle": "شاهد ما يقوله عملاؤنا"
     },
     "cta": {
-      "title": "هل أنت مستعد لتحويل عملك في الإصلاح؟",
-      "subtitle": "انضم إلى آلاف متاجر الإصلاح التي تستخدم AfterSales Pro",
+      "title": "مستعد لتحويل عملك في الإصلاح؟",
+      "subtitle": "انضم إلى آلاف ورش الإصلاح التي تستخدم AfterSales Pro",
       "button": "ابدأ التجربة المجانية"
     },
     "footer": {
@@ -109,9 +109,9 @@
   "auth": {
     "login": {
       "title": "مرحباً بعودتك",
-      "subtitle": "سجّل الدخول إلى حسابك",
-      "subdomain": "النطاق الفرعي للمتجر",
-      "subdomain_placeholder": "yourshop",
+      "subtitle": "سجل الدخول إلى حسابك",
+      "subdomain": "نطاق المتجر الفرعي",
+      "subdomain_placeholder": "متجرك",
       "email": "البريد الإلكتروني",
       "email_placeholder": "you@example.com",
       "password": "كلمة المرور",
@@ -120,7 +120,7 @@
       "forgot_password": "نسيت كلمة المرور؟",
       "submit": "تسجيل الدخول",
       "no_account": "ليس لديك حساب؟",
-      "signup_link": "سجّل الآن"
+      "signup_link": "سجل الآن"
     },
     "signup": {
       "title": "أنشئ حسابك",
@@ -128,20 +128,20 @@
       "step1": "تفاصيل المتجر",
       "step2": "إعداد الحساب",
       "company_name": "اسم المتجر / الشركة",
-      "company_placeholder": "متجر نيوستور للإصلاح",
+      "company_placeholder": "إصلاحات نيوستور",
       "subdomain": "اختر نطاقك الفرعي",
       "subdomain_suffix": ".aftersales.pro",
-      "phone": "رقم الجوال",
-      "phone_placeholder": "9876543210",
+      "phone": "رقم الهاتف",
+      "phone_placeholder": "0501234567",
       "address": "عنوان المتجر",
-      "address_placeholder": "123، الشارع الرئيسي، المدينة",
+      "address_placeholder": "123 الشارع الرئيسي، المدينة",
       "your_name": "اسمك",
       "your_email": "البريد الإلكتروني",
       "password": "كلمة المرور",
       "confirm_password": "تأكيد كلمة المرور",
       "submit": "إنشاء الحساب",
-      "have_account": "لديك حساب بالفعل؟",
-      "login_link": "سجّل الدخول",
+      "have_account": "لديك حساب؟",
+      "login_link": "تسجيل الدخول",
       "checking_availability": "جاري التحقق...",
       "available": "متاح!",
       "taken": "مستخدم بالفعل"
@@ -157,20 +157,20 @@
     "stats": {
       "total_jobs": "إجمالي الأعمال",
       "pending_jobs": "أعمال معلقة",
-      "completed_today": "مكتملة اليوم",
+      "completed_today": "مكتمل اليوم",
       "revenue_today": "إيرادات اليوم",
-      "ready_delivery": "جاهزة للتسليم",
+      "ready_delivery": "جاهز للتسليم",
       "in_progress": "قيد التنفيذ"
     },
     "recent_jobs": "الأعمال الأخيرة",
     "quick_actions": "إجراءات سريعة",
     "new_job": "عمل جديد",
-    "view_all_jobs": "عرض جميع الأعمال"
+    "view_all_jobs": "عرض كل الأعمال"
   },
   "jobs": {
     "title": "الأعمال",
     "new_job": "عمل جديد",
-    "all_jobs": "جميع الأعمال",
+    "all_jobs": "كل الأعمال",
     "search_placeholder": "البحث برقم العمل، العميل...",
     "filter_status": "تصفية حسب الحالة",
     "filter_date": "تصفية حسب التاريخ",
@@ -189,51 +189,18 @@
       "delivered": "تم التسليم",
       "closed": "مغلق",
       "cancelled": "ملغي"
-    },
-    "create": {
-      "title": "إنشاء عمل جديد",
-      "customer_details": "تفاصيل العميل",
-      "device_details": "تفاصيل الجهاز",
-      "problem_details": "تفاصيل المشكلة",
-      "accessories": "الملحقات",
-      "customer_name": "اسم العميل",
-      "mobile": "رقم الجوال",
-      "device_type": "نوع الجهاز",
-      "brand": "العلامة التجارية",
-      "model": "الموديل",
-      "serial_imei": "الرقم التسلسلي/IMEI (اختياري)",
-      "condition": "حالة الجهاز (اختياري)",
-      "unlock_pattern": "نمط/كلمة مرور الفتح",
-      "problem_description": "وصف المشكلة",
-      "submit": "إنشاء العمل"
-    },
-    "detail": {
-      "job_info": "معلومات العمل",
-      "timeline": "الجدول الزمني",
-      "photos": "الصور",
-      "diagnosis": "التشخيص",
-      "approval": "الموافقة",
-      "repair": "تفاصيل الإصلاح",
-      "delivery": "التسليم",
-      "actions": "الإجراءات",
-      "download_pdf": "تحميل PDF",
-      "send_whatsapp": "إرسال واتساب",
-      "mark_diagnosed": "تحديد كمشخص",
-      "record_approval": "تسجيل الموافقة",
-      "mark_repaired": "تحديد كمُصلح",
-      "mark_delivered": "تحديد كمُسلّم"
     }
   },
   "customers": {
     "title": "العملاء",
-    "all_customers": "جميع العملاء",
+    "all_customers": "كل العملاء",
     "search_placeholder": "البحث عن عملاء...",
     "total_customers": "إجمالي العملاء",
-    "with_outstanding": "لديهم مستحقات",
+    "with_outstanding": "مع مستحقات",
     "total_jobs": "إجمالي الأعمال",
     "outstanding": "المستحقات",
     "view_statement": "عرض كشف الحساب",
-    "record_payment": "تسجيل الدفع"
+    "record_payment": "تسجيل دفعة"
   },
   "inventory": {
     "title": "المخزون",
@@ -251,21 +218,6 @@
     "min_stock": "الحد الأدنى للمخزون",
     "adjust_stock": "تعديل المخزون",
     "usage_history": "سجل الاستخدام"
-  },
-  "team": {
-    "title": "الفريق",
-    "add_member": "إضافة عضو",
-    "search_placeholder": "البحث عن أعضاء...",
-    "role": "الدور",
-    "branch": "الفرع",
-    "roles": {
-      "admin": "مدير",
-      "manager": "مشرف",
-      "technician": "فني",
-      "receptionist": "استقبال"
-    },
-    "edit_member": "تعديل العضو",
-    "reset_password": "إعادة تعيين كلمة المرور"
   },
   "settings": {
     "title": "الإعدادات",
@@ -289,7 +241,7 @@
     "customer_satisfaction": "رضا العملاء",
     "top_services": "أفضل الخدمات",
     "revenue_trend": "اتجاه الإيرادات",
-    "job_status_distribution": "توزيع حالة الأعمال"
+    "job_status_distribution": "توزيع حالات العمل"
   },
   "notifications": {
     "job_created": "تم إنشاء عمل جديد",

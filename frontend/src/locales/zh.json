@@ -12,7 +12,7 @@
     "status": "状态",
     "date": "日期",
     "name": "姓名",
-    "email": "电子邮件",
+    "email": "邮箱",
     "phone": "电话",
     "address": "地址",
     "submit": "提交",
@@ -34,33 +34,33 @@
   },
   "landing": {
     "hero": {
-      "title": "简化您的维修店运营",
-      "subtitle": "管理维修工作、跟踪库存、让客户满意的完整解决方案",
+      "title": "维修店管理, 化繁为简",
+      "subtitle": "管理维修工单、追踪库存、提升客户满意度的一站式解决方案",
       "cta": "免费开始",
       "cta_login": "登录控制台"
     },
     "features": {
       "title": "运营维修店所需的一切",
-      "subtitle": "专为维修企业设计的强大功能",
+      "subtitle": "专为维修业务设计的强大功能",
       "job_management": {
         "title": "工单管理",
-        "description": "通过直观的工作流程系统跟踪从接收到交付的每一项维修"
+        "description": "通过直观的工作流系统追踪每次维修从接收到交付的全过程"
       },
       "inventory": {
-        "title": "库存控制",
-        "description": "实时库存跟踪和低库存警报管理零件和耗材"
+        "title": "库存管理",
+        "description": "实时库存追踪和低库存提醒，轻松管理零件和物料"
       },
       "customer": {
         "title": "客户管理",
-        "description": "通过完整的客户历史记录和沟通工具建立持久关系"
+        "description": "完整的客户历史记录和沟通工具，建立持久的客户关系"
       },
       "analytics": {
-        "title": "分析与报告",
+        "title": "数据分析与报表",
         "description": "通过全面的业务洞察做出数据驱动的决策"
       },
       "whatsapp": {
-        "title": "WhatsApp集成",
-        "description": "一键通过WhatsApp向客户发送自动更新"
+        "title": "WhatsApp 集成",
+        "description": "一键通过 WhatsApp 向客户发送自动更新"
       },
       "multi_branch": {
         "title": "多门店支持",
@@ -70,32 +70,32 @@
     "pricing": {
       "title": "简单透明的定价",
       "subtitle": "选择适合您业务的方案",
-      "monthly": "每月",
-      "yearly": "每年",
+      "monthly": "月付",
+      "yearly": "年付",
       "forever": "永久",
       "popular": "最受欢迎",
-      "get_started": "开始使用",
+      "get_started": "立即开始",
       "current_plan": "当前方案",
-      "features_included": "包含功能：",
+      "features_included": "包含功能:",
       "users": "用户",
       "branches": "门店",
       "jobs_month": "工单/月",
-      "unlimited": "无限"
+      "unlimited": "无限制"
     },
     "testimonials": {
       "title": "全球维修店的信赖之选",
       "subtitle": "看看我们的客户怎么说"
     },
     "cta": {
-      "title": "准备好改变您的维修业务了吗？",
-      "subtitle": "加入已经使用AfterSales Pro的数千家维修店",
+      "title": "准备好转型您的维修业务了吗？",
+      "subtitle": "加入已经在使用 AfterSales Pro 的数千家维修店",
       "button": "开始免费试用"
     },
     "footer": {
       "product": "产品",
       "features": "功能",
-      "pricing": "价格",
-      "contact": "联系",
+      "pricing": "定价",
+      "contact": "联系我们",
       "company": "公司",
       "about": "关于我们",
       "privacy": "隐私政策",
@@ -103,7 +103,7 @@
       "support": "支持",
       "help": "帮助中心",
       "documentation": "文档",
-      "copyright": "© 2026 AfterSales Pro. 版权所有。"
+      "copyright": "© 2026 AfterSales Pro. 保留所有权利。"
     }
   },
   "auth": {
@@ -111,15 +111,15 @@
       "title": "欢迎回来",
       "subtitle": "登录您的账户",
       "subdomain": "店铺子域名",
-      "subdomain_placeholder": "yourshop",
-      "email": "电子邮件地址",
+      "subdomain_placeholder": "您的店铺",
+      "email": "邮箱地址",
       "email_placeholder": "you@example.com",
       "password": "密码",
       "password_placeholder": "输入您的密码",
       "remember_me": "记住我",
       "forgot_password": "忘记密码？",
       "submit": "登录",
-      "no_account": "还没有账户？",
+      "no_account": "没有账户？",
       "signup_link": "立即注册"
     },
     "signup": {
@@ -128,21 +128,21 @@
       "step1": "店铺详情",
       "step2": "账户设置",
       "company_name": "店铺/公司名称",
-      "company_placeholder": "NeoStore维修店",
+      "company_placeholder": "新星维修店",
       "subdomain": "选择您的子域名",
       "subdomain_suffix": ".aftersales.pro",
       "phone": "手机号码",
       "phone_placeholder": "13800138000",
       "address": "店铺地址",
-      "address_placeholder": "123号，主街，城市",
+      "address_placeholder": "123号 主街 城市",
       "your_name": "您的姓名",
-      "your_email": "电子邮件地址",
+      "your_email": "邮箱地址",
       "password": "密码",
       "confirm_password": "确认密码",
       "submit": "创建账户",
       "have_account": "已有账户？",
       "login_link": "登录",
-      "checking_availability": "检查可用性...",
+      "checking_availability": "正在检查可用性...",
       "available": "可用！",
       "taken": "已被使用"
     }
@@ -163,7 +163,7 @@
       "in_progress": "进行中"
     },
     "recent_jobs": "最近工单",
-    "quick_actions": "快捷操作",
+    "quick_actions": "快速操作",
     "new_job": "新建工单",
     "view_all_jobs": "查看所有工单"
   },
@@ -171,7 +171,7 @@
     "title": "工单",
     "new_job": "新建工单",
     "all_jobs": "所有工单",
-    "search_placeholder": "按工单号、客户搜索...",
+    "search_placeholder": "搜索工单号、客户...",
     "filter_status": "按状态筛选",
     "filter_date": "按日期筛选",
     "job_number": "工单号",
@@ -183,45 +183,12 @@
     "statuses": {
       "received": "已接收",
       "diagnosed": "已诊断",
-      "waiting_approval": "等待批准",
+      "waiting_approval": "待批准",
       "in_progress": "进行中",
       "repaired": "已维修",
       "delivered": "已交付",
       "closed": "已关闭",
       "cancelled": "已取消"
-    },
-    "create": {
-      "title": "创建新工单",
-      "customer_details": "客户详情",
-      "device_details": "设备详情",
-      "problem_details": "问题详情",
-      "accessories": "配件",
-      "customer_name": "客户姓名",
-      "mobile": "手机号码",
-      "device_type": "设备类型",
-      "brand": "品牌",
-      "model": "型号",
-      "serial_imei": "序列号/IMEI（可选）",
-      "condition": "设备状况（可选）",
-      "unlock_pattern": "解锁图案/密码",
-      "problem_description": "问题描述",
-      "submit": "创建工单"
-    },
-    "detail": {
-      "job_info": "工单信息",
-      "timeline": "状态时间线",
-      "photos": "照片",
-      "diagnosis": "诊断",
-      "approval": "批准",
-      "repair": "维修详情",
-      "delivery": "交付",
-      "actions": "操作",
-      "download_pdf": "下载PDF",
-      "send_whatsapp": "发送WhatsApp",
-      "mark_diagnosed": "标记为已诊断",
-      "record_approval": "记录批准",
-      "mark_repaired": "标记为已维修",
-      "mark_delivered": "标记为已交付"
     }
   },
   "customers": {
@@ -232,14 +199,14 @@
     "with_outstanding": "有欠款",
     "total_jobs": "总工单数",
     "outstanding": "欠款",
-    "view_statement": "查看对账单",
+    "view_statement": "查看账单",
     "record_payment": "记录付款"
   },
   "inventory": {
     "title": "库存",
     "add_item": "添加物品",
     "search_placeholder": "搜索库存...",
-    "total_items": "总物品数",
+    "total_items": "物品总数",
     "low_stock": "低库存",
     "total_value": "总价值",
     "item_name": "物品名称",
@@ -252,28 +219,13 @@
     "adjust_stock": "调整库存",
     "usage_history": "使用历史"
   },
-  "team": {
-    "title": "团队",
-    "add_member": "添加成员",
-    "search_placeholder": "搜索成员...",
-    "role": "角色",
-    "branch": "门店",
-    "roles": {
-      "admin": "管理员",
-      "manager": "经理",
-      "technician": "技术员",
-      "receptionist": "前台"
-    },
-    "edit_member": "编辑成员",
-    "reset_password": "重置密码"
-  },
   "settings": {
     "title": "设置",
     "shop_details": "店铺详情",
     "company_name": "公司名称",
     "address": "地址",
     "phone": "电话",
-    "email": "电子邮件",
+    "email": "邮箱",
     "footer_text": "PDF页脚文字",
     "language": "语言",
     "language_description": "选择您的首选语言",
@@ -281,7 +233,7 @@
     "save_settings": "保存设置"
   },
   "analytics": {
-    "title": "分析",
+    "title": "数据分析",
     "overview": "概览",
     "revenue": "收入",
     "jobs_completed": "完成工单数",
@@ -295,6 +247,6 @@
     "job_created": "新工单已创建",
     "job_updated": "工单已更新",
     "payment_received": "已收到付款",
-    "low_stock_alert": "低库存警报"
+    "low_stock_alert": "低库存提醒"
   }
 }
