@@ -154,21 +154,18 @@ export default function Landing() {
   const features = [
     {
       icon: ClipboardList,
-      title: "Digital Job Sheets",
-      description:
-        "Create professional job sheets with customer info, device details, and accessories checklist. Never lose track of a device again.",
+      title: t("landing.features.job_management.title"),
+      description: t("landing.features.job_management.description"),
     },
     {
       icon: MessageSquare,
-      title: "WhatsApp Updates",
-      description:
-        "Send instant status updates to customers via WhatsApp. One click, professional communication.",
+      title: t("landing.features.whatsapp.title"),
+      description: t("landing.features.whatsapp.description"),
     },
     {
       icon: BarChart3,
-      title: "Real-time Dashboard",
-      description:
-        "Track all jobs at a glance. Know what's pending, what's ready, and what needs attention.",
+      title: t("landing.features.analytics.title"),
+      description: t("landing.features.analytics.description"),
     },
     {
       icon: Shield,
@@ -184,9 +181,8 @@ export default function Landing() {
     },
     {
       icon: Wrench,
-      title: "Multi-Branch Ready",
-      description:
-        "Manage multiple shop locations from a single dashboard. Perfect for growing businesses.",
+      title: t("landing.features.multi_branch.title"),
+      description: t("landing.features.multi_branch.description"),
     },
   ];
 
