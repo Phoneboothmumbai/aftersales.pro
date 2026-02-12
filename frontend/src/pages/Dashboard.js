@@ -50,14 +50,14 @@ export default function Dashboard() {
 
   const statCards = [
     {
-      title: "Total Jobs",
+      title: t("dashboard.stats.total_jobs"),
       value: stats?.total || 0,
       icon: ClipboardList,
       color: "text-primary",
       bgColor: "bg-primary/10",
     },
     {
-      title: "Pending Diagnosis",
+      title: t("dashboard.stats.pending_jobs"),
       value: stats?.received || 0,
       icon: Clock,
       color: "text-blue-500",
@@ -71,21 +71,21 @@ export default function Dashboard() {
       bgColor: "bg-orange-500/10",
     },
     {
-      title: "Ready for Delivery",
+      title: t("dashboard.stats.ready_delivery"),
       value: stats?.repaired || 0,
       icon: CheckCircle,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
     },
     {
-      title: "Completed Today",
+      title: t("dashboard.stats.completed_today"),
       value: stats?.closed || 0,
       icon: Package,
       color: "text-gray-500",
       bgColor: "bg-gray-500/10",
     },
     {
-      title: "Jobs Today",
+      title: t("dashboard.today"),
       value: stats?.today || 0,
       icon: Wrench,
       color: "text-purple-500",
