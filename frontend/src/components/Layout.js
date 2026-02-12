@@ -179,6 +179,7 @@ export const Layout = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            <LanguageSelector variant="ghost" />
             <Button
               variant="ghost"
               size="icon"
