@@ -136,9 +136,9 @@ export default function Dashboard() {
         {/* Recent Jobs */}
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Jobs</CardTitle>
+            <CardTitle>{t("dashboard.recent_jobs")}</CardTitle>
             <Button variant="ghost" onClick={() => navigate("/jobs")} data-testid="view-all-jobs-btn">
-              View all
+              {t("dashboard.view_all_jobs")}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </CardHeader>
