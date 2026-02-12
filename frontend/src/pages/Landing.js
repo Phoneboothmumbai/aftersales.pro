@@ -408,7 +408,7 @@ export default function Landing() {
                   {isPopular(plan, index) && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-full">
-                        Most Popular
+                        {t("landing.pricing.popular")}
                       </span>
                     </div>
                   )}
