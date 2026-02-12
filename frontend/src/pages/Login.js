@@ -44,6 +44,11 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {/* Language Selector */}
+        <div className="flex justify-end mb-4">
+          <LanguageSelector variant="ghost" showLabel />
+        </div>
+
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
@@ -56,8 +61,8 @@ export default function Login() {
 
         <Card className="card-shadow">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>Login to your repair shop dashboard</CardDescription>
+            <CardTitle className="text-2xl">{t("auth.login.title")}</CardTitle>
+            <CardDescription>{t("auth.login.subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,13 +74,13 @@ export default function Login() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="subdomain">Shop Subdomain</Label>
+                <Label htmlFor="subdomain">{t("auth.login.subdomain")}</Label>
                 <div className="flex">
                   <Input
                     id="subdomain"
                     name="subdomain"
                     type="text"
-                    placeholder="yourshop"
+                    placeholder={t("auth.login.subdomain_placeholder")}
                     value={formData.subdomain}
                     onChange={handleChange}
                     className="rounded-r-none"
@@ -89,12 +94,12 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.login.email")}</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t("auth.login.email_placeholder")}
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -103,13 +108,13 @@ export default function Login() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.login.password")}</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder={t("auth.login.password_placeholder")}
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -129,18 +134,18 @@ export default function Login() {
                 {loading ? (
                   <>
                     <span className="spinner mr-2" />
-                    Signing in...
+                    {t("common.loading")}
                   </>
                 ) : (
-                  "Sign In"
+                  t("auth.login.submit")
                 )}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Don't have an account? </span>
+              <span className="text-muted-foreground">{t("auth.login.no_account")} </span>
               <Link to="/signup" className="text-primary hover:underline" data-testid="login-signup-link">
-                Start free trial
+                {t("auth.login.signup_link")}
               </Link>
             </div>
           </CardContent>
@@ -148,7 +153,7 @@ export default function Login() {
 
         <div className="mt-6 text-center">
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Back to homepage
+            ← {t("common.back")} to homepage
           </Link>
         </div>
       </div>
