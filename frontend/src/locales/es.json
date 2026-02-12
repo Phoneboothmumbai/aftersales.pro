@@ -1,0 +1,300 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "actions": "Acciones",
+    "status": "Estado",
+    "date": "Fecha",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "submit": "Enviar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "yes": "Sí",
+    "no": "No",
+    "all": "Todos",
+    "none": "Ninguno",
+    "close": "Cerrar",
+    "view": "Ver",
+    "download": "Descargar",
+    "upload": "Subir",
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información"
+  },
+  "landing": {
+    "hero": {
+      "title": "Optimiza las operaciones de tu taller de reparación",
+      "subtitle": "La solución completa para gestionar trabajos de reparación, controlar inventario y deleitar a tus clientes",
+      "cta": "Comenzar gratis",
+      "cta_login": "Iniciar sesión en el panel"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para tu taller de reparación",
+      "subtitle": "Funciones potentes diseñadas específicamente para negocios de reparación",
+      "job_management": {
+        "title": "Gestión de trabajos",
+        "description": "Rastrea cada reparación desde la recepción hasta la entrega con nuestro sistema de flujo intuitivo"
+      },
+      "inventory": {
+        "title": "Control de inventario",
+        "description": "Gestiona piezas y suministros con seguimiento de stock en tiempo real y alertas de stock bajo"
+      },
+      "customer": {
+        "title": "Gestión de clientes",
+        "description": "Construye relaciones duraderas con historial completo de clientes y herramientas de comunicación"
+      },
+      "analytics": {
+        "title": "Análisis e informes",
+        "description": "Toma decisiones basadas en datos con información empresarial completa"
+      },
+      "whatsapp": {
+        "title": "Integración con WhatsApp",
+        "description": "Envía actualizaciones automáticas a clientes por WhatsApp con un solo clic"
+      },
+      "multi_branch": {
+        "title": "Soporte multisucursal",
+        "description": "Gestiona múltiples ubicaciones desde un solo panel"
+      }
+    },
+    "pricing": {
+      "title": "Precios simples y transparentes",
+      "subtitle": "Elige el plan que se adapte a tu negocio",
+      "monthly": "mensual",
+      "yearly": "anual",
+      "forever": "para siempre",
+      "popular": "Más popular",
+      "get_started": "Comenzar",
+      "current_plan": "Plan actual",
+      "features_included": "Características incluidas:",
+      "users": "usuarios",
+      "branches": "sucursales",
+      "jobs_month": "trabajos/mes",
+      "unlimited": "Ilimitado"
+    },
+    "testimonials": {
+      "title": "Confiado por talleres de reparación en todo el mundo",
+      "subtitle": "Mira lo que dicen nuestros clientes"
+    },
+    "cta": {
+      "title": "¿Listo para transformar tu negocio de reparación?",
+      "subtitle": "Únete a miles de talleres que ya usan AfterSales Pro",
+      "button": "Comenzar prueba gratuita"
+    },
+    "footer": {
+      "product": "Producto",
+      "features": "Características",
+      "pricing": "Precios",
+      "contact": "Contacto",
+      "company": "Empresa",
+      "about": "Sobre nosotros",
+      "privacy": "Política de privacidad",
+      "terms": "Términos de servicio",
+      "support": "Soporte",
+      "help": "Centro de ayuda",
+      "documentation": "Documentación",
+      "copyright": "© 2026 AfterSales Pro. Todos los derechos reservados."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Inicia sesión en tu cuenta",
+      "subdomain": "Subdominio de la tienda",
+      "subdomain_placeholder": "tutienda",
+      "email": "Correo electrónico",
+      "email_placeholder": "tu@ejemplo.com",
+      "password": "Contraseña",
+      "password_placeholder": "Ingresa tu contraseña",
+      "remember_me": "Recuérdame",
+      "forgot_password": "¿Olvidaste tu contraseña?",
+      "submit": "Iniciar sesión",
+      "no_account": "¿No tienes cuenta?",
+      "signup_link": "Regístrate ahora"
+    },
+    "signup": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Comienza tu prueba gratuita hoy",
+      "step1": "Detalles de la tienda",
+      "step2": "Configuración de cuenta",
+      "company_name": "Nombre de la tienda / Empresa",
+      "company_placeholder": "NeoStore Reparaciones",
+      "subdomain": "Elige tu subdominio",
+      "subdomain_suffix": ".aftersales.pro",
+      "phone": "Número de móvil",
+      "phone_placeholder": "9876543210",
+      "address": "Dirección de la tienda",
+      "address_placeholder": "Calle Principal 123, Ciudad",
+      "your_name": "Tu nombre",
+      "your_email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirm_password": "Confirmar contraseña",
+      "submit": "Crear cuenta",
+      "have_account": "¿Ya tienes cuenta?",
+      "login_link": "Inicia sesión",
+      "checking_availability": "Verificando disponibilidad...",
+      "available": "¡Disponible!",
+      "taken": "Ya está en uso"
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcome": "Bienvenido de nuevo",
+    "overview": "Resumen",
+    "today": "Hoy",
+    "this_week": "Esta semana",
+    "this_month": "Este mes",
+    "stats": {
+      "total_jobs": "Total de trabajos",
+      "pending_jobs": "Trabajos pendientes",
+      "completed_today": "Completados hoy",
+      "revenue_today": "Ingresos de hoy",
+      "ready_delivery": "Listos para entregar",
+      "in_progress": "En progreso"
+    },
+    "recent_jobs": "Trabajos recientes",
+    "quick_actions": "Acciones rápidas",
+    "new_job": "Nuevo trabajo",
+    "view_all_jobs": "Ver todos los trabajos"
+  },
+  "jobs": {
+    "title": "Trabajos",
+    "new_job": "Nuevo trabajo",
+    "all_jobs": "Todos los trabajos",
+    "search_placeholder": "Buscar por número de trabajo, cliente...",
+    "filter_status": "Filtrar por estado",
+    "filter_date": "Filtrar por fecha",
+    "job_number": "Número de trabajo",
+    "customer": "Cliente",
+    "device": "Dispositivo",
+    "problem": "Problema",
+    "status": "Estado",
+    "created": "Creado",
+    "statuses": {
+      "received": "Recibido",
+      "diagnosed": "Diagnosticado",
+      "waiting_approval": "Esperando aprobación",
+      "in_progress": "En progreso",
+      "repaired": "Reparado",
+      "delivered": "Entregado",
+      "closed": "Cerrado",
+      "cancelled": "Cancelado"
+    },
+    "create": {
+      "title": "Crear nuevo trabajo",
+      "customer_details": "Detalles del cliente",
+      "device_details": "Detalles del dispositivo",
+      "problem_details": "Detalles del problema",
+      "accessories": "Accesorios",
+      "customer_name": "Nombre del cliente",
+      "mobile": "Número de móvil",
+      "device_type": "Tipo de dispositivo",
+      "brand": "Marca",
+      "model": "Modelo",
+      "serial_imei": "Serial/IMEI (Opcional)",
+      "condition": "Condición del dispositivo (Opcional)",
+      "unlock_pattern": "Patrón/Contraseña de desbloqueo",
+      "problem_description": "Descripción del problema",
+      "submit": "Crear trabajo"
+    },
+    "detail": {
+      "job_info": "Información del trabajo",
+      "timeline": "Línea de tiempo",
+      "photos": "Fotos",
+      "diagnosis": "Diagnóstico",
+      "approval": "Aprobación",
+      "repair": "Detalles de reparación",
+      "delivery": "Entrega",
+      "actions": "Acciones",
+      "download_pdf": "Descargar PDF",
+      "send_whatsapp": "Enviar WhatsApp",
+      "mark_diagnosed": "Marcar como diagnosticado",
+      "record_approval": "Registrar aprobación",
+      "mark_repaired": "Marcar como reparado",
+      "mark_delivered": "Marcar como entregado"
+    }
+  },
+  "customers": {
+    "title": "Clientes",
+    "all_customers": "Todos los clientes",
+    "search_placeholder": "Buscar clientes...",
+    "total_customers": "Total de clientes",
+    "with_outstanding": "Con saldo pendiente",
+    "total_jobs": "Total de trabajos",
+    "outstanding": "Saldo pendiente",
+    "view_statement": "Ver estado de cuenta",
+    "record_payment": "Registrar pago"
+  },
+  "inventory": {
+    "title": "Inventario",
+    "add_item": "Agregar artículo",
+    "search_placeholder": "Buscar en inventario...",
+    "total_items": "Total de artículos",
+    "low_stock": "Stock bajo",
+    "total_value": "Valor total",
+    "item_name": "Nombre del artículo",
+    "sku": "SKU",
+    "category": "Categoría",
+    "quantity": "Cantidad",
+    "cost_price": "Precio de costo",
+    "selling_price": "Precio de venta",
+    "min_stock": "Stock mínimo",
+    "adjust_stock": "Ajustar stock",
+    "usage_history": "Historial de uso"
+  },
+  "team": {
+    "title": "Equipo",
+    "add_member": "Agregar miembro",
+    "search_placeholder": "Buscar miembros...",
+    "role": "Rol",
+    "branch": "Sucursal",
+    "roles": {
+      "admin": "Administrador",
+      "manager": "Gerente",
+      "technician": "Técnico",
+      "receptionist": "Recepcionista"
+    },
+    "edit_member": "Editar miembro",
+    "reset_password": "Restablecer contraseña"
+  },
+  "settings": {
+    "title": "Configuración",
+    "shop_details": "Detalles de la tienda",
+    "company_name": "Nombre de la empresa",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "email": "Correo electrónico",
+    "footer_text": "Texto de pie de PDF",
+    "language": "Idioma",
+    "language_description": "Selecciona tu idioma preferido",
+    "theme": "Tema",
+    "save_settings": "Guardar configuración"
+  },
+  "analytics": {
+    "title": "Análisis",
+    "overview": "Resumen",
+    "revenue": "Ingresos",
+    "jobs_completed": "Trabajos completados",
+    "avg_repair_time": "Tiempo promedio de reparación",
+    "customer_satisfaction": "Satisfacción del cliente",
+    "top_services": "Servicios principales",
+    "revenue_trend": "Tendencia de ingresos",
+    "job_status_distribution": "Distribución de estados"
+  },
+  "notifications": {
+    "job_created": "Nuevo trabajo creado",
+    "job_updated": "Trabajo actualizado",
+    "payment_received": "Pago recibido",
+    "low_stock_alert": "Alerta de stock bajo"
+  }
+}

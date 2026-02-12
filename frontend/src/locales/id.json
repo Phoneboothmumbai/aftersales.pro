@@ -1,0 +1,300 @@
+{
+  "common": {
+    "loading": "Memuat...",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "create": "Buat",
+    "search": "Cari",
+    "filter": "Filter",
+    "actions": "Aksi",
+    "status": "Status",
+    "date": "Tanggal",
+    "name": "Nama",
+    "email": "Email",
+    "phone": "Telepon",
+    "address": "Alamat",
+    "submit": "Kirim",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "previous": "Sebelumnya",
+    "yes": "Ya",
+    "no": "Tidak",
+    "all": "Semua",
+    "none": "Tidak ada",
+    "close": "Tutup",
+    "view": "Lihat",
+    "download": "Unduh",
+    "upload": "Unggah",
+    "success": "Berhasil",
+    "error": "Error",
+    "warning": "Peringatan",
+    "info": "Info"
+  },
+  "landing": {
+    "hero": {
+      "title": "Sederhanakan Operasi Toko Reparasi Anda",
+      "subtitle": "Solusi lengkap untuk mengelola pekerjaan reparasi, melacak inventaris, dan memuaskan pelanggan",
+      "cta": "Mulai Gratis",
+      "cta_login": "Login ke Dashboard"
+    },
+    "features": {
+      "title": "Semua yang Anda Butuhkan untuk Menjalankan Toko Reparasi",
+      "subtitle": "Fitur canggih yang dirancang khusus untuk bisnis reparasi",
+      "job_management": {
+        "title": "Manajemen Pekerjaan",
+        "description": "Lacak setiap reparasi dari penerimaan hingga pengiriman dengan sistem alur kerja intuitif"
+      },
+      "inventory": {
+        "title": "Kontrol Inventaris",
+        "description": "Kelola suku cadang dengan pelacakan stok real-time dan peringatan stok rendah"
+      },
+      "customer": {
+        "title": "Manajemen Pelanggan",
+        "description": "Bangun hubungan jangka panjang dengan riwayat pelanggan lengkap dan alat komunikasi"
+      },
+      "analytics": {
+        "title": "Analitik & Laporan",
+        "description": "Buat keputusan berbasis data dengan wawasan bisnis komprehensif"
+      },
+      "whatsapp": {
+        "title": "Integrasi WhatsApp",
+        "description": "Kirim pembaruan otomatis ke pelanggan via WhatsApp dengan satu klik"
+      },
+      "multi_branch": {
+        "title": "Dukungan Multi-Cabang",
+        "description": "Kelola beberapa lokasi dari satu dashboard"
+      }
+    },
+    "pricing": {
+      "title": "Harga Sederhana dan Transparan",
+      "subtitle": "Pilih paket yang sesuai dengan bisnis Anda",
+      "monthly": "bulanan",
+      "yearly": "tahunan",
+      "forever": "selamanya",
+      "popular": "Paling Populer",
+      "get_started": "Mulai",
+      "current_plan": "Paket Saat Ini",
+      "features_included": "Fitur termasuk:",
+      "users": "pengguna",
+      "branches": "cabang",
+      "jobs_month": "pekerjaan/bulan",
+      "unlimited": "Tak Terbatas"
+    },
+    "testimonials": {
+      "title": "Dipercaya oleh Toko Reparasi di Seluruh Dunia",
+      "subtitle": "Lihat apa kata pelanggan kami"
+    },
+    "cta": {
+      "title": "Siap Mengubah Bisnis Reparasi Anda?",
+      "subtitle": "Bergabunglah dengan ribuan toko reparasi yang sudah menggunakan AfterSales Pro",
+      "button": "Mulai Uji Coba Gratis"
+    },
+    "footer": {
+      "product": "Produk",
+      "features": "Fitur",
+      "pricing": "Harga",
+      "contact": "Kontak",
+      "company": "Perusahaan",
+      "about": "Tentang Kami",
+      "privacy": "Kebijakan Privasi",
+      "terms": "Ketentuan Layanan",
+      "support": "Dukungan",
+      "help": "Pusat Bantuan",
+      "documentation": "Dokumentasi",
+      "copyright": "© 2026 AfterSales Pro. Hak cipta dilindungi."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Selamat Datang Kembali",
+      "subtitle": "Masuk ke akun Anda",
+      "subdomain": "Subdomain Toko",
+      "subdomain_placeholder": "yourshop",
+      "email": "Alamat Email",
+      "email_placeholder": "you@example.com",
+      "password": "Kata Sandi",
+      "password_placeholder": "Masukkan kata sandi",
+      "remember_me": "Ingat saya",
+      "forgot_password": "Lupa kata sandi?",
+      "submit": "Masuk",
+      "no_account": "Belum punya akun?",
+      "signup_link": "Daftar sekarang"
+    },
+    "signup": {
+      "title": "Buat Akun Anda",
+      "subtitle": "Mulai uji coba gratis Anda hari ini",
+      "step1": "Detail Toko",
+      "step2": "Pengaturan Akun",
+      "company_name": "Nama Toko / Perusahaan",
+      "company_placeholder": "NeoStore Repairs",
+      "subdomain": "Pilih subdomain Anda",
+      "subdomain_suffix": ".aftersales.pro",
+      "phone": "Nomor HP",
+      "phone_placeholder": "08123456789",
+      "address": "Alamat Toko",
+      "address_placeholder": "Jl. Utama No. 123, Kota",
+      "your_name": "Nama Anda",
+      "your_email": "Alamat Email",
+      "password": "Kata Sandi",
+      "confirm_password": "Konfirmasi Kata Sandi",
+      "submit": "Buat Akun",
+      "have_account": "Sudah punya akun?",
+      "login_link": "Masuk",
+      "checking_availability": "Memeriksa ketersediaan...",
+      "available": "Tersedia!",
+      "taken": "Sudah digunakan"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Selamat datang kembali",
+    "overview": "Ringkasan",
+    "today": "Hari Ini",
+    "this_week": "Minggu Ini",
+    "this_month": "Bulan Ini",
+    "stats": {
+      "total_jobs": "Total Pekerjaan",
+      "pending_jobs": "Pekerjaan Tertunda",
+      "completed_today": "Selesai Hari Ini",
+      "revenue_today": "Pendapatan Hari Ini",
+      "ready_delivery": "Siap Dikirim",
+      "in_progress": "Dalam Proses"
+    },
+    "recent_jobs": "Pekerjaan Terbaru",
+    "quick_actions": "Aksi Cepat",
+    "new_job": "Pekerjaan Baru",
+    "view_all_jobs": "Lihat Semua Pekerjaan"
+  },
+  "jobs": {
+    "title": "Pekerjaan",
+    "new_job": "Pekerjaan Baru",
+    "all_jobs": "Semua Pekerjaan",
+    "search_placeholder": "Cari berdasarkan nomor pekerjaan, pelanggan...",
+    "filter_status": "Filter berdasarkan Status",
+    "filter_date": "Filter berdasarkan Tanggal",
+    "job_number": "Nomor Pekerjaan",
+    "customer": "Pelanggan",
+    "device": "Perangkat",
+    "problem": "Masalah",
+    "status": "Status",
+    "created": "Dibuat",
+    "statuses": {
+      "received": "Diterima",
+      "diagnosed": "Terdiagnosis",
+      "waiting_approval": "Menunggu Persetujuan",
+      "in_progress": "Dalam Proses",
+      "repaired": "Diperbaiki",
+      "delivered": "Terkirim",
+      "closed": "Ditutup",
+      "cancelled": "Dibatalkan"
+    },
+    "create": {
+      "title": "Buat Pekerjaan Baru",
+      "customer_details": "Detail Pelanggan",
+      "device_details": "Detail Perangkat",
+      "problem_details": "Detail Masalah",
+      "accessories": "Aksesori",
+      "customer_name": "Nama Pelanggan",
+      "mobile": "Nomor HP",
+      "device_type": "Jenis Perangkat",
+      "brand": "Merek",
+      "model": "Model",
+      "serial_imei": "Serial/IMEI (Opsional)",
+      "condition": "Kondisi Perangkat (Opsional)",
+      "unlock_pattern": "Pola/Password Unlock",
+      "problem_description": "Deskripsi Masalah",
+      "submit": "Buat Pekerjaan"
+    },
+    "detail": {
+      "job_info": "Info Pekerjaan",
+      "timeline": "Timeline Status",
+      "photos": "Foto",
+      "diagnosis": "Diagnosis",
+      "approval": "Persetujuan",
+      "repair": "Detail Reparasi",
+      "delivery": "Pengiriman",
+      "actions": "Aksi",
+      "download_pdf": "Unduh PDF",
+      "send_whatsapp": "Kirim WhatsApp",
+      "mark_diagnosed": "Tandai Terdiagnosis",
+      "record_approval": "Catat Persetujuan",
+      "mark_repaired": "Tandai Diperbaiki",
+      "mark_delivered": "Tandai Terkirim"
+    }
+  },
+  "customers": {
+    "title": "Pelanggan",
+    "all_customers": "Semua Pelanggan",
+    "search_placeholder": "Cari pelanggan...",
+    "total_customers": "Total Pelanggan",
+    "with_outstanding": "Dengan Tagihan",
+    "total_jobs": "Total Pekerjaan",
+    "outstanding": "Tagihan",
+    "view_statement": "Lihat Laporan",
+    "record_payment": "Catat Pembayaran"
+  },
+  "inventory": {
+    "title": "Inventaris",
+    "add_item": "Tambah Item",
+    "search_placeholder": "Cari inventaris...",
+    "total_items": "Total Item",
+    "low_stock": "Stok Rendah",
+    "total_value": "Total Nilai",
+    "item_name": "Nama Item",
+    "sku": "SKU",
+    "category": "Kategori",
+    "quantity": "Jumlah",
+    "cost_price": "Harga Modal",
+    "selling_price": "Harga Jual",
+    "min_stock": "Stok Minimum",
+    "adjust_stock": "Sesuaikan Stok",
+    "usage_history": "Riwayat Penggunaan"
+  },
+  "team": {
+    "title": "Tim",
+    "add_member": "Tambah Anggota",
+    "search_placeholder": "Cari anggota...",
+    "role": "Peran",
+    "branch": "Cabang",
+    "roles": {
+      "admin": "Admin",
+      "manager": "Manajer",
+      "technician": "Teknisi",
+      "receptionist": "Resepsionis"
+    },
+    "edit_member": "Edit Anggota",
+    "reset_password": "Reset Password"
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "shop_details": "Detail Toko",
+    "company_name": "Nama Perusahaan",
+    "address": "Alamat",
+    "phone": "Telepon",
+    "email": "Email",
+    "footer_text": "Teks Footer PDF",
+    "language": "Bahasa",
+    "language_description": "Pilih bahasa pilihan Anda",
+    "theme": "Tema",
+    "save_settings": "Simpan Pengaturan"
+  },
+  "analytics": {
+    "title": "Analitik",
+    "overview": "Ringkasan",
+    "revenue": "Pendapatan",
+    "jobs_completed": "Pekerjaan Selesai",
+    "avg_repair_time": "Rata-rata Waktu Reparasi",
+    "customer_satisfaction": "Kepuasan Pelanggan",
+    "top_services": "Layanan Teratas",
+    "revenue_trend": "Tren Pendapatan",
+    "job_status_distribution": "Distribusi Status Pekerjaan"
+  },
+  "notifications": {
+    "job_created": "Pekerjaan baru dibuat",
+    "job_updated": "Pekerjaan diperbarui",
+    "payment_received": "Pembayaran diterima",
+    "low_stock_alert": "Peringatan stok rendah"
+  }
+}
