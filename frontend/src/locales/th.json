@@ -34,37 +34,37 @@
   },
   "landing": {
     "hero": {
-      "title": "จัดการร้านซ่อมของคุณอย่างมีประสิทธิภาพ",
-      "subtitle": "โซลูชันครบวงจรสำหรับจัดการงานซ่อม ติดตามสินค้าคงคลัง และสร้างความพึงพอใจให้ลูกค้า",
+      "title": "การจัดการร้านซ่อม, ทำให้ง่ายขึ้น",
+      "subtitle": "โซลูชันครบวงจรสำหรับจัดการงานซ่อม ติดตามสินค้าคงคลัง และทำให้ลูกค้าพอใจ",
       "cta": "เริ่มต้นฟรี",
-      "cta_login": "เข้าสู่ระบบ"
+      "cta_login": "เข้าสู่แดชบอร์ด"
     },
     "features": {
-      "title": "ทุกสิ่งที่คุณต้องการสำหรับร้านซ่อม",
-      "subtitle": "ฟีเจอร์ที่ออกแบบมาสำหรับธุรกิจซ่อมโดยเฉพาะ",
+      "title": "ทุกสิ่งที่คุณต้องการเพื่อบริหารร้านซ่อม",
+      "subtitle": "ฟีเจอร์ทรงพลังที่ออกแบบมาเฉพาะสำหรับธุรกิจซ่อม",
       "job_management": {
-        "title": "จัดการงานซ่อม",
-        "description": "ติดตามทุกงานซ่อมตั้งแต่รับเครื่องจนถึงส่งมอบด้วยระบบที่ใช้งานง่าย"
+        "title": "การจัดการงาน",
+        "description": "ติดตามการซ่อมทุกชิ้นตั้งแต่รับเข้าจนถึงส่งมอบด้วยระบบเวิร์กโฟลว์ที่ใช้งานง่าย"
       },
       "inventory": {
-        "title": "ควบคุมสินค้าคงคลัง",
-        "description": "จัดการอะไหล่และอุปกรณ์ด้วยการติดตามสต็อกแบบเรียลไทม์"
+        "title": "การควบคุมสินค้าคงคลัง",
+        "description": "จัดการอะไหล่และวัสดุสิ้นเปลืองด้วยการติดตามสต็อกแบบเรียลไทม์และการแจ้งเตือนสินค้าใกล้หมด"
       },
       "customer": {
-        "title": "จัดการลูกค้า",
-        "description": "สร้างความสัมพันธ์กับลูกค้าด้วยประวัติและเครื่องมือสื่อสาร"
+        "title": "การจัดการลูกค้า",
+        "description": "สร้างความสัมพันธ์ที่ยั่งยืนด้วยประวัติลูกค้าครบถ้วนและเครื่องมือสื่อสาร"
       },
       "analytics": {
-        "title": "วิเคราะห์และรายงาน",
-        "description": "ตัดสินใจอย่างชาญฉลาดด้วยข้อมูลเชิงลึกทางธุรกิจ"
+        "title": "การวิเคราะห์และรายงาน",
+        "description": "ตัดสินใจจากข้อมูลด้วยข้อมูลเชิงลึกทางธุรกิจที่ครบถ้วน"
       },
       "whatsapp": {
-        "title": "เชื่อมต่อ WhatsApp",
-        "description": "ส่งการอัปเดตอัตโนมัติให้ลูกค้าผ่าน WhatsApp"
+        "title": "การเชื่อมต่อ WhatsApp",
+        "description": "ส่งอัปเดตอัตโนมัติให้ลูกค้าทาง WhatsApp ด้วยคลิกเดียว"
       },
       "multi_branch": {
         "title": "รองรับหลายสาขา",
-        "description": "จัดการหลายสาขาจากแดชบอร์ดเดียว"
+        "description": "จัดการหลายสถานที่จากแดชบอร์ดเดียว"
       }
     },
     "pricing": {
@@ -76,7 +76,7 @@
       "popular": "ยอดนิยม",
       "get_started": "เริ่มต้น",
       "current_plan": "แผนปัจจุบัน",
-      "features_included": "ฟีเจอร์ที่รวมอยู่:",
+      "features_included": "ฟีเจอร์ที่รวม:",
       "users": "ผู้ใช้",
       "branches": "สาขา",
       "jobs_month": "งาน/เดือน",
@@ -84,12 +84,12 @@
     },
     "testimonials": {
       "title": "ได้รับความไว้วางใจจากร้านซ่อมทั่วโลก",
-      "subtitle": "ดูความคิดเห็นจากลูกค้าของเรา"
+      "subtitle": "ดูว่าลูกค้าของเราพูดอะไร"
     },
     "cta": {
       "title": "พร้อมที่จะเปลี่ยนแปลงธุรกิจซ่อมของคุณหรือยัง?",
-      "subtitle": "เข้าร่วมกับร้านซ่อมหลายพันแห่งที่ใช้ AfterSales Pro",
-      "button": "เริ่มทดลองใช้ฟรี"
+      "subtitle": "เข้าร่วมกับร้านซ่อมหลายพันแห่งที่ใช้ AfterSales Pro แล้ว",
+      "button": "เริ่มทดลองฟรี"
     },
     "footer": {
       "product": "ผลิตภัณฑ์",
@@ -99,11 +99,11 @@
       "company": "บริษัท",
       "about": "เกี่ยวกับเรา",
       "privacy": "นโยบายความเป็นส่วนตัว",
-      "terms": "ข้อกำหนดการให้บริการ",
+      "terms": "ข้อกำหนดการใช้งาน",
       "support": "สนับสนุน",
       "help": "ศูนย์ช่วยเหลือ",
       "documentation": "เอกสาร",
-      "copyright": "© 2026 AfterSales Pro สงวนลิขสิทธิ์"
+      "copyright": "© 2026 AfterSales Pro. สงวนลิขสิทธิ์"
     }
   },
   "auth": {
@@ -111,7 +111,7 @@
       "title": "ยินดีต้อนรับกลับ",
       "subtitle": "เข้าสู่ระบบบัญชีของคุณ",
       "subdomain": "ซับโดเมนร้าน",
-      "subdomain_placeholder": "yourshop",
+      "subdomain_placeholder": "ร้านของคุณ",
       "email": "ที่อยู่อีเมล",
       "email_placeholder": "you@example.com",
       "password": "รหัสผ่าน",
@@ -120,21 +120,21 @@
       "forgot_password": "ลืมรหัสผ่าน?",
       "submit": "เข้าสู่ระบบ",
       "no_account": "ยังไม่มีบัญชี?",
-      "signup_link": "ลงทะเบียนเลย"
+      "signup_link": "ลงทะเบียนตอนนี้"
     },
     "signup": {
       "title": "สร้างบัญชีของคุณ",
-      "subtitle": "เริ่มทดลองใช้ฟรีวันนี้",
+      "subtitle": "เริ่มทดลองฟรีวันนี้",
       "step1": "รายละเอียดร้าน",
       "step2": "ตั้งค่าบัญชี",
       "company_name": "ชื่อร้าน / บริษัท",
       "company_placeholder": "NeoStore Repairs",
       "subdomain": "เลือกซับโดเมนของคุณ",
       "subdomain_suffix": ".aftersales.pro",
-      "phone": "เบอร์โทรศัพท์",
+      "phone": "หมายเลขโทรศัพท์",
       "phone_placeholder": "0812345678",
       "address": "ที่อยู่ร้าน",
-      "address_placeholder": "123 ถนนหลัก, เมือง",
+      "address_placeholder": "123 ถนนหลัก เมือง",
       "your_name": "ชื่อของคุณ",
       "your_email": "ที่อยู่อีเมล",
       "password": "รหัสผ่าน",
@@ -143,7 +143,7 @@
       "have_account": "มีบัญชีอยู่แล้ว?",
       "login_link": "เข้าสู่ระบบ",
       "checking_availability": "กำลังตรวจสอบ...",
-      "available": "ว่างอยู่!",
+      "available": "ใช้ได้!",
       "taken": "ถูกใช้แล้ว"
     }
   },
@@ -156,7 +156,7 @@
     "this_month": "เดือนนี้",
     "stats": {
       "total_jobs": "งานทั้งหมด",
-      "pending_jobs": "งานที่รอดำเนินการ",
+      "pending_jobs": "งานรอดำเนินการ",
       "completed_today": "เสร็จวันนี้",
       "revenue_today": "รายได้วันนี้",
       "ready_delivery": "พร้อมส่งมอบ",
@@ -171,10 +171,10 @@
     "title": "งาน",
     "new_job": "งานใหม่",
     "all_jobs": "งานทั้งหมด",
-    "search_placeholder": "ค้นหาตามเลขงาน, ลูกค้า...",
+    "search_placeholder": "ค้นหาตามหมายเลขงาน ลูกค้า...",
     "filter_status": "กรองตามสถานะ",
     "filter_date": "กรองตามวันที่",
-    "job_number": "เลขงาน",
+    "job_number": "หมายเลขงาน",
     "customer": "ลูกค้า",
     "device": "อุปกรณ์",
     "problem": "ปัญหา",
@@ -183,45 +183,12 @@
     "statuses": {
       "received": "รับแล้ว",
       "diagnosed": "วินิจฉัยแล้ว",
-      "waiting_approval": "รออนุมัติ",
+      "waiting_approval": "รอการอนุมัติ",
       "in_progress": "กำลังดำเนินการ",
-      "repaired": "ซ่อมเสร็จ",
+      "repaired": "ซ่อมแล้ว",
       "delivered": "ส่งมอบแล้ว",
-      "closed": "ปิดงาน",
+      "closed": "ปิด",
       "cancelled": "ยกเลิก"
-    },
-    "create": {
-      "title": "สร้างงานใหม่",
-      "customer_details": "รายละเอียดลูกค้า",
-      "device_details": "รายละเอียดอุปกรณ์",
-      "problem_details": "รายละเอียดปัญหา",
-      "accessories": "อุปกรณ์เสริม",
-      "customer_name": "ชื่อลูกค้า",
-      "mobile": "เบอร์โทรศัพท์",
-      "device_type": "ประเภทอุปกรณ์",
-      "brand": "ยี่ห้อ",
-      "model": "รุ่น",
-      "serial_imei": "Serial/IMEI (ไม่บังคับ)",
-      "condition": "สภาพอุปกรณ์ (ไม่บังคับ)",
-      "unlock_pattern": "รหัส/รูปแบบปลดล็อค",
-      "problem_description": "รายละเอียดปัญหา",
-      "submit": "สร้างงาน"
-    },
-    "detail": {
-      "job_info": "ข้อมูลงาน",
-      "timeline": "ไทม์ไลน์สถานะ",
-      "photos": "รูปภาพ",
-      "diagnosis": "การวินิจฉัย",
-      "approval": "การอนุมัติ",
-      "repair": "รายละเอียดการซ่อม",
-      "delivery": "การส่งมอบ",
-      "actions": "การดำเนินการ",
-      "download_pdf": "ดาวน์โหลด PDF",
-      "send_whatsapp": "ส่ง WhatsApp",
-      "mark_diagnosed": "บันทึกการวินิจฉัย",
-      "record_approval": "บันทึกการอนุมัติ",
-      "mark_repaired": "บันทึกการซ่อมเสร็จ",
-      "mark_delivered": "บันทึกการส่งมอบ"
     }
   },
   "customers": {
@@ -232,43 +199,28 @@
     "with_outstanding": "มียอดค้างชำระ",
     "total_jobs": "งานทั้งหมด",
     "outstanding": "ยอดค้างชำระ",
-    "view_statement": "ดูใบแจ้งยอด",
-    "record_payment": "บันทึกการชำระเงิน"
+    "view_statement": "ดูรายการ",
+    "record_payment": "บันทึกการชำระ"
   },
   "inventory": {
     "title": "สินค้าคงคลัง",
-    "add_item": "เพิ่มสินค้า",
+    "add_item": "เพิ่มรายการ",
     "search_placeholder": "ค้นหาสินค้า...",
-    "total_items": "สินค้าทั้งหมด",
-    "low_stock": "สต็อกต่ำ",
+    "total_items": "รายการทั้งหมด",
+    "low_stock": "สินค้าใกล้หมด",
     "total_value": "มูลค่ารวม",
-    "item_name": "ชื่อสินค้า",
-    "sku": "SKU",
+    "item_name": "ชื่อรายการ",
+    "sku": "รหัสสินค้า",
     "category": "หมวดหมู่",
     "quantity": "จำนวน",
-    "cost_price": "ราคาทุน",
+    "cost_price": "ราคาต้นทุน",
     "selling_price": "ราคาขาย",
-    "min_stock": "สต็อกขั้นต่ำ",
+    "min_stock": "ระดับสต็อกขั้นต่ำ",
     "adjust_stock": "ปรับสต็อก",
     "usage_history": "ประวัติการใช้งาน"
   },
-  "team": {
-    "title": "ทีม",
-    "add_member": "เพิ่มสมาชิก",
-    "search_placeholder": "ค้นหาสมาชิก...",
-    "role": "ตำแหน่ง",
-    "branch": "สาขา",
-    "roles": {
-      "admin": "ผู้ดูแลระบบ",
-      "manager": "ผู้จัดการ",
-      "technician": "ช่างเทคนิค",
-      "receptionist": "พนักงานต้อนรับ"
-    },
-    "edit_member": "แก้ไขสมาชิก",
-    "reset_password": "รีเซ็ตรหัสผ่าน"
-  },
   "settings": {
-    "title": "ตั้งค่า",
+    "title": "การตั้งค่า",
     "shop_details": "รายละเอียดร้าน",
     "company_name": "ชื่อบริษัท",
     "address": "ที่อยู่",
@@ -276,12 +228,12 @@
     "email": "อีเมล",
     "footer_text": "ข้อความท้าย PDF",
     "language": "ภาษา",
-    "language_description": "เลือกภาษาที่คุณต้องการ",
+    "language_description": "เลือกภาษาที่ต้องการ",
     "theme": "ธีม",
     "save_settings": "บันทึกการตั้งค่า"
   },
   "analytics": {
-    "title": "วิเคราะห์",
+    "title": "การวิเคราะห์",
     "overview": "ภาพรวม",
     "revenue": "รายได้",
     "jobs_completed": "งานที่เสร็จ",
@@ -292,9 +244,9 @@
     "job_status_distribution": "การกระจายสถานะงาน"
   },
   "notifications": {
-    "job_created": "สร้างงานใหม่แล้ว",
-    "job_updated": "อัปเดตงานแล้ว",
-    "payment_received": "รับชำระเงินแล้ว",
-    "low_stock_alert": "แจ้งเตือนสต็อกต่ำ"
+    "job_created": "สร้างงานใหม่",
+    "job_updated": "อัปเดตงาน",
+    "payment_received": "รับชำระเงิน",
+    "low_stock_alert": "แจ้งเตือนสินค้าใกล้หมด"
   }
 }

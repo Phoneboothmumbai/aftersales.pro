@@ -1,25 +1,25 @@
 {
   "common": {
     "loading": "लोड हो रहा है...",
-    "save": "सेव करें",
+    "save": "सहेजें",
     "cancel": "रद्द करें",
     "delete": "हटाएं",
     "edit": "संपादित करें",
     "create": "बनाएं",
     "search": "खोजें",
     "filter": "फ़िल्टर",
-    "actions": "कार्रवाई",
+    "actions": "क्रियाएं",
     "status": "स्थिति",
     "date": "तारीख",
     "name": "नाम",
     "email": "ईमेल",
     "phone": "फ़ोन",
     "address": "पता",
-    "submit": "सबमिट करें",
+    "submit": "जमा करें",
     "back": "वापस",
     "next": "अगला",
     "previous": "पिछला",
-    "yes": "हां",
+    "yes": "हाँ",
     "no": "नहीं",
     "all": "सभी",
     "none": "कोई नहीं",
@@ -34,42 +34,42 @@
   },
   "landing": {
     "hero": {
-      "title": "अपनी रिपेयर शॉप को बेहतर बनाएं",
-      "subtitle": "रिपेयर जॉब्स मैनेज करने, इन्वेंट्री ट्रैक करने और ग्राहकों को खुश रखने का संपूर्ण समाधान",
-      "cta": "मुफ्त शुरू करें",
+      "title": "अपनी रिपेयर शॉप को, सरल बनाएं",
+      "subtitle": "रिपेयर जॉब्स को मैनेज करने, इन्वेंटरी ट्रैक करने और ग्राहकों को खुश करने का संपूर्ण समाधान",
+      "cta": "मुफ्त में शुरू करें",
       "cta_login": "डैशबोर्ड में लॉगिन करें"
     },
     "features": {
-      "title": "आपकी रिपेयर शॉप के लिए सब कुछ",
-      "subtitle": "रिपेयर बिज़नेस के लिए विशेष रूप से डिज़ाइन की गई शक्तिशाली सुविधाएं",
+      "title": "आपकी रिपेयर शॉप चलाने के लिए सब कुछ",
+      "subtitle": "रिपेयर बिजनेस के लिए विशेष रूप से डिज़ाइन की गई शक्तिशाली सुविधाएं",
       "job_management": {
         "title": "जॉब मैनेजमेंट",
-        "description": "हमारे सहज वर्कफ़्लो सिस्टम के साथ हर रिपेयर को ट्रैक करें"
+        "description": "हमारी सहज वर्कफ़्लो प्रणाली के साथ इनटेक से डिलीवरी तक हर रिपेयर को ट्रैक करें"
       },
       "inventory": {
-        "title": "इन्वेंट्री कंट्रोल",
-        "description": "रियल-टाइम स्टॉक ट्रैकिंग और लो-स्टॉक अलर्ट के साथ पार्ट्स मैनेज करें"
+        "title": "इन्वेंटरी कंट्रोल",
+        "description": "रियल-टाइम स्टॉक ट्रैकिंग और कम स्टॉक अलर्ट के साथ पार्ट्स और सप्लाई मैनेज करें"
       },
       "customer": {
         "title": "कस्टमर मैनेजमेंट",
-        "description": "पूर्ण ग्राहक इतिहास और संचार टूल्स के साथ संबंध बनाएं"
+        "description": "पूर्ण ग्राहक इतिहास और संचार उपकरणों के साथ स्थायी संबंध बनाएं"
       },
       "analytics": {
         "title": "एनालिटिक्स और रिपोर्ट्स",
-        "description": "व्यापक बिज़नेस इनसाइट्स के साथ डेटा-ड्रिवन निर्णय लें"
+        "description": "व्यापक बिजनेस इनसाइट्स के साथ डेटा-संचालित निर्णय लें"
       },
       "whatsapp": {
-        "title": "WhatsApp इंटीग्रेशन",
-        "description": "एक क्लिक में ग्राहकों को WhatsApp पर अपडेट भेजें"
+        "title": "व्हाट्सएप इंटीग्रेशन",
+        "description": "एक क्लिक में ग्राहकों को व्हाट्सएप पर स्वचालित अपडेट भेजें"
       },
       "multi_branch": {
         "title": "मल्टी-ब्रांच सपोर्ट",
-        "description": "एक डैशबोर्ड से कई लोकेशन मैनेज करें"
+        "description": "एक ही डैशबोर्ड से कई लोकेशन मैनेज करें"
       }
     },
     "pricing": {
-      "title": "सरल, पारदर्शी मूल्य निर्धारण",
-      "subtitle": "अपने बिज़नेस के लिए सही प्लान चुनें",
+      "title": "सरल, पारदर्शी मूल्य",
+      "subtitle": "अपने बिजनेस के लिए सही प्लान चुनें",
       "monthly": "मासिक",
       "yearly": "वार्षिक",
       "forever": "हमेशा के लिए",
@@ -78,55 +78,55 @@
       "current_plan": "वर्तमान प्लान",
       "features_included": "शामिल सुविधाएं:",
       "users": "यूजर्स",
-      "branches": "शाखाएं",
+      "branches": "ब्रांच",
       "jobs_month": "जॉब्स/महीना",
       "unlimited": "असीमित"
     },
     "testimonials": {
-      "title": "दुनिया भर की रिपेयर शॉप्स का भरोसा",
+      "title": "दुनिया भर की रिपेयर शॉप्स द्वारा विश्वसनीय",
       "subtitle": "देखें हमारे ग्राहक क्या कहते हैं"
     },
     "cta": {
-      "title": "अपने रिपेयर बिज़नेस को बदलने के लिए तैयार?",
-      "subtitle": "हज़ारों रिपेयर शॉप्स से जुड़ें जो पहले से AfterSales Pro का उपयोग कर रही हैं",
+      "title": "अपने रिपेयर बिजनेस को बदलने के लिए तैयार?",
+      "subtitle": "हजारों रिपेयर शॉप्स से जुड़ें जो पहले से AfterSales Pro का उपयोग कर रहे हैं",
       "button": "मुफ्त ट्रायल शुरू करें"
     },
     "footer": {
-      "product": "प्रोडक्ट",
+      "product": "उत्पाद",
       "features": "सुविधाएं",
       "pricing": "मूल्य",
       "contact": "संपर्क",
       "company": "कंपनी",
       "about": "हमारे बारे में",
-      "privacy": "प्राइवेसी पॉलिसी",
+      "privacy": "गोपनीयता नीति",
       "terms": "सेवा की शर्तें",
-      "support": "सपोर्ट",
-      "help": "हेल्प सेंटर",
-      "documentation": "डॉक्यूमेंटेशन",
+      "support": "सहायता",
+      "help": "सहायता केंद्र",
+      "documentation": "दस्तावेज़ीकरण",
       "copyright": "© 2026 AfterSales Pro. सर्वाधिकार सुरक्षित।"
     }
   },
   "auth": {
     "login": {
       "title": "वापस स्वागत है",
-      "subtitle": "अपने अकाउंट में लॉगिन करें",
+      "subtitle": "अपने खाते में साइन इन करें",
       "subdomain": "शॉप सबडोमेन",
-      "subdomain_placeholder": "yourshop",
-      "email": "ईमेल एड्रेस",
+      "subdomain_placeholder": "आपकीशॉप",
+      "email": "ईमेल पता",
       "email_placeholder": "you@example.com",
       "password": "पासवर्ड",
       "password_placeholder": "अपना पासवर्ड दर्ज करें",
       "remember_me": "मुझे याद रखें",
       "forgot_password": "पासवर्ड भूल गए?",
-      "submit": "लॉगिन करें",
-      "no_account": "अकाउंट नहीं है?",
+      "submit": "साइन इन",
+      "no_account": "खाता नहीं है?",
       "signup_link": "अभी साइन अप करें"
     },
     "signup": {
-      "title": "अपना अकाउंट बनाएं",
+      "title": "अपना खाता बनाएं",
       "subtitle": "आज ही मुफ्त ट्रायल शुरू करें",
       "step1": "शॉप विवरण",
-      "step2": "अकाउंट सेटअप",
+      "step2": "खाता सेटअप",
       "company_name": "शॉप / कंपनी का नाम",
       "company_placeholder": "नियोस्टोर रिपेयर्स",
       "subdomain": "अपना सबडोमेन चुनें",
@@ -136,15 +136,15 @@
       "address": "शॉप का पता",
       "address_placeholder": "123, मेन स्ट्रीट, शहर",
       "your_name": "आपका नाम",
-      "your_email": "ईमेल एड्रेस",
+      "your_email": "ईमेल पता",
       "password": "पासवर्ड",
       "confirm_password": "पासवर्ड की पुष्टि करें",
-      "submit": "अकाउंट बनाएं",
-      "have_account": "पहले से अकाउंट है?",
-      "login_link": "लॉगिन करें",
-      "checking_availability": "उपलब्धता जांच रहे हैं...",
+      "submit": "खाता बनाएं",
+      "have_account": "पहले से खाता है?",
+      "login_link": "साइन इन करें",
+      "checking_availability": "उपलब्धता जाँच रहे हैं...",
       "available": "उपलब्ध!",
-      "taken": "पहले से लिया गया"
+      "taken": "पहले से लिया हुआ"
     }
   },
   "dashboard": {
@@ -156,14 +156,14 @@
     "this_month": "इस महीने",
     "stats": {
       "total_jobs": "कुल जॉब्स",
-      "pending_jobs": "पेंडिंग जॉब्स",
+      "pending_jobs": "लंबित जॉब्स",
       "completed_today": "आज पूर्ण",
-      "revenue_today": "आज की आय",
+      "revenue_today": "आज का राजस्व",
       "ready_delivery": "डिलीवरी के लिए तैयार",
       "in_progress": "प्रगति में"
     },
     "recent_jobs": "हाल की जॉब्स",
-    "quick_actions": "त्वरित कार्रवाई",
+    "quick_actions": "त्वरित क्रियाएं",
     "new_job": "नई जॉब",
     "view_all_jobs": "सभी जॉब्स देखें"
   },
@@ -183,45 +183,12 @@
     "statuses": {
       "received": "प्राप्त",
       "diagnosed": "निदान किया गया",
-      "waiting_approval": "अनुमोदन की प्रतीक्षा",
+      "waiting_approval": "स्वीकृति की प्रतीक्षा",
       "in_progress": "प्रगति में",
       "repaired": "मरम्मत हुई",
       "delivered": "डिलीवर किया गया",
       "closed": "बंद",
       "cancelled": "रद्द"
-    },
-    "create": {
-      "title": "नई जॉब बनाएं",
-      "customer_details": "ग्राहक विवरण",
-      "device_details": "डिवाइस विवरण",
-      "problem_details": "समस्या विवरण",
-      "accessories": "एक्सेसरीज़",
-      "customer_name": "ग्राहक का नाम",
-      "mobile": "मोबाइल नंबर",
-      "device_type": "डिवाइस प्रकार",
-      "brand": "ब्रांड",
-      "model": "मॉडल",
-      "serial_imei": "सीरियल/IMEI (वैकल्पिक)",
-      "condition": "डिवाइस की स्थिति (वैकल्पिक)",
-      "unlock_pattern": "अनलॉक पैटर्न/पासवर्ड",
-      "problem_description": "समस्या का विवरण",
-      "submit": "जॉब बनाएं"
-    },
-    "detail": {
-      "job_info": "जॉब जानकारी",
-      "timeline": "स्थिति टाइमलाइन",
-      "photos": "फ़ोटो",
-      "diagnosis": "निदान",
-      "approval": "अनुमोदन",
-      "repair": "मरम्मत विवरण",
-      "delivery": "डिलीवरी",
-      "actions": "कार्रवाई",
-      "download_pdf": "PDF डाउनलोड करें",
-      "send_whatsapp": "WhatsApp भेजें",
-      "mark_diagnosed": "निदान के रूप में चिह्नित करें",
-      "record_approval": "अनुमोदन रिकॉर्ड करें",
-      "mark_repaired": "मरम्मत के रूप में चिह्नित करें",
-      "mark_delivered": "डिलीवर के रूप में चिह्नित करें"
     }
   },
   "customers": {
@@ -233,12 +200,12 @@
     "total_jobs": "कुल जॉब्स",
     "outstanding": "बकाया",
     "view_statement": "स्टेटमेंट देखें",
-    "record_payment": "भुगतान रिकॉर्ड करें"
+    "record_payment": "भुगतान दर्ज करें"
   },
   "inventory": {
-    "title": "इन्वेंट्री",
+    "title": "इन्वेंटरी",
     "add_item": "आइटम जोड़ें",
-    "search_placeholder": "इन्वेंट्री खोजें...",
+    "search_placeholder": "इन्वेंटरी खोजें...",
     "total_items": "कुल आइटम",
     "low_stock": "कम स्टॉक",
     "total_value": "कुल मूल्य",
@@ -248,24 +215,9 @@
     "quantity": "मात्रा",
     "cost_price": "लागत मूल्य",
     "selling_price": "बिक्री मूल्य",
-    "min_stock": "न्यूनतम स्टॉक",
-    "adjust_stock": "स्टॉक एडजस्ट करें",
+    "min_stock": "न्यूनतम स्टॉक स्तर",
+    "adjust_stock": "स्टॉक समायोजित करें",
     "usage_history": "उपयोग इतिहास"
-  },
-  "team": {
-    "title": "टीम",
-    "add_member": "सदस्य जोड़ें",
-    "search_placeholder": "सदस्य खोजें...",
-    "role": "भूमिका",
-    "branch": "शाखा",
-    "roles": {
-      "admin": "एडमिन",
-      "manager": "मैनेजर",
-      "technician": "टेक्नीशियन",
-      "receptionist": "रिसेप्शनिस्ट"
-    },
-    "edit_member": "सदस्य संपादित करें",
-    "reset_password": "पासवर्ड रीसेट करें"
   },
   "settings": {
     "title": "सेटिंग्स",
@@ -274,27 +226,27 @@
     "address": "पता",
     "phone": "फ़ोन",
     "email": "ईमेल",
-    "footer_text": "PDF फ़ुटर टेक्स्ट",
+    "footer_text": "PDF फुटर टेक्स्ट",
     "language": "भाषा",
     "language_description": "अपनी पसंदीदा भाषा चुनें",
     "theme": "थीम",
-    "save_settings": "सेटिंग्स सेव करें"
+    "save_settings": "सेटिंग्स सहेजें"
   },
   "analytics": {
     "title": "एनालिटिक्स",
     "overview": "ओवरव्यू",
-    "revenue": "आय",
+    "revenue": "राजस्व",
     "jobs_completed": "पूर्ण जॉब्स",
     "avg_repair_time": "औसत मरम्मत समय",
     "customer_satisfaction": "ग्राहक संतुष्टि",
-    "top_services": "टॉप सर्विसेज",
-    "revenue_trend": "आय ट्रेंड",
+    "top_services": "शीर्ष सेवाएं",
+    "revenue_trend": "राजस्व ट्रेंड",
     "job_status_distribution": "जॉब स्थिति वितरण"
   },
   "notifications": {
     "job_created": "नई जॉब बनाई गई",
     "job_updated": "जॉब अपडेट हुई",
-    "payment_received": "भुगतान प्राप्त",
+    "payment_received": "भुगतान प्राप्त हुआ",
     "low_stock_alert": "कम स्टॉक अलर्ट"
   }
 }
