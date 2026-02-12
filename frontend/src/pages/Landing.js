@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
+import LanguageSelector from "../components/LanguageSelector";
 import {
   Wrench,
   ClipboardList,
@@ -21,6 +23,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [plans, setPlans] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
