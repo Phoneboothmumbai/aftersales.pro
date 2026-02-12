@@ -473,13 +473,13 @@ export default function Landing() {
               </div>
               <div className="flex flex-wrap justify-center gap-4 text-sm">
                 <a href="/contact" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
-                  Contact Us
+                  {t("landing.footer.contact")}
                 </a>
                 <a href="/legal/privacy_policy" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy Policy
+                  {t("landing.footer.privacy")}
                 </a>
                 <a href="/legal/terms_of_service" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Terms of Service
+                  {t("landing.footer.terms")}
                 </a>
                 <a href="/legal/refund_policy" className="text-muted-foreground hover:text-foreground transition-colors">
                   Refund Policy
@@ -491,7 +491,7 @@ export default function Landing() {
             </div>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} The Good Men Enterprise. All rights reserved.
+                {t("landing.footer.copyright")}
               </p>
             </div>
           </div>
