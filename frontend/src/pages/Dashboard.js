@@ -109,12 +109,12 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back to {tenant?.company_name}</p>
+            <h1 className="text-3xl font-bold">{t("dashboard.title")}</h1>
+            <p className="text-muted-foreground">{t("dashboard.welcome")} to {tenant?.company_name}</p>
           </div>
           <Button onClick={() => navigate("/jobs/new")} data-testid="new-job-btn">
             <Plus className="w-4 h-4 mr-2" />
-            New Job
+            {t("dashboard.new_job")}
           </Button>
         </div>
 
