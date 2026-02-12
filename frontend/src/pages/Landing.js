@@ -262,12 +262,11 @@ export default function Landing() {
                 Now with 14-day free trial
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance">
-                Repair shop management,{" "}
-                <span className="text-primary">simplified</span>
+                {t("landing.hero.title").split(",")[0]},{" "}
+                <span className="text-primary">{t("landing.hero.title").split(",")[1] || "simplified"}</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-xl">
-                Stop losing devices, stop disputes, stop chaos. AfterSales.pro brings control, traceability, and
-                professional customer communication to your repair business.
+                {t("landing.hero.subtitle")}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
@@ -276,7 +275,7 @@ export default function Landing() {
                   onClick={() => navigate("/signup")}
                   data-testid="hero-start-trial-btn"
                 >
-                  Start Free Trial
+                  {t("landing.hero.cta")}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
                 <Button
@@ -285,7 +284,7 @@ export default function Landing() {
                   onClick={() => navigate("/login")}
                   data-testid="hero-login-btn"
                 >
-                  Login to Dashboard
+                  {t("landing.hero.cta_login")}
                 </Button>
               </div>
               <div className="flex items-center gap-6 text-sm text-muted-foreground">
