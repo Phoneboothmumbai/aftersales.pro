@@ -305,7 +305,7 @@ class DeviceInfo(BaseModel):
 - [x] Profit Tracking System (password protected, job-wise, party-wise, bulk expense)
 
 ### P1 (High Priority)
-- [ ] Multi-language Support (i18n)
+- [x] Multi-language Support (i18n) ✅ COMPLETED January 2026
 - [ ] WhatsApp alerts for expiring subscriptions
 - [ ] Plan usage progress bars in tenant dashboard
 - [ ] SSL setup for aftersales.pro
