@@ -292,6 +292,8 @@ class DeviceInfo(BaseModel):
 - `/app/test_reports/iteration_9.json` - Super Admin New Features
 - `/app/test_reports/iteration_10.json` - Optional Fields, Unlock Pattern, Customer Ledger (17 tests)
 - `/app/test_reports/iteration_11.json` - Profit Tracking System (16 tests)
+- `/app/test_reports/iteration_12.json` - Inventory-Linked Parts System
+- `/app/test_reports/iteration_13.json` - Multi-language Support (i18n) - 100% Pass
 
 ## Prioritized Backlog
 
