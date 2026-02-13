@@ -328,6 +328,14 @@ class DeviceInfo(BaseModel):
 - [ ] Payment gateway
 
 ## Tech Stack
-- **Frontend**: React 19, Tailwind CSS, Shadcn/UI, react-dropzone, date-fns
+- **Frontend**: React 19, Tailwind CSS, Shadcn/UI, react-dropzone, date-fns, react-i18next (i18n)
 - **Backend**: FastAPI, Motor (async MongoDB), PyJWT, ReportLab, qrcode
 - **Database**: MongoDB
+
+### Internationalization (i18n) - January 2026
+- ✅ **11 Languages Supported**: English, Thai, Chinese, Hindi, Gujarati, Arabic, Vietnamese, Indonesian, Tamil, Marathi, Spanish
+- ✅ **Language Selector Component** - Globe icon dropdown in navbar (Landing, Login, Dashboard Layout)
+- ✅ **Translation Files** - Complete translations in `/app/frontend/src/locales/` for all major UI sections
+- ✅ **RTL Support** - Arabic text direction support with full page layout flip
+- ✅ **Language Persistence** - Saves preference to localStorage via i18next-browser-languagedetector
+- ✅ **Translated Sections**: Common UI, Landing page, Auth (Login/Signup), Dashboard, Jobs, Customers, Inventory, Settings, Analytics, Notifications
