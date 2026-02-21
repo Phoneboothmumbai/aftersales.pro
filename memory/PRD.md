@@ -308,6 +308,7 @@ class DeviceInfo(BaseModel):
 
 ### P1 (High Priority)
 - [x] Multi-language Support (i18n) ✅ COMPLETED January 2026
+- [x] Self-Service Billing with Razorpay ✅ COMPLETED February 2026
 - [ ] WhatsApp alerts for expiring subscriptions
 - [ ] Plan usage progress bars in tenant dashboard
 - [ ] SSL setup for aftersales.pro
