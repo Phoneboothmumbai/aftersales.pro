@@ -6552,7 +6552,7 @@ async def download_invoice_pdf(
 @api_router.post("/billing/update-gstin")
 async def update_gstin(
     request: Request,
-    tenant: dict = Depends(get_current_tenant)
+    user: dict = Depends(get_current_user)
 ):
     """Update tenant GSTIN for GST invoicing"""
     body = await request.json()
@@ -6564,7 +6564,7 @@ async def update_gstin(
         raise HTTPException(status_code=400, detail="Invalid GSTIN format. Must be 15 characters.")
     
     await db.tenants.update_one(
-        {"id": tenant["id"]},
+        {"id": user["tenant_id"]},
         {"$set": {
             "gstin": gstin if gstin else None,
             "billing_address": billing_address if billing_address else None,
