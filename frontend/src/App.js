@@ -203,6 +203,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/billing"
+        element={
+          <ProtectedRoute>
+            <Billing />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Super Admin Routes */}
       <Route path="/super-admin" element={<SuperAdminLogin />} />
