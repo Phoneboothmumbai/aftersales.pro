@@ -29,6 +29,7 @@ import {
   BarChart3,
   UserCircle,
   Shield,
+  CreditCard,
 } from "lucide-react";
 
 export const Layout = ({ children }) => {
@@ -46,6 +47,7 @@ export const Layout = ({ children }) => {
     { name: "Analytics", href: "/metrics", icon: BarChart3 },
     ...(isAdmin ? [{ name: "Team", href: "/team", icon: Users }] : []),
     ...(isAdmin ? [{ name: "Branches", href: "/branches", icon: Building }] : []),
+    ...(isAdmin ? [{ name: "Billing", href: "/billing", icon: CreditCard }] : []),
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 
