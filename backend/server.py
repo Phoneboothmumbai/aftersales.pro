@@ -5853,7 +5853,7 @@ def generate_invoice_number():
     return f"INV-{now.strftime('%Y%m')}-{str(uuid.uuid4())[:8].upper()}"
 
 @api_router.get("/billing/config")
-async def get_billing_config(tenant: dict = Depends(get_current_tenant)):
+async def get_billing_config(user: dict = Depends(get_current_user)):
     """Get Razorpay public key and billing configuration"""
     return {
         "razorpay_key_id": RAZORPAY_KEY_ID if not RAZORPAY_KEY_ID.startswith('placeholder') else None,
@@ -5863,9 +5863,9 @@ async def get_billing_config(tenant: dict = Depends(get_current_tenant)):
     }
 
 @api_router.get("/billing/current")
-async def get_current_billing(tenant: dict = Depends(get_current_tenant)):
+async def get_current_billing(user: dict = Depends(get_current_user)):
     """Get current subscription status and billing info for tenant"""
-    tenant_id = tenant["id"]
+    tenant_id = user["tenant_id"]
     tenant_data = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
     
     plan_id = tenant_data.get("subscription_plan", "free")
