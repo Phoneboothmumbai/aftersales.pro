@@ -6002,13 +6002,13 @@ async def get_available_plans(user: dict = Depends(get_current_user)):
 @api_router.post("/billing/create-subscription")
 async def create_subscription(
     data: CreateSubscriptionRequest,
-    tenant: dict = Depends(get_current_tenant)
+    user: dict = Depends(get_current_user)
 ):
     """Create a new Razorpay subscription for the tenant"""
     if not razorpay_client:
         raise HTTPException(status_code=400, detail="Payment gateway not configured. Please contact support.")
     
-    tenant_id = tenant["id"]
+    tenant_id = user["tenant_id"]
     tenant_data = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
     
     # Get plan details
