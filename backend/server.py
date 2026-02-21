@@ -6440,18 +6440,18 @@ async def get_invoice(
 @api_router.get("/billing/invoices/{invoice_id}/pdf")
 async def download_invoice_pdf(
     invoice_id: str,
-    tenant: dict = Depends(get_current_tenant)
+    user: dict = Depends(get_current_user)
 ):
     """Generate and download invoice PDF"""
     invoice = await db.invoices.find_one(
-        {"id": invoice_id, "tenant_id": tenant["id"]},
+        {"id": invoice_id, "tenant_id": user["tenant_id"]},
         {"_id": 0}
     )
     
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
     
-    tenant_data = await db.tenants.find_one({"id": tenant["id"]}, {"_id": 0})
+    tenant_data = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0})
     
     # Generate PDF
     buffer = BytesIO()
