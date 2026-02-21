@@ -6369,9 +6369,9 @@ async def change_plan(
     }
 
 @api_router.post("/billing/cancel-subscription")
-async def cancel_subscription(tenant: dict = Depends(get_current_tenant)):
+async def cancel_subscription(user: dict = Depends(get_current_user)):
     """Cancel auto-renewal of subscription"""
-    tenant_id = tenant["id"]
+    tenant_id = user["tenant_id"]
     
     subscription = await db.subscriptions.find_one(
         {"tenant_id": tenant_id, "status": "active"},
