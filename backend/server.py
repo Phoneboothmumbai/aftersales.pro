@@ -6118,7 +6118,7 @@ async def create_subscription(
 @api_router.post("/billing/verify-payment")
 async def verify_payment(
     request: Request,
-    tenant: dict = Depends(get_current_tenant)
+    user: dict = Depends(get_current_user)
 ):
     """Verify Razorpay payment after checkout"""
     body = await request.json()
