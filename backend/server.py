@@ -5782,6 +5782,960 @@ async def get_profit_summary(
         "profit_margin": round((total_profit / data["total_received"] * 100), 2) if data["total_received"] > 0 else 0
     }
 
+# ==================== SELF-SERVICE BILLING WITH RAZORPAY ====================
+
+class CreateSubscriptionRequest(BaseModel):
+    plan_id: str
+    billing_cycle: str = "monthly"  # monthly or yearly
+
+class SubscriptionResponse(BaseModel):
+    subscription_id: str
+    razorpay_subscription_id: Optional[str] = None
+    plan_id: str
+    status: str
+    current_start: Optional[str] = None
+    current_end: Optional[str] = None
+    next_billing_at: Optional[str] = None
+
+class InvoiceResponse(BaseModel):
+    id: str
+    invoice_number: str
+    tenant_id: str
+    plan_id: str
+    plan_name: str
+    amount: float
+    tax_amount: float
+    total_amount: float
+    currency: str = "INR"
+    status: str  # paid, pending, failed
+    payment_id: Optional[str] = None
+    razorpay_payment_id: Optional[str] = None
+    billing_period_start: str
+    billing_period_end: str
+    created_at: str
+    paid_at: Optional[str] = None
+    # GST fields
+    gstin: Optional[str] = None
+    hsn_code: str = "998314"  # SAC for IT services
+    cgst: float = 0
+    sgst: float = 0
+    igst: float = 0
+
+class ChangePlanRequest(BaseModel):
+    new_plan_id: str
+    billing_cycle: str = "monthly"
+
+# GST Configuration
+GST_RATE = 18  # 18% GST for IT services
+HSN_CODE = "998314"  # SAC for IT services
+
+def calculate_gst(base_amount: float, is_same_state: bool = True):
+    """Calculate GST breakdown"""
+    gst_amount = base_amount * GST_RATE / 100
+    if is_same_state:
+        return {
+            "cgst": round(gst_amount / 2, 2),
+            "sgst": round(gst_amount / 2, 2),
+            "igst": 0,
+            "total_gst": round(gst_amount, 2)
+        }
+    else:
+        return {
+            "cgst": 0,
+            "sgst": 0,
+            "igst": round(gst_amount, 2),
+            "total_gst": round(gst_amount, 2)
+        }
+
+def generate_invoice_number():
+    """Generate unique invoice number"""
+    now = datetime.now(timezone.utc)
+    return f"INV-{now.strftime('%Y%m')}-{str(uuid.uuid4())[:8].upper()}"
+
+@api_router.get("/billing/config")
+async def get_billing_config(tenant: dict = Depends(get_current_tenant)):
+    """Get Razorpay public key and billing configuration"""
+    return {
+        "razorpay_key_id": RAZORPAY_KEY_ID if not RAZORPAY_KEY_ID.startswith('placeholder') else None,
+        "razorpay_enabled": razorpay_client is not None,
+        "gst_rate": GST_RATE,
+        "currency": "INR"
+    }
+
+@api_router.get("/billing/current")
+async def get_current_billing(tenant: dict = Depends(get_current_tenant)):
+    """Get current subscription status and billing info for tenant"""
+    tenant_id = tenant["id"]
+    tenant_data = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    
+    plan_id = tenant_data.get("subscription_plan", "free")
+    plan = await db.subscription_plans.find_one({"id": plan_id, "is_active": True}, {"_id": 0})
+    
+    if not plan:
+        plan = await db.subscription_plans.find_one({"id": "free"}, {"_id": 0})
+    
+    # Get active subscription if exists
+    subscription = await db.subscriptions.find_one(
+        {"tenant_id": tenant_id, "status": {"$in": ["active", "authenticated"]}},
+        {"_id": 0}
+    )
+    
+    # Get recent invoices
+    recent_invoices = await db.invoices.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(5).to_list(5)
+    
+    # Calculate days remaining
+    days_remaining = None
+    is_expired = False
+    subscription_status = tenant_data.get("subscription_status", "trial")
+    
+    if subscription_status == "trial":
+        end_date_str = tenant_data.get("trial_ends_at")
+    else:
+        end_date_str = tenant_data.get("subscription_ends_at")
+    
+    if end_date_str:
+        try:
+            end_date = datetime.fromisoformat(end_date_str.replace('Z', '+00:00'))
+            now = datetime.now(timezone.utc)
+            delta = end_date - now
+            days_remaining = max(0, delta.days)
+            is_expired = delta.total_seconds() < 0
+        except:
+            pass
+    
+    # Get plan usage
+    plan_usage = await get_plan_usage_internal(tenant_id, plan)
+    
+    return {
+        "tenant": {
+            "id": tenant_data.get("id"),
+            "company_name": tenant_data.get("company_name"),
+            "email": tenant_data.get("email"),
+            "gstin": tenant_data.get("gstin"),
+            "billing_address": tenant_data.get("billing_address")
+        },
+        "subscription": {
+            "status": subscription_status,
+            "plan_id": plan_id,
+            "plan_name": plan.get("name") if plan else "Free",
+            "plan_price": plan.get("price", 0) if plan else 0,
+            "billing_cycle": plan.get("billing_cycle", "month") if plan else "month",
+            "ends_at": end_date_str,
+            "days_remaining": days_remaining,
+            "is_expired": is_expired,
+            "auto_renew": subscription.get("auto_renew", False) if subscription else False,
+            "razorpay_subscription_id": subscription.get("razorpay_subscription_id") if subscription else None
+        },
+        "plan": plan,
+        "plan_usage": plan_usage,
+        "recent_invoices": recent_invoices
+    }
+
+async def get_plan_usage_internal(tenant_id: str, plan: dict):
+    """Internal helper to get plan usage statistics"""
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    # Count jobs this month
+    jobs_this_month = await db.jobs.count_documents({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": month_start.isoformat()}
+    })
+    
+    # Count users
+    users_count = await db.users.count_documents({"tenant_id": tenant_id})
+    
+    # Count branches
+    branches_count = await db.branches.count_documents({"tenant_id": tenant_id})
+    
+    # Count inventory items
+    inventory_count = await db.inventory.count_documents({"tenant_id": tenant_id})
+    
+    return {
+        "jobs": {
+            "used": jobs_this_month,
+            "limit": plan.get("max_jobs_per_month", -1) if plan else -1,
+            "unlimited": plan.get("max_jobs_per_month", -1) == -1 if plan else True
+        },
+        "users": {
+            "used": users_count,
+            "limit": plan.get("max_users", -1) if plan else -1,
+            "unlimited": plan.get("max_users", -1) == -1 if plan else True
+        },
+        "branches": {
+            "used": branches_count,
+            "limit": plan.get("max_branches", -1) if plan else -1,
+            "unlimited": plan.get("max_branches", -1) == -1 if plan else True
+        },
+        "inventory": {
+            "used": inventory_count,
+            "limit": plan.get("max_inventory_items", -1) if plan else -1,
+            "unlimited": plan.get("max_inventory_items", -1) == -1 if plan else True
+        }
+    }
+
+@api_router.get("/billing/plans")
+async def get_available_plans(tenant: dict = Depends(get_current_tenant)):
+    """Get all available plans for upgrade/downgrade"""
+    plans = await db.subscription_plans.find(
+        {"is_active": True, "show_on_pricing": {"$ne": False}},
+        {"_id": 0}
+    ).sort("sort_order", 1).to_list(100)
+    
+    current_plan_id = tenant.get("subscription_plan", "free")
+    
+    for plan in plans:
+        plan["is_current"] = plan["id"] == current_plan_id
+        # Calculate yearly price with discount
+        if plan.get("price", 0) > 0:
+            monthly_price = plan["price"]
+            yearly_price = monthly_price * 12 * 0.8  # 20% discount for yearly
+            plan["yearly_price"] = round(yearly_price, 2)
+            plan["yearly_savings"] = round(monthly_price * 12 - yearly_price, 2)
+    
+    return plans
+
+@api_router.post("/billing/create-subscription")
+async def create_subscription(
+    data: CreateSubscriptionRequest,
+    tenant: dict = Depends(get_current_tenant)
+):
+    """Create a new Razorpay subscription for the tenant"""
+    if not razorpay_client:
+        raise HTTPException(status_code=400, detail="Payment gateway not configured. Please contact support.")
+    
+    tenant_id = tenant["id"]
+    tenant_data = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    
+    # Get plan details
+    plan = await db.subscription_plans.find_one({"id": data.plan_id, "is_active": True}, {"_id": 0})
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    if plan.get("price", 0) == 0:
+        raise HTTPException(status_code=400, detail="Cannot create subscription for free plan")
+    
+    # Calculate price based on billing cycle
+    if data.billing_cycle == "yearly":
+        base_amount = plan["price"] * 12 * 0.8  # 20% discount
+        period = "yearly"
+        interval = 1
+    else:
+        base_amount = plan["price"]
+        period = "monthly"
+        interval = 1
+    
+    # Calculate GST
+    gst = calculate_gst(base_amount)
+    total_amount = base_amount + gst["total_gst"]
+    
+    try:
+        # Check if Razorpay plan exists, if not create it
+        razorpay_plan_id = plan.get(f"razorpay_plan_id_{data.billing_cycle}")
+        
+        if not razorpay_plan_id:
+            # Create Razorpay plan
+            rp_plan = razorpay_client.plan.create({
+                "period": period,
+                "interval": interval,
+                "item": {
+                    "name": f"{plan['name']} - {data.billing_cycle.capitalize()}",
+                    "amount": int(total_amount * 100),  # Convert to paise
+                    "currency": "INR",
+                    "description": f"AfterSales.pro {plan['name']} Plan"
+                }
+            })
+            razorpay_plan_id = rp_plan["id"]
+            
+            # Save Razorpay plan ID
+            await db.subscription_plans.update_one(
+                {"id": data.plan_id},
+                {"$set": {f"razorpay_plan_id_{data.billing_cycle}": razorpay_plan_id}}
+            )
+        
+        # Create Razorpay subscription
+        subscription_data = {
+            "plan_id": razorpay_plan_id,
+            "total_count": 120,  # Max billing cycles
+            "customer_notify": 1,
+            "notes": {
+                "tenant_id": tenant_id,
+                "plan_id": data.plan_id,
+                "billing_cycle": data.billing_cycle
+            }
+        }
+        
+        # Add customer info if available
+        if tenant_data.get("email"):
+            subscription_data["notify_info"] = {
+                "notify_email": tenant_data.get("email")
+            }
+        
+        rp_subscription = razorpay_client.subscription.create(subscription_data)
+        
+        # Store subscription in database
+        now = datetime.now(timezone.utc).isoformat()
+        subscription_record = {
+            "id": str(uuid.uuid4()),
+            "tenant_id": tenant_id,
+            "plan_id": data.plan_id,
+            "billing_cycle": data.billing_cycle,
+            "razorpay_subscription_id": rp_subscription["id"],
+            "razorpay_plan_id": razorpay_plan_id,
+            "status": "created",
+            "base_amount": base_amount,
+            "gst_amount": gst["total_gst"],
+            "total_amount": total_amount,
+            "auto_renew": True,
+            "created_at": now,
+            "updated_at": now
+        }
+        await db.subscriptions.insert_one(subscription_record)
+        
+        return {
+            "subscription_id": subscription_record["id"],
+            "razorpay_subscription_id": rp_subscription["id"],
+            "razorpay_key_id": RAZORPAY_KEY_ID,
+            "amount": int(total_amount * 100),
+            "currency": "INR",
+            "name": f"AfterSales.pro - {plan['name']}",
+            "description": f"{plan['name']} Plan ({data.billing_cycle.capitalize()})",
+            "prefill": {
+                "name": tenant_data.get("company_name", ""),
+                "email": tenant_data.get("email", ""),
+                "contact": tenant_data.get("phone", "")
+            }
+        }
+        
+    except Exception as e:
+        logging.error(f"Razorpay subscription creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create subscription: {str(e)}")
+
+@api_router.post("/billing/verify-payment")
+async def verify_payment(
+    request: Request,
+    tenant: dict = Depends(get_current_tenant)
+):
+    """Verify Razorpay payment after checkout"""
+    body = await request.json()
+    
+    razorpay_payment_id = body.get("razorpay_payment_id")
+    razorpay_subscription_id = body.get("razorpay_subscription_id")
+    razorpay_signature = body.get("razorpay_signature")
+    
+    if not all([razorpay_payment_id, razorpay_subscription_id, razorpay_signature]):
+        raise HTTPException(status_code=400, detail="Missing payment verification parameters")
+    
+    try:
+        # Verify signature
+        message = f"{razorpay_payment_id}|{razorpay_subscription_id}"
+        expected_signature = hmac.new(
+            RAZORPAY_KEY_SECRET.encode(),
+            message.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        
+        if expected_signature != razorpay_signature:
+            raise HTTPException(status_code=400, detail="Invalid payment signature")
+        
+        # Get subscription from DB
+        subscription = await db.subscriptions.find_one(
+            {"razorpay_subscription_id": razorpay_subscription_id},
+            {"_id": 0}
+        )
+        
+        if not subscription:
+            raise HTTPException(status_code=404, detail="Subscription not found")
+        
+        tenant_id = subscription["tenant_id"]
+        plan_id = subscription["plan_id"]
+        
+        # Get plan details
+        plan = await db.subscription_plans.find_one({"id": plan_id}, {"_id": 0})
+        
+        now = datetime.now(timezone.utc)
+        
+        # Calculate subscription end date
+        if subscription["billing_cycle"] == "yearly":
+            duration_days = 365
+        else:
+            duration_days = 30
+        
+        subscription_ends_at = (now + timedelta(days=duration_days)).isoformat()
+        
+        # Update subscription status
+        await db.subscriptions.update_one(
+            {"razorpay_subscription_id": razorpay_subscription_id},
+            {"$set": {
+                "status": "active",
+                "razorpay_payment_id": razorpay_payment_id,
+                "current_start": now.isoformat(),
+                "current_end": subscription_ends_at,
+                "updated_at": now.isoformat()
+            }}
+        )
+        
+        # Update tenant subscription
+        await db.tenants.update_one(
+            {"id": tenant_id},
+            {"$set": {
+                "subscription_plan": plan_id,
+                "subscription_status": "paid",
+                "subscription_ends_at": subscription_ends_at,
+                "updated_at": now.isoformat()
+            }}
+        )
+        
+        # Create invoice
+        invoice = await create_invoice_internal(
+            tenant_id=tenant_id,
+            subscription=subscription,
+            plan=plan,
+            payment_id=razorpay_payment_id,
+            status="paid"
+        )
+        
+        return {
+            "success": True,
+            "message": "Payment verified successfully",
+            "subscription_status": "active",
+            "plan_name": plan.get("name"),
+            "subscription_ends_at": subscription_ends_at,
+            "invoice_id": invoice["id"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Payment verification failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Payment verification failed: {str(e)}")
+
+async def create_invoice_internal(tenant_id: str, subscription: dict, plan: dict, payment_id: str, status: str = "paid"):
+    """Internal helper to create invoice"""
+    tenant_data = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    
+    now = datetime.now(timezone.utc)
+    
+    # Calculate billing period
+    if subscription["billing_cycle"] == "yearly":
+        period_end = now + timedelta(days=365)
+    else:
+        period_end = now + timedelta(days=30)
+    
+    base_amount = subscription["base_amount"]
+    gst = calculate_gst(base_amount)
+    
+    invoice = {
+        "id": str(uuid.uuid4()),
+        "invoice_number": generate_invoice_number(),
+        "tenant_id": tenant_id,
+        "subscription_id": subscription["id"],
+        "plan_id": subscription["plan_id"],
+        "plan_name": plan.get("name", ""),
+        "billing_cycle": subscription["billing_cycle"],
+        "base_amount": base_amount,
+        "cgst": gst["cgst"],
+        "sgst": gst["sgst"],
+        "igst": gst["igst"],
+        "tax_amount": gst["total_gst"],
+        "total_amount": subscription["total_amount"],
+        "currency": "INR",
+        "status": status,
+        "payment_id": payment_id,
+        "razorpay_payment_id": payment_id,
+        "billing_period_start": now.isoformat(),
+        "billing_period_end": period_end.isoformat(),
+        "hsn_code": HSN_CODE,
+        "gstin": tenant_data.get("gstin"),
+        "billing_name": tenant_data.get("company_name"),
+        "billing_address": tenant_data.get("billing_address") or tenant_data.get("address"),
+        "billing_email": tenant_data.get("email"),
+        "created_at": now.isoformat(),
+        "paid_at": now.isoformat() if status == "paid" else None
+    }
+    
+    await db.invoices.insert_one(invoice)
+    
+    return invoice
+
+@api_router.post("/billing/change-plan")
+async def change_plan(
+    data: ChangePlanRequest,
+    tenant: dict = Depends(get_current_tenant)
+):
+    """Change subscription plan with proration"""
+    if not razorpay_client:
+        raise HTTPException(status_code=400, detail="Payment gateway not configured")
+    
+    tenant_id = tenant["id"]
+    tenant_data = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    
+    # Get new plan
+    new_plan = await db.subscription_plans.find_one({"id": data.new_plan_id, "is_active": True}, {"_id": 0})
+    if not new_plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    current_plan_id = tenant_data.get("subscription_plan", "free")
+    current_status = tenant_data.get("subscription_status", "trial")
+    
+    if current_plan_id == data.new_plan_id:
+        raise HTTPException(status_code=400, detail="Already on this plan")
+    
+    # Get current subscription
+    current_subscription = await db.subscriptions.find_one(
+        {"tenant_id": tenant_id, "status": "active"},
+        {"_id": 0}
+    )
+    
+    now = datetime.now(timezone.utc)
+    
+    # Calculate proration if upgrading from paid plan
+    proration_credit = 0
+    if current_status == "paid" and current_subscription:
+        current_end_str = tenant_data.get("subscription_ends_at")
+        if current_end_str:
+            try:
+                current_end = datetime.fromisoformat(current_end_str.replace('Z', '+00:00'))
+                days_remaining = max(0, (current_end - now).days)
+                
+                current_plan = await db.subscription_plans.find_one({"id": current_plan_id}, {"_id": 0})
+                if current_plan and current_plan.get("price", 0) > 0:
+                    daily_rate = current_plan["price"] / 30
+                    proration_credit = round(daily_rate * days_remaining, 2)
+            except:
+                pass
+    
+    # If downgrading to free plan
+    if new_plan.get("price", 0) == 0:
+        # Cancel existing Razorpay subscription if exists
+        if current_subscription and current_subscription.get("razorpay_subscription_id"):
+            try:
+                razorpay_client.subscription.cancel(current_subscription["razorpay_subscription_id"])
+            except:
+                pass
+        
+        # Update to free plan
+        await db.tenants.update_one(
+            {"id": tenant_id},
+            {"$set": {
+                "subscription_plan": "free",
+                "subscription_status": "free",
+                "subscription_ends_at": None,
+                "updated_at": now.isoformat()
+            }}
+        )
+        
+        # Mark subscription as cancelled
+        if current_subscription:
+            await db.subscriptions.update_one(
+                {"id": current_subscription["id"]},
+                {"$set": {"status": "cancelled", "cancelled_at": now.isoformat()}}
+            )
+        
+        return {
+            "success": True,
+            "message": "Downgraded to free plan",
+            "proration_credit": proration_credit
+        }
+    
+    # For paid plan changes, create new subscription with proration
+    # Calculate new price
+    if data.billing_cycle == "yearly":
+        base_amount = new_plan["price"] * 12 * 0.8
+    else:
+        base_amount = new_plan["price"]
+    
+    gst = calculate_gst(base_amount)
+    total_amount = base_amount + gst["total_gst"]
+    
+    # Apply proration credit
+    amount_to_charge = max(0, total_amount - proration_credit)
+    
+    return {
+        "action": "create_subscription",
+        "new_plan_id": data.new_plan_id,
+        "new_plan_name": new_plan["name"],
+        "billing_cycle": data.billing_cycle,
+        "base_amount": base_amount,
+        "gst_amount": gst["total_gst"],
+        "total_amount": total_amount,
+        "proration_credit": proration_credit,
+        "amount_to_charge": amount_to_charge,
+        "message": f"Upgrade to {new_plan['name']} plan"
+    }
+
+@api_router.post("/billing/cancel-subscription")
+async def cancel_subscription(tenant: dict = Depends(get_current_tenant)):
+    """Cancel auto-renewal of subscription"""
+    tenant_id = tenant["id"]
+    
+    subscription = await db.subscriptions.find_one(
+        {"tenant_id": tenant_id, "status": "active"},
+        {"_id": 0}
+    )
+    
+    if not subscription:
+        raise HTTPException(status_code=404, detail="No active subscription found")
+    
+    now = datetime.now(timezone.utc)
+    
+    # Cancel in Razorpay
+    if razorpay_client and subscription.get("razorpay_subscription_id"):
+        try:
+            razorpay_client.subscription.cancel(subscription["razorpay_subscription_id"])
+        except Exception as e:
+            logging.error(f"Failed to cancel Razorpay subscription: {e}")
+    
+    # Update subscription
+    await db.subscriptions.update_one(
+        {"id": subscription["id"]},
+        {"$set": {
+            "status": "cancelled",
+            "auto_renew": False,
+            "cancelled_at": now.isoformat(),
+            "updated_at": now.isoformat()
+        }}
+    )
+    
+    return {
+        "success": True,
+        "message": "Subscription cancelled. You will retain access until the end of your billing period."
+    }
+
+@api_router.get("/billing/invoices")
+async def get_invoices(
+    limit: int = 20,
+    tenant: dict = Depends(get_current_tenant)
+):
+    """Get all invoices for tenant"""
+    tenant_id = tenant["id"]
+    
+    invoices = await db.invoices.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    return invoices
+
+@api_router.get("/billing/invoices/{invoice_id}")
+async def get_invoice(
+    invoice_id: str,
+    tenant: dict = Depends(get_current_tenant)
+):
+    """Get specific invoice details"""
+    invoice = await db.invoices.find_one(
+        {"id": invoice_id, "tenant_id": tenant["id"]},
+        {"_id": 0}
+    )
+    
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    return invoice
+
+@api_router.get("/billing/invoices/{invoice_id}/pdf")
+async def download_invoice_pdf(
+    invoice_id: str,
+    tenant: dict = Depends(get_current_tenant)
+):
+    """Generate and download invoice PDF"""
+    invoice = await db.invoices.find_one(
+        {"id": invoice_id, "tenant_id": tenant["id"]},
+        {"_id": 0}
+    )
+    
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    tenant_data = await db.tenants.find_one({"id": tenant["id"]}, {"_id": 0})
+    
+    # Generate PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=20*mm, bottomMargin=20*mm, leftMargin=15*mm, rightMargin=15*mm)
+    
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=20, spaceAfter=20, textColor=colors.HexColor('#6366f1'))
+    header_style = ParagraphStyle('Header', parent=styles['Normal'], fontSize=11, fontName='Helvetica-Bold', spaceAfter=5)
+    normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=10, spaceAfter=3)
+    
+    elements = []
+    
+    # Header
+    elements.append(Paragraph("TAX INVOICE", title_style))
+    elements.append(Spacer(1, 10))
+    
+    # Invoice details
+    invoice_info = f"""
+    <b>Invoice Number:</b> {invoice['invoice_number']}<br/>
+    <b>Invoice Date:</b> {invoice['created_at'][:10]}<br/>
+    <b>Due Date:</b> {invoice['created_at'][:10]}<br/>
+    <b>Status:</b> {invoice['status'].upper()}
+    """
+    elements.append(Paragraph(invoice_info, normal_style))
+    elements.append(Spacer(1, 15))
+    
+    # Seller info
+    elements.append(Paragraph("<b>From:</b>", header_style))
+    seller_info = """
+    The Good Men Enterprise<br/>
+    AfterSales.pro<br/>
+    GSTIN: [Your GSTIN]<br/>
+    Mumbai, Maharashtra, India
+    """
+    elements.append(Paragraph(seller_info, normal_style))
+    elements.append(Spacer(1, 15))
+    
+    # Buyer info
+    elements.append(Paragraph("<b>Bill To:</b>", header_style))
+    buyer_info = f"""
+    {invoice.get('billing_name', tenant_data.get('company_name', 'N/A'))}<br/>
+    {invoice.get('billing_address', tenant_data.get('address', 'N/A'))}<br/>
+    Email: {invoice.get('billing_email', tenant_data.get('email', 'N/A'))}<br/>
+    GSTIN: {invoice.get('gstin', 'N/A')}
+    """
+    elements.append(Paragraph(buyer_info, normal_style))
+    elements.append(Spacer(1, 20))
+    
+    # Items table
+    table_data = [
+        ['Description', 'HSN/SAC', 'Qty', 'Rate', 'Amount'],
+        [
+            f"{invoice['plan_name']} Plan ({invoice['billing_cycle'].capitalize()})",
+            invoice.get('hsn_code', HSN_CODE),
+            '1',
+            f"₹{invoice['base_amount']:.2f}",
+            f"₹{invoice['base_amount']:.2f}"
+        ],
+        ['', '', '', 'Subtotal', f"₹{invoice['base_amount']:.2f}"],
+        ['', '', '', f'CGST ({GST_RATE/2}%)', f"₹{invoice.get('cgst', 0):.2f}"],
+        ['', '', '', f'SGST ({GST_RATE/2}%)', f"₹{invoice.get('sgst', 0):.2f}"],
+        ['', '', '', 'Total', f"₹{invoice['total_amount']:.2f}"]
+    ]
+    
+    table = Table(table_data, colWidths=[200, 60, 40, 80, 80])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#6366f1')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ALIGN', (3, 1), (-1, -1), 'RIGHT'),
+        ('FONTNAME', (3, -1), (-1, -1), 'Helvetica-Bold'),
+    ]))
+    elements.append(table)
+    elements.append(Spacer(1, 30))
+    
+    # Footer
+    footer_text = """
+    <b>Payment Terms:</b> Due on receipt<br/>
+    <b>Payment Method:</b> Online Payment via Razorpay<br/><br/>
+    Thank you for your business!<br/>
+    For any queries, contact: support@aftersales.pro
+    """
+    elements.append(Paragraph(footer_text, normal_style))
+    
+    doc.build(elements)
+    buffer.seek(0)
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=Invoice_{invoice['invoice_number']}.pdf"}
+    )
+
+@api_router.post("/billing/update-gstin")
+async def update_gstin(
+    request: Request,
+    tenant: dict = Depends(get_current_tenant)
+):
+    """Update tenant GSTIN for GST invoicing"""
+    body = await request.json()
+    gstin = body.get("gstin", "").strip().upper()
+    billing_address = body.get("billing_address", "")
+    
+    # Basic GSTIN validation (15 characters)
+    if gstin and len(gstin) != 15:
+        raise HTTPException(status_code=400, detail="Invalid GSTIN format. Must be 15 characters.")
+    
+    await db.tenants.update_one(
+        {"id": tenant["id"]},
+        {"$set": {
+            "gstin": gstin if gstin else None,
+            "billing_address": billing_address if billing_address else None,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"success": True, "message": "Billing details updated"}
+
+# Razorpay Webhook Handler
+@api_router.post("/webhooks/razorpay")
+async def razorpay_webhook(request: Request):
+    """Handle Razorpay webhook events"""
+    body = await request.body()
+    signature = request.headers.get("X-Razorpay-Signature", "")
+    
+    # Verify webhook signature
+    if RAZORPAY_WEBHOOK_SECRET and not RAZORPAY_WEBHOOK_SECRET.startswith('placeholder'):
+        try:
+            expected_signature = hmac.new(
+                RAZORPAY_WEBHOOK_SECRET.encode(),
+                body,
+                hashlib.sha256
+            ).hexdigest()
+            
+            if expected_signature != signature:
+                logging.warning("Invalid Razorpay webhook signature")
+                raise HTTPException(status_code=400, detail="Invalid signature")
+        except HTTPException:
+            raise
+        except Exception as e:
+            logging.error(f"Webhook signature verification failed: {e}")
+    
+    payload = await request.json()
+    event = payload.get("event")
+    
+    logging.info(f"Razorpay webhook received: {event}")
+    
+    now = datetime.now(timezone.utc)
+    
+    try:
+        if event == "subscription.authenticated":
+            # Subscription created and authenticated
+            subscription_data = payload.get("payload", {}).get("subscription", {}).get("entity", {})
+            razorpay_subscription_id = subscription_data.get("id")
+            
+            await db.subscriptions.update_one(
+                {"razorpay_subscription_id": razorpay_subscription_id},
+                {"$set": {"status": "authenticated", "updated_at": now.isoformat()}}
+            )
+            
+        elif event == "subscription.activated":
+            # Subscription activated after first payment
+            subscription_data = payload.get("payload", {}).get("subscription", {}).get("entity", {})
+            razorpay_subscription_id = subscription_data.get("id")
+            
+            subscription = await db.subscriptions.find_one(
+                {"razorpay_subscription_id": razorpay_subscription_id}
+            )
+            
+            if subscription:
+                tenant_id = subscription["tenant_id"]
+                plan_id = subscription["plan_id"]
+                
+                # Calculate end date
+                if subscription["billing_cycle"] == "yearly":
+                    duration_days = 365
+                else:
+                    duration_days = 30
+                
+                subscription_ends_at = (now + timedelta(days=duration_days)).isoformat()
+                
+                # Update tenant
+                await db.tenants.update_one(
+                    {"id": tenant_id},
+                    {"$set": {
+                        "subscription_plan": plan_id,
+                        "subscription_status": "paid",
+                        "subscription_ends_at": subscription_ends_at,
+                        "updated_at": now.isoformat()
+                    }}
+                )
+                
+                # Update subscription
+                await db.subscriptions.update_one(
+                    {"razorpay_subscription_id": razorpay_subscription_id},
+                    {"$set": {
+                        "status": "active",
+                        "current_start": now.isoformat(),
+                        "current_end": subscription_ends_at,
+                        "updated_at": now.isoformat()
+                    }}
+                )
+                
+        elif event == "subscription.charged":
+            # Recurring payment successful
+            subscription_data = payload.get("payload", {}).get("subscription", {}).get("entity", {})
+            payment_data = payload.get("payload", {}).get("payment", {}).get("entity", {})
+            razorpay_subscription_id = subscription_data.get("id")
+            razorpay_payment_id = payment_data.get("id")
+            
+            subscription = await db.subscriptions.find_one(
+                {"razorpay_subscription_id": razorpay_subscription_id}
+            )
+            
+            if subscription:
+                tenant_id = subscription["tenant_id"]
+                plan = await db.subscription_plans.find_one({"id": subscription["plan_id"]})
+                
+                # Calculate new end date
+                if subscription["billing_cycle"] == "yearly":
+                    duration_days = 365
+                else:
+                    duration_days = 30
+                
+                subscription_ends_at = (now + timedelta(days=duration_days)).isoformat()
+                
+                # Update tenant
+                await db.tenants.update_one(
+                    {"id": tenant_id},
+                    {"$set": {
+                        "subscription_ends_at": subscription_ends_at,
+                        "updated_at": now.isoformat()
+                    }}
+                )
+                
+                # Create invoice
+                await create_invoice_internal(
+                    tenant_id=tenant_id,
+                    subscription=subscription,
+                    plan=plan,
+                    payment_id=razorpay_payment_id,
+                    status="paid"
+                )
+                
+        elif event == "subscription.cancelled":
+            subscription_data = payload.get("payload", {}).get("subscription", {}).get("entity", {})
+            razorpay_subscription_id = subscription_data.get("id")
+            
+            await db.subscriptions.update_one(
+                {"razorpay_subscription_id": razorpay_subscription_id},
+                {"$set": {"status": "cancelled", "updated_at": now.isoformat()}}
+            )
+            
+        elif event == "payment.failed":
+            payment_data = payload.get("payload", {}).get("payment", {}).get("entity", {})
+            subscription_id = payment_data.get("subscription_id")
+            
+            if subscription_id:
+                subscription = await db.subscriptions.find_one(
+                    {"razorpay_subscription_id": subscription_id}
+                )
+                
+                if subscription:
+                    # Log failed payment
+                    failed_payment = {
+                        "id": str(uuid.uuid4()),
+                        "tenant_id": subscription["tenant_id"],
+                        "subscription_id": subscription["id"],
+                        "razorpay_payment_id": payment_data.get("id"),
+                        "amount": payment_data.get("amount", 0) / 100,
+                        "error_code": payment_data.get("error_code"),
+                        "error_description": payment_data.get("error_description"),
+                        "created_at": now.isoformat()
+                    }
+                    await db.failed_payments.insert_one(failed_payment)
+    
+    except Exception as e:
+        logging.error(f"Webhook processing error: {e}")
+    
+    return {"status": "ok"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
