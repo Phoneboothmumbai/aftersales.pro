@@ -6424,11 +6424,11 @@ async def get_invoices(
 @api_router.get("/billing/invoices/{invoice_id}")
 async def get_invoice(
     invoice_id: str,
-    tenant: dict = Depends(get_current_tenant)
+    user: dict = Depends(get_current_user)
 ):
     """Get specific invoice details"""
     invoice = await db.invoices.find_one(
-        {"id": invoice_id, "tenant_id": tenant["id"]},
+        {"id": invoice_id, "tenant_id": user["tenant_id"]},
         {"_id": 0}
     )
     
