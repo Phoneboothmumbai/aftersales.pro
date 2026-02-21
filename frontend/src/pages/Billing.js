@@ -505,7 +505,7 @@ export default function Billing() {
                         : plan.max_jobs_per_month}{" "}
                       jobs/month
                     </div>
-                    {plan.features?.slice(0, 3).map((feature, i) => (
+                    {plan.features && Object.values(plan.features).slice(0, 3).map((feature, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-green-500" />
                         {feature}
