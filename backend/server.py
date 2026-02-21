@@ -6409,10 +6409,10 @@ async def cancel_subscription(user: dict = Depends(get_current_user)):
 @api_router.get("/billing/invoices")
 async def get_invoices(
     limit: int = 20,
-    tenant: dict = Depends(get_current_tenant)
+    user: dict = Depends(get_current_user)
 ):
     """Get all invoices for tenant"""
-    tenant_id = tenant["id"]
+    tenant_id = user["tenant_id"]
     
     invoices = await db.invoices.find(
         {"tenant_id": tenant_id},
