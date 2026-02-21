@@ -20,6 +20,7 @@ import Inventory from "./pages/Inventory";
 import Metrics from "./pages/Metrics";
 import Customers from "./pages/Customers";
 import ProfitReports from "./pages/ProfitReports";
+import Billing from "./pages/Billing";
 import Contact from "./pages/Contact";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
