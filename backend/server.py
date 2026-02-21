@@ -5978,14 +5978,15 @@ async def get_plan_usage_internal(tenant_id: str, plan: dict):
     }
 
 @api_router.get("/billing/plans")
-async def get_available_plans(tenant: dict = Depends(get_current_tenant)):
+async def get_available_plans(user: dict = Depends(get_current_user)):
     """Get all available plans for upgrade/downgrade"""
+    tenant = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0})
     plans = await db.subscription_plans.find(
         {"is_active": True, "show_on_pricing": {"$ne": False}},
         {"_id": 0}
     ).sort("sort_order", 1).to_list(100)
     
-    current_plan_id = tenant.get("subscription_plan", "free")
+    current_plan_id = tenant.get("subscription_plan", "free") if tenant else "free"
     
     for plan in plans:
         plan["is_current"] = plan["id"] == current_plan_id
