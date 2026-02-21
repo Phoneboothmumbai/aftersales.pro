@@ -6265,13 +6265,13 @@ async def create_invoice_internal(tenant_id: str, subscription: dict, plan: dict
 @api_router.post("/billing/change-plan")
 async def change_plan(
     data: ChangePlanRequest,
-    tenant: dict = Depends(get_current_tenant)
+    user: dict = Depends(get_current_user)
 ):
     """Change subscription plan with proration"""
     if not razorpay_client:
         raise HTTPException(status_code=400, detail="Payment gateway not configured")
     
-    tenant_id = tenant["id"]
+    tenant_id = user["tenant_id"]
     tenant_data = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
     
     # Get new plan
