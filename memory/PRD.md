@@ -342,3 +342,14 @@ class DeviceInfo(BaseModel):
 - ✅ **RTL Support** - Arabic text direction support with full page layout flip
 - ✅ **Language Persistence** - Saves preference to localStorage via i18next-browser-languagedetector
 - ✅ **Translated Sections**: Common UI, Landing page, Auth (Login/Signup), Dashboard, Jobs, Customers, Inventory, Settings, Analytics, Notifications
+
+### Self-Service Billing with Razorpay - February 2026
+- ✅ **Billing Page** (`/billing`) - Full subscription management dashboard
+- ✅ **Plan Selection Dialog** - Visual plan comparison with Monthly/Yearly toggle
+- ✅ **Razorpay Subscription Integration** - Auto-recurring payments support
+- ✅ **GST-Compliant Invoicing** - With GSTIN, HSN code, CGST/SGST/IGST breakup
+- ✅ **Plan Usage Display** - Progress bars for jobs, users, branches, inventory
+- ✅ **Proration Support** - Credit calculation for plan changes
+- ✅ **Webhook Handler** - For payment events (subscription.activated, subscription.charged, payment.failed)
+- ✅ **Invoice PDF Generation** - Downloadable GST-compliant invoices
+- ✅ **Hard Block on Expiry** - Shows warning and redirects to billing page
