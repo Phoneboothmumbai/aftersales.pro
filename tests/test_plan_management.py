@@ -10,7 +10,7 @@ import os
 import uuid
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://globalsaas.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://aftersales-staging.preview.emergentagent.com').rstrip('/')
 
 # Super Admin credentials
 SUPER_ADMIN_EMAIL = "superadmin@aftersales.pro"

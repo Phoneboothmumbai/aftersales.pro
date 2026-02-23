@@ -15,196 +15,170 @@ PRODUCT REQUIREMENTS:
     - Inform Technician feature to notify technicians about new jobs via WhatsApp without sharing customer details.
     - Ability to add/edit phone numbers for team members to enable WhatsApp notifications.
     - Link repair job parts to an inventory system, adjusting stock and tracking usage history.
+    - During signup, collect the dealer's mobile number and shop address.
+    - Add a feature for super admins to show/hide subscription plans on the public pricing page.
+    - Redesign the Job Sheet PDF to be professional and visually appealing.
+    - Add a password reset option for tenants in the Super Admin panel.
 - **Multi-tenancy & Super Admin**: Full feature set including plan management, user impersonation, and tenant management.
-- **Internationalization**: Add support for multiple languages.
+- **Internationalization**: Add support for multiple languages (Thai, Mandarin, Hindi, Gujarati, Arabic, Spanish, etc.).
+- **Self-Service Billing**: Implement a self-service billing system with a payment gateway (Razorpay) for tenants to purchase and manage subscriptions.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The session successfully implemented several major features. A complete customer credit and ledger system is now functional, allowing shops to mark jobs as credit, view outstanding balances on the customer page, and see a detailed statement. A comprehensive, password-protected profit tracking system was also built, which calculates profit from revenue and expenses (parts/labor) and provides job-wise and party-wise reports.
+The agent first completed the multi-language support (i18n) feature, which was fully tested. Following that, the agent implemented a comprehensive self-service billing system using Razorpay, as requested by the user. This included new backend endpoints for handling subscriptions and webhooks, and a new frontend  page for tenants to manage their plans.
 
-Additionally, team management was enhanced to allow adding and editing phone numbers, which fixed a bug preventing WhatsApp notifications. An Inform Technician feature was added to both the job creation success modal and the job detail page. A public contact page was created, and a bug causing the delivery modal to not be scrollable was fixed. All completed work was tested via manual testing, API checks, screenshots, and two comprehensive test runs by the testing agent. The agent has just started work on the next major feature: linking parts used in repairs to the inventory system.
+The remainder of the session was dedicated to assisting the user with deploying these new features to their external Vultr server. This involved extensive troubleshooting of the user's production environment, which had numerous configuration and dependency issues, including incorrect Node.js/Python versions, missing process managers (), and conflicting Python packages (, ). The agent successfully guided the user through resolving these issues, and the backend service was started successfully on the user's server.
 
 **Last working item**:
--   **Last item agent was working:** Implementing an inventory-linked parts system for repairs. This involves allowing users to select parts from the inventory when marking a job as repaired, which will then automatically deduct the quantity from the inventory and create a usage history for that part.
--   **Status:** IN PROGRESS
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** both
--   **User Testing Done:** N
+- **Last item agent was working:** Assisting the user with the final steps of a complex manual deployment to their Vultr server. The last command successfully pulled the latest code from the  branch, rebuilt the application, installed dependencies, and started the backend process.
+- **Status:** USER VERIFICATION PENDING
+- **Agent Testing Done:** N
+- **Which testing method agent to use?** Manual testing by user on their live portal.
+- **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** (P0) Inventory-linked parts system implementation is incomplete.
+- **Issue 1 (P0):** Verify successful deployment on the Vultr server.
 
 **Issues Detail:**
--   **Issue 1: Inventory-linked parts system implementation is incomplete**
-    -   **Attempted fixes:**
-        -   Backend ():
-            -   Updated the  Pydantic model to accept a list of  objects (, ).
-            -   Modified the  endpoint () to process this list, deduct stock from the  collection, and record the usage within the  document.
-            -   Created a new endpoint  to fetch all jobs where a specific inventory item was used.
-    -   **Next debug checklist:**
-        1.  Modify the Mark as Repaired modal in .
-        2.  Replace the existing  text field with a dynamic component that allows searching and selecting multiple parts from the inventory (e.g., a multi-select dropdown with search or a button that opens a part selection modal).
-        3.  For each selected part, add an input field for the quantity used.
-        4.  Update the  function to send the structured array of  to the backend.
-        5.  Create a new UI view, likely on the  page, that is triggered by clicking an inventory item. This view will call the new  endpoint to display the part's usage history (job number, customer, date, etc.).
-    -   **Why fix this issue and what will be achieved with the fix?** This will provide accurate inventory tracking, prevent stock discrepancies, and give shop owners valuable data on which parts are used most frequently and for which jobs.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on other issue:** None
+- **Issue 1: Verify successful deployment on the Vultr server**
+    - **Attempted fixes:** The agent guided the user through a multi-step debugging process to resolve environment inconsistencies on their Vultr server. This included upgrading Node.js, installing yarn install v1.22.22
+[1/4] Resolving packages...
+[2/4] Fetching packages...
+[3/4] Linking dependencies...
+[4/4] Building fresh packages...
+success Saved lockfile.
+Done in 0.03s., fixing Python package conflicts (, , removing ), creating a missing  file, and manually starting the  server since  was not installed. The last command sequence appeared to complete successfully.
+    - **Next debug checklist:**
+        1. User needs to access their live portal () and confirm if the latest changes (i18n and Billing page) are visible and functional.
+        2. If not, the agent should check the Nginx configuration and the backend/frontend logs on the Vultr server ( for backend).
+    - **Why fix this issue and what will be achieved with the fix?** This will confirm that the features developed by the agent are live and accessible to the user and their customers.
+    - **Status:** USER VERIFICATION PENDING
+    - **Is recurring issue?** Y (Deployment issues have been a recurring theme).
+    - **Should Test frontend/backend/both after fix?** Both
+    - **Blocked on other issue:** None
 
 **In progress Task List**:
--   **Task 1: Complete Inventory-Linked Parts System**
-    -   **Where to resume:** Focus on the frontend implementation as described in the Next debug checklist for Issue 1 above. The backend logic is in place but needs the corresponding UI to be functional.
-    -   **What will be achieved with this?** A fully integrated inventory management system where parts are consumed and tracked automatically through the repair workflow.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Both
-    *   **Blocked on something:** None.
+- None
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks:**
-    -   (P1) **Multi-language Support**: Add internationalization (i18n). The user has requested this multiple times.
-    -   (P1) **WhatsApp Alerts**: Notify shops about expiring subscriptions via WhatsApp.
-    -   (P1) **Plan Usage UI**: Add progress bars in the tenant dashboard to show current usage against plan limits.
--   **Future Tasks:**
-    -   (P2) **Revenue Forecasting**: Predict next month's revenue based on expiring subscriptions.
-    -   (P2) **Churn Report**: Analytics for shops that did not renew.
-    -   (P2) **Email notifications** for job status changes.
-    -   (P3) **Refactor **: Break the monolith into a modular structure using FastAPI routers.
-    -   (P3) **Containerize the application**: Use Docker to simplify future deployments.
+- **Upcoming Tasks:**
+    - (P1) **WhatsApp Alerts**: Notify shops about expiring subscriptions via WhatsApp.
+    - (P1) **Plan Usage UI**: Add more detailed progress bars/visuals in the tenant dashboard to show current usage against plan limits.
+    - (P1) **Razorpay Webhook Finalization**: Complete and test the webhook endpoint to automatically handle subscription status changes (e.g., payment success, failure).
+- **Future Tasks:**
+    - (P2) **Revenue Forecasting**: Predict next month's revenue based on expiring subscriptions.
+    - (P2) **Churn Report**: Analytics for shops that did not renew.
+    - (P2) **Email notifications** for job status changes.
+    - (P3) **Refactor **: Break the monolith into a modular structure using FastAPI routers.
+    - (P3) **Containerize the application**: Use Docker to simplify future deployments.
 
 **Completed work in this session**
--   **Customer Ledger & Optional Fields (DONE)**:
-    -   Made 'IMEI/Serial' & 'Device Condition' fields optional in .
-    -   Added an 'Unlock Pattern' field with a visual grid () and text input toggle.
-    -   Implemented the full customer ledger UI in  with outstanding balances, a View Statement modal, and payment recording capabilities.
--   **Profit Tracking System (DONE)**:
-    -   Created a new password-protected page  with role-based access.
-    -   Implemented UI for job-wise/party-wise profit reports, summary stats, and bulk expense entry.
-    -   Added backend endpoints for setting/verifying passwords and fetching all profit data.
-    -   Updated the delivery modal in  to capture optional  and  costs.
--   **Team Management & WhatsApp Fix (DONE)**:
-    -   Added a  number field to the Add Team Member and Edit Team Member modals in .
-    -   Created a  endpoint and updated the  model in  to include the  field, fixing the bug where WhatsApp messages could not be sent.
--   **Inform Technician Feature (DONE)**:
-    -   Added a button on the job creation success modal () and the  Actions card to send job details (excluding customer info) to a technician via WhatsApp.
--   **Contact Page (DONE)**:
-    -   Created  with business details and added a link to the landing page footer.
--   **Bug Fix (DONE)**:
-    -   Fixed a scrolling issue on the delivery modal in  by adding .
+- **Multi-language Support (i18n) (DONE):** Fully implemented and tested internationalization for 11 languages. This included a  component, refactoring key pages (, , ), and populating translation files. Verified by the testing agent.
+- **Self-Service Billing with Razorpay (DONE):**
+    - Integrated Razorpay for handling recurring subscriptions.
+    - Created backend endpoints () for creating subscriptions, fetching status/invoices, and a webhook handler.
+    - Created a new  page in the frontend for tenants to view their current plan, see usage statistics, and upgrade their subscription via a plan selection modal.
+- **Vultr Deployment Troubleshooting (DONE):** Resolved numerous issues on the user's live server related to Node.js version, Python dependencies (, ), missing  file, and lack of a process manager.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: React Hook Dependency Warnings**
-    -   **Debug checklist:** The linter consistently reports warnings in  and  for missing dependencies in  hooks. These should be reviewed and fixed to prevent stale state issues.
-    -   **Why to solve this issue and what will be achieved with this?** Adhering to React best practices ensures code stability and predictable behavior.
-    -   **Should Test frontend/backend/both after fix:** Frontend
-    -   **Is recurring issue?** Y
+- **Issue 1: React Hook Dependency Warnings**
+    - **Debug checklist:** The linter consistently reports warnings in  for missing dependencies in  hooks. These should be reviewed and fixed to prevent stale state issues. This was seen again during the build process on the user's server.
+    - **Why to solve this issue and what will be achieved with this?** Adhering to React best practices ensures code stability and predictable behavior.
+    - **Should Test frontend/backend/both after fix:** Frontend
+    - **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** Manual deployment process.
--   **Recurrence count:** High.
--   **Status:** RESOLVED. The agent consistently provided the user with a reliable one-liner deployment command, which has become the standard procedure for deploying updates.
+- None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Backend**: FastAPI, Motor (async MongoDB), Pydantic, JWT, bcrypt.
--   **Frontend**: React, React Router, Axios, Tailwind CSS, Shadcn UI.
--   **Testing**: Pytest for backend unit/integration tests, manual E2E testing with screenshots.
+- **Backend**: FastAPI, Motor (async MongoDB), Pydantic, ReportLab.
+- **Frontend**: React, React Router, Axios, Tailwind CSS, Shadcn UI.
+- **Internationalization**: , .
+- **Payments**: Razorpay API.
 
 **key DB schema**
--   **jobs**:
-    -    sub-document now contains , where  is .
-    -    sub-document now contains  and .
--   **tenants**:
-    -   Added .
--   **users**:
-    -   The  field is now actively used for sending WhatsApp notifications.
+- **tenants**:
+    -  (new)
+    -  (new)
+    -  (new, e.g., 'trialing', 'active', 'expired')
+
+**changes in tech stack**
+- Added  Python library for payment processing.
 
 **All files of reference**
--   
--   
--   
--   
--   
--   
--   
--   **New Files:**
-    -   
-    -   
-    -   
-    -   
-    -   
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- All files in 
 
 **Areas that need refactoring**:
--    is over 3500 lines long and urgently needs to be broken down into smaller components.
--    is a large monolith that should be refactored into a modular structure using FastAPI routers.
+-  is extremely large and complex; it should be broken down into smaller, manageable components.
+-  remains a large monolith that would benefit from being refactored into a modular structure with FastAPI routers.
 
 **key api endpoints**
--   **Profit Tracking (New)**:
-    -   
-    -   
-    -   
-    -   
-    -   
-    -   
-    -   
--   **Team Management (New/Updated)**:
-    -    (New endpoint to update user details, including phone).
-    -    (Response model updated to include ).
--   **Inventory (New)**:
-    -   
--   **Jobs (Updated)**:
-    -    (Payload updated to accept , ).
-    -    (Payload updated to accept  array).
+- **Billing (New)**:
+    - : Creates a Razorpay subscription for the tenant.
+    - : Handles webhooks from Razorpay for payment events.
+    - : Fetches the current tenant's billing and subscription status.
+    - : Fetches a list of past invoices for the tenant.
+    - : Gets current resource usage against plan limits.
 
 **Critical Info for New Agent**
--   The user is now accustomed to receiving a **one-liner deployment command** after each feature implementation. Continue providing this command: 
--   The immediate priority is to complete the inventory-linked parts system by building the frontend components in  and the inventory history view.
+- **User's Production Environment is Fragile:** The Vultr server has a custom, manual setup. It does **not** use . The backend is started with . Any deployment commands must respect this.
+- **Dependency Management:** The user's server has system-level Python packages that conflict with the application's requirements. The  package must be removed from  before deployment.  and  versions might also need pinning or specific handling.
+- **Deployment Branch:** The user is now deploying from the  branch, not .
+- **Deployment Path:** The application code is located at  on the user's server.
 
 **documents and test reports created in this job**
--    (Updated)
--    (Covers optional fields, pattern lock, and customer ledger)
--    (Covers profit tracking system)
--   
--   
+-  (Updated with i18n and Billing features)
+-  (Covers i18n feature)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Asks to add a Contact Us page. (COMPLETED)
-2.  **User**: Asks for an Inform Technician feature after job creation. (COMPLETED)
-3.  **User**: Asks for the one-line deployment command. (PROVIDED)
-4.  **User**: Asks to add the Inform Technician button to the job detail page as well. (COMPLETED)
-5.  **User**: Asks to add a phone number field for team members. (COMPLETED)
-6.  **User**: Acknowledges credits added. (NONE)
-7.  **User**: Asks to add an Edit button for team members. (COMPLETED)
-8.  **User**: Reports that WhatsApp notifications are not being sent even after adding a number. (COMPLETED - Fixed via backend changes)
-9.  **User**: Asks to link parts used during repair to the inventory system, auto-adjust stock, and provide usage history. (IN PROGRESS)
-10. **Agent**: Started implementing the inventory-linked parts system. (IN PROGRESS)
+10. **User**: Confirms they will use Razorpay for billing. (ACKNOWLEDGED)
+9.  **User**: Provides deployment command output showing . (ADDRESSED)
+8.  **User**: Provides deployment command output showing Node.js version incompatibility. (ADDRESSED)
+7.  **User**: Reports still no change on portal after running a deployment command. (ADDRESSED)
+6.  **User**: Asks for a deployment command for the  branch. (PROVIDED)
+5.  **User**: Provides output of a failed  due to a missing  package. (ADDRESSED)
+4.  **User**: Provides output of a failed  due to  version incompatibility. (ADDRESSED)
+3.  **User**: Provides logs showing a  attribute error, preventing the backend from starting. (ADDRESSED)
+2.  **User**: Provides logs showing a  after fixing OpenSSL, indicating a missing  file. (ADDRESSED)
+1.  **User**: After being guided through the full deployment fix, asks to check the API with . The agent confirms the backend is running and advises the user to check their portal. (PENDING USER VERIFICATION)
 
 **Project Health Check:**
--   **Working**: The live application is stable. All newly implemented features (Customer Ledger, Profit Tracking, Contact Page, Team Member editing, Inform Technician) are functional and have been tested.
--   **Broken**: No part of the application is broken.
--   **In Progress**: The inventory-linked parts system is partially implemented (backend is ready, frontend is pending).
+- **Working**: Within the agent's environment, the application is fully functional, including the newly added i18n and billing features.
+- **Broken**: The state of the user's live deployment on Vultr is unconfirmed. While the backend process was started successfully, the user has not yet verified if the site is working as expected.
 
 **3rd Party Integrations**
--   **Cloudflare**: Used for DNS management. No new integrations were added.
+- **i18next**: 
+- **react-i18next**: 
+- **i18next-browser-languagedetector**: 
+- **Razorpay**: 
+- **Cloudflare**: Used for DNS management.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES. Used for the customer ledger features and the profit tracking system.
--   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**:
-    -   
-    -   
--   **Known regressions**: None.
+- **Testing agent used after significant changes**: YES. Used for the i18n feature.
+- **Troubleshoot agent used after agent stuck in loop**: NO
+- **Test files created**: None.
+- **Known regressions**: None.
 
 **Credentials to test flow:**
--   **Super Admin URL**: 
--   **Super Admin Email**: 
--   **Super Admin Password**: 
--   **Shop Login URL**:  (Requires a tenant subdomain, email, and password. A  or newly created shop can be used for testing).
+- **Super Admin URL**: 
+- **Super Admin Email**: 
+- **Super Admin Password**: 
+- **Shop Login URL**:  (Requires a tenant subdomain, email, and password. A  or newly created shop can be used for testing).
 
 **What agent forgot to execute**
--   The React hook dependency warnings in  and , carried over from the previous session, have still not been addressed.
--   The implementation of multi-language support is still pending, although the user has asked for it. This is correctly listed in the upcoming tasks.</analysis>
+- The recurring React hook dependency warnings in , which were flagged by the linter during the remote build, have still not been addressed.</analysis>
