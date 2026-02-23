@@ -91,6 +91,34 @@
       "subtitle": "Join thousands of repair shops already using AfterSales Pro",
       "button": "Start Free Trial"
     },
+    "hero_badge": "Now with 14-day free trial",
+    "no_credit_card": "No credit card required",
+    "setup_time": "Setup in 2 minutes",
+    "active_jobs": "Active Jobs",
+    "completed_today": "Completed Today",
+    "pending_delivery": "Pending Delivery",
+    "how_it_works": {
+      "title": "How it works",
+      "subtitle": "Simple workflow, powerful results",
+      "step1_title": "Create Job",
+      "step1_desc": "Customer walks in, fill the form",
+      "step2_title": "Diagnose",
+      "step2_desc": "Add diagnosis and cost estimate",
+      "step3_title": "Repair",
+      "step3_desc": "Complete work and update status",
+      "step4_title": "Deliver",
+      "step4_desc": "Close job and collect payment"
+    },
+    "features": {
+      "dispute_prevention": {
+        "title": "Dispute Prevention",
+        "description": "Accessories checklist, device condition notes, and full audit trail. Protect your business."
+      },
+      "status_timeline": {
+        "title": "Status Timeline",
+        "description": "Every status change is timestamped and logged. Complete transparency for you and your customers."
+      }
+    },
     "footer": {
       "product": "Product",
       "features": "Features",

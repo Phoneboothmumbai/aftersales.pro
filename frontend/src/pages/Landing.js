@@ -169,15 +169,13 @@ export default function Landing() {
     },
     {
       icon: Shield,
-      title: "Dispute Prevention",
-      description:
-        "Accessories checklist, device condition notes, and full audit trail. Protect your business.",
+      title: t("landing.features.dispute_prevention.title"),
+      description: t("landing.features.dispute_prevention.description"),
     },
     {
       icon: Clock,
-      title: "Status Timeline",
-      description:
-        "Every status change is timestamped and logged. Complete transparency for you and your customers.",
+      title: t("landing.features.status_timeline.title"),
+      description: t("landing.features.status_timeline.description"),
     },
     {
       icon: Wrench,
@@ -259,7 +257,7 @@ export default function Landing() {
             <div className="space-y-8">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
                 <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                Now with 14-day free trial
+                {t("landing.hero_badge")}
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance">
                 {t("landing.hero.title").split(",")[0]},{" "}
@@ -290,11 +288,11 @@ export default function Landing() {
               <div className="flex items-center gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />
-                  No credit card required
+                  {t("landing.no_credit_card")}
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />
-                  Setup in 2 minutes
+                  {t("landing.setup_time")}
                 </div>
               </div>
             </div>
@@ -310,15 +308,15 @@ export default function Landing() {
                   <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">Active Jobs</p>
+                        <p className="text-sm text-muted-foreground">{t("landing.active_jobs")}</p>
                         <p className="text-2xl font-bold">24</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Completed Today</p>
+                        <p className="text-sm text-muted-foreground">{t("landing.completed_today")}</p>
                         <p className="text-2xl font-bold text-green-600">8</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Pending Delivery</p>
+                        <p className="text-sm text-muted-foreground">{t("landing.pending_delivery")}</p>
                         <p className="text-2xl font-bold text-orange-500">5</p>
                       </div>
                     </div>
@@ -365,15 +363,15 @@ export default function Landing() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">How it works</h2>
-            <p className="text-lg text-muted-foreground">Simple workflow, powerful results</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">{t("landing.how_it_works.title")}</h2>
+            <p className="text-lg text-muted-foreground">{t("landing.how_it_works.subtitle")}</p>
           </div>
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: "1", title: "Create Job", desc: "Customer walks in, fill the form" },
-              { step: "2", title: "Diagnose", desc: "Add diagnosis and cost estimate" },
-              { step: "3", title: "Repair", desc: "Complete work and update status" },
-              { step: "4", title: "Deliver", desc: "Close job and collect payment" },
+              { step: "1", title: t("landing.how_it_works.step1_title"), desc: t("landing.how_it_works.step1_desc") },
+              { step: "2", title: t("landing.how_it_works.step2_title"), desc: t("landing.how_it_works.step2_desc") },
+              { step: "3", title: t("landing.how_it_works.step3_title"), desc: t("landing.how_it_works.step3_desc") },
+              { step: "4", title: t("landing.how_it_works.step4_title"), desc: t("landing.how_it_works.step4_desc") },
             ].map((item, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
