@@ -91,6 +91,34 @@
       "subtitle": "Bergabunglah dengan ribuan toko reparasi yang sudah menggunakan AfterSales Pro",
       "button": "Mulai Uji Coba Gratis"
     },
+    "hero_badge": "Uji coba gratis 14 hari",
+    "no_credit_card": "Tidak perlu kartu kredit",
+    "setup_time": "Setup dalam 2 menit",
+    "active_jobs": "Pekerjaan Aktif",
+    "completed_today": "Selesai Hari Ini",
+    "pending_delivery": "Menunggu Pengiriman",
+    "how_it_works": {
+      "title": "Cara Kerjanya",
+      "subtitle": "Alur kerja sederhana, hasil yang kuat",
+      "step1_title": "Buat Pekerjaan",
+      "step1_desc": "Pelanggan datang, isi formulir",
+      "step2_title": "Diagnosis",
+      "step2_desc": "Tambahkan diagnosis dan perkiraan biaya",
+      "step3_title": "Reparasi",
+      "step3_desc": "Selesaikan pekerjaan dan perbarui status",
+      "step4_title": "Kirim",
+      "step4_desc": "Tutup pekerjaan dan terima pembayaran"
+    },
+    "features": {
+      "dispute_prevention": {
+        "title": "Pencegahan Sengketa",
+        "description": "Daftar aksesori, catatan kondisi perangkat, dan jejak audit lengkap. Lindungi bisnis Anda."
+      },
+      "status_timeline": {
+        "title": "Timeline Status",
+        "description": "Setiap perubahan status dicatat dengan waktu. Transparansi penuh untuk Anda dan pelanggan."
+      }
+    },
     "footer": {
       "product": "Produk",
       "features": "Fitur",

@@ -91,6 +91,34 @@
       "subtitle": "Tham gia cùng hàng ngàn cửa hàng đang sử dụng AfterSales Pro",
       "button": "Bắt đầu dùng thử miễn phí"
     },
+    "hero_badge": "Dùng thử miễn phí 14 ngày",
+    "no_credit_card": "Không cần thẻ tín dụng",
+    "setup_time": "Cài đặt trong 2 phút",
+    "active_jobs": "Công việc đang hoạt động",
+    "completed_today": "Hoàn thành hôm nay",
+    "pending_delivery": "Chờ giao hàng",
+    "how_it_works": {
+      "title": "Cách hoạt động",
+      "subtitle": "Quy trình đơn giản, kết quả mạnh mẽ",
+      "step1_title": "Tạo công việc",
+      "step1_desc": "Khách hàng đến, điền biểu mẫu",
+      "step2_title": "Chẩn đoán",
+      "step2_desc": "Thêm chẩn đoán và ước tính chi phí",
+      "step3_title": "Sửa chữa",
+      "step3_desc": "Hoàn thành công việc và cập nhật trạng thái",
+      "step4_title": "Giao hàng",
+      "step4_desc": "Đóng công việc và thu tiền"
+    },
+    "features": {
+      "dispute_prevention": {
+        "title": "Ngăn ngừa tranh chấp",
+        "description": "Danh sách phụ kiện, ghi chú tình trạng thiết bị, và lịch sử kiểm tra đầy đủ. Bảo vệ doanh nghiệp của bạn."
+      },
+      "status_timeline": {
+        "title": "Dòng thời gian trạng thái",
+        "description": "Mọi thay đổi trạng thái đều được ghi nhận thời gian. Minh bạch hoàn toàn cho bạn và khách hàng."
+      }
+    },
     "footer": {
       "product": "Sản phẩm",
       "features": "Tính năng",
