@@ -91,6 +91,34 @@
       "subtitle": "加入已经在使用 AfterSales Pro 的数千家维修店",
       "button": "开始免费试用"
     },
+    "hero_badge": "14天免费试用",
+    "no_credit_card": "无需信用卡",
+    "setup_time": "2分钟完成设置",
+    "active_jobs": "进行中的工作",
+    "completed_today": "今日完成",
+    "pending_delivery": "待交付",
+    "how_it_works": {
+      "title": "如何运作",
+      "subtitle": "简单流程，强大效果",
+      "step1_title": "创建工单",
+      "step1_desc": "客户到店，填写表单",
+      "step2_title": "诊断",
+      "step2_desc": "添加诊断和费用估算",
+      "step3_title": "维修",
+      "step3_desc": "完成工作并更新状态",
+      "step4_title": "交付",
+      "step4_desc": "结束工单并收款"
+    },
+    "features": {
+      "dispute_prevention": {
+        "title": "纠纷预防",
+        "description": "配件清单、设备状况记录和完整审计追踪。保护您的业务。"
+      },
+      "status_timeline": {
+        "title": "状态时间线",
+        "description": "每次状态变更都有时间戳和记录。为您和客户提供完全透明。"
+      }
+    },
     "footer": {
       "product": "产品",
       "features": "功能",
