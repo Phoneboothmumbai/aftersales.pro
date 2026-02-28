@@ -1169,8 +1169,12 @@ async def update_user(user_id: str, data: UserUpdate, admin: dict = Depends(requ
         update_data["phone"] = data.phone
     if data.role:
         update_data["role"] = data.role
+    if data.role_id is not None:
+        update_data["role_id"] = data.role_id if data.role_id else None
     if data.branch_id is not None:
         update_data["branch_id"] = data.branch_id if data.branch_id else None
+    if data.branch_ids is not None:
+        update_data["branch_ids"] = data.branch_ids
     
     if update_data:
         await db.users.update_one(
