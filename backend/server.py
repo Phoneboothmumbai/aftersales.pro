@@ -1203,6 +1203,309 @@ async def delete_user(user_id: str, admin: dict = Depends(require_admin)):
     
     return {"message": "User deleted"}
 
+# ==================== ROLE MANAGEMENT ROUTES ====================
+
+# Default system roles with permissions
+DEFAULT_ROLES = [
+    {
+        "name": "Admin",
+        "description": "Full access to all features and branches",
+        "is_system": True,
+        "permissions": {
+            "modules": {
+                "jobs": {"view": True, "create": True, "edit": True, "delete": True},
+                "customers": {"view": True, "create": True, "edit": True, "delete": True},
+                "inventory": {"view": True, "create": True, "edit": True, "delete": True},
+                "team": {"view": True, "create": True, "edit": True, "delete": True},
+                "reports": {"view": True, "create": True, "edit": True, "delete": True},
+                "settings": {"view": True, "create": True, "edit": True, "delete": True},
+                "billing": {"view": True, "create": True, "edit": True, "delete": True},
+                "branches": {"view": True, "create": True, "edit": True, "delete": True},
+            },
+            "actions": {
+                "approve_jobs": True,
+                "record_payment": True,
+                "view_profit_reports": True,
+                "send_whatsapp": True,
+                "download_pdf": True,
+                "assign_technician": True,
+                "manage_inventory": True,
+                "view_analytics": True,
+                "manage_roles": True,
+            }
+        }
+    },
+    {
+        "name": "Manager",
+        "description": "Branch manager with limited admin access",
+        "is_system": True,
+        "permissions": {
+            "modules": {
+                "jobs": {"view": True, "create": True, "edit": True, "delete": False},
+                "customers": {"view": True, "create": True, "edit": True, "delete": False},
+                "inventory": {"view": True, "create": True, "edit": True, "delete": False},
+                "team": {"view": True, "create": False, "edit": False, "delete": False},
+                "reports": {"view": True, "create": False, "edit": False, "delete": False},
+                "settings": {"view": True, "create": False, "edit": False, "delete": False},
+                "billing": {"view": False, "create": False, "edit": False, "delete": False},
+                "branches": {"view": True, "create": False, "edit": False, "delete": False},
+            },
+            "actions": {
+                "approve_jobs": True,
+                "record_payment": True,
+                "view_profit_reports": False,
+                "send_whatsapp": True,
+                "download_pdf": True,
+                "assign_technician": True,
+                "manage_inventory": True,
+                "view_analytics": True,
+                "manage_roles": False,
+            }
+        }
+    },
+    {
+        "name": "Technician",
+        "description": "Can view and work on assigned jobs",
+        "is_system": True,
+        "permissions": {
+            "modules": {
+                "jobs": {"view": True, "create": False, "edit": True, "delete": False},
+                "customers": {"view": True, "create": False, "edit": False, "delete": False},
+                "inventory": {"view": True, "create": False, "edit": False, "delete": False},
+                "team": {"view": False, "create": False, "edit": False, "delete": False},
+                "reports": {"view": False, "create": False, "edit": False, "delete": False},
+                "settings": {"view": False, "create": False, "edit": False, "delete": False},
+                "billing": {"view": False, "create": False, "edit": False, "delete": False},
+                "branches": {"view": False, "create": False, "edit": False, "delete": False},
+            },
+            "actions": {
+                "approve_jobs": False,
+                "record_payment": False,
+                "view_profit_reports": False,
+                "send_whatsapp": True,
+                "download_pdf": True,
+                "assign_technician": False,
+                "manage_inventory": False,
+                "view_analytics": False,
+                "manage_roles": False,
+            }
+        }
+    },
+    {
+        "name": "Receptionist",
+        "description": "Can create jobs and manage customers",
+        "is_system": True,
+        "permissions": {
+            "modules": {
+                "jobs": {"view": True, "create": True, "edit": True, "delete": False},
+                "customers": {"view": True, "create": True, "edit": True, "delete": False},
+                "inventory": {"view": True, "create": False, "edit": False, "delete": False},
+                "team": {"view": False, "create": False, "edit": False, "delete": False},
+                "reports": {"view": False, "create": False, "edit": False, "delete": False},
+                "settings": {"view": False, "create": False, "edit": False, "delete": False},
+                "billing": {"view": False, "create": False, "edit": False, "delete": False},
+                "branches": {"view": False, "create": False, "edit": False, "delete": False},
+            },
+            "actions": {
+                "approve_jobs": False,
+                "record_payment": True,
+                "view_profit_reports": False,
+                "send_whatsapp": True,
+                "download_pdf": True,
+                "assign_technician": False,
+                "manage_inventory": False,
+                "view_analytics": False,
+                "manage_roles": False,
+            }
+        }
+    },
+]
+
+async def ensure_default_roles(tenant_id: str):
+    """Create default roles for a tenant if they don't exist"""
+    existing = await db.roles.find_one({"tenant_id": tenant_id})
+    if existing:
+        return  # Roles already exist
+    
+    now = datetime.now(timezone.utc).isoformat()
+    for role_template in DEFAULT_ROLES:
+        role = {
+            "id": str(uuid.uuid4()),
+            "tenant_id": tenant_id,
+            "name": role_template["name"],
+            "description": role_template["description"],
+            "is_default": True,
+            "is_system": role_template["is_system"],
+            "permissions": role_template["permissions"],
+            "created_at": now
+        }
+        await db.roles.insert_one(role)
+
+@api_router.get("/roles", response_model=List[RoleResponse])
+async def list_roles(user: dict = Depends(get_current_user)):
+    """List all roles for the tenant"""
+    # Ensure default roles exist
+    await ensure_default_roles(user["tenant_id"])
+    
+    roles = await db.roles.find(
+        {"tenant_id": user["tenant_id"]},
+        {"_id": 0}
+    ).to_list(100)
+    return [RoleResponse(**r) for r in roles]
+
+@api_router.get("/roles/{role_id}", response_model=RoleResponse)
+async def get_role(role_id: str, user: dict = Depends(get_current_user)):
+    """Get a specific role"""
+    role = await db.roles.find_one(
+        {"id": role_id, "tenant_id": user["tenant_id"]},
+        {"_id": 0}
+    )
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    return RoleResponse(**role)
+
+@api_router.post("/roles", response_model=RoleResponse)
+async def create_role(data: RoleCreate, admin: dict = Depends(require_admin)):
+    """Create a custom role"""
+    # Check if role name already exists
+    existing = await db.roles.find_one({
+        "name": data.name,
+        "tenant_id": admin["tenant_id"]
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="Role name already exists")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    role_id = str(uuid.uuid4())
+    
+    role = {
+        "id": role_id,
+        "tenant_id": admin["tenant_id"],
+        "name": data.name,
+        "description": data.description,
+        "is_default": False,
+        "is_system": False,
+        "permissions": data.permissions.model_dump(),
+        "created_at": now
+    }
+    await db.roles.insert_one(role)
+    return RoleResponse(**role)
+
+@api_router.put("/roles/{role_id}", response_model=RoleResponse)
+async def update_role(role_id: str, data: RoleUpdate, admin: dict = Depends(require_admin)):
+    """Update a role"""
+    role = await db.roles.find_one({
+        "id": role_id,
+        "tenant_id": admin["tenant_id"]
+    })
+    
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    
+    # Cannot modify system Admin role name
+    if role.get("is_system") and role.get("name") == "Admin" and data.name and data.name != "Admin":
+        raise HTTPException(status_code=400, detail="Cannot rename the Admin role")
+    
+    update_data = {}
+    if data.name:
+        # Check if name is taken
+        name_exists = await db.roles.find_one({
+            "name": data.name,
+            "tenant_id": admin["tenant_id"],
+            "id": {"$ne": role_id}
+        })
+        if name_exists:
+            raise HTTPException(status_code=400, detail="Role name already exists")
+        update_data["name"] = data.name
+    
+    if data.description is not None:
+        update_data["description"] = data.description
+    
+    if data.permissions:
+        update_data["permissions"] = data.permissions.model_dump()
+    
+    if update_data:
+        await db.roles.update_one(
+            {"id": role_id},
+            {"$set": update_data}
+        )
+    
+    updated = await db.roles.find_one({"id": role_id}, {"_id": 0})
+    return RoleResponse(**updated)
+
+@api_router.delete("/roles/{role_id}")
+async def delete_role(role_id: str, admin: dict = Depends(require_admin)):
+    """Delete a custom role"""
+    role = await db.roles.find_one({
+        "id": role_id,
+        "tenant_id": admin["tenant_id"]
+    })
+    
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    
+    if role.get("is_system"):
+        raise HTTPException(status_code=400, detail="Cannot delete system roles")
+    
+    # Check if any users have this role
+    users_with_role = await db.users.count_documents({
+        "role_id": role_id,
+        "tenant_id": admin["tenant_id"]
+    })
+    
+    if users_with_role > 0:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Cannot delete role. {users_with_role} user(s) are assigned to this role."
+        )
+    
+    await db.roles.delete_one({"id": role_id})
+    return {"message": "Role deleted"}
+
+# Helper function to get user's effective permissions
+async def get_user_permissions(user: dict) -> dict:
+    """Get the effective permissions for a user"""
+    # Admin always has full access
+    if user.get("role") == "admin":
+        return DEFAULT_ROLES[0]["permissions"]
+    
+    # If user has a role_id, get permissions from that role
+    if user.get("role_id"):
+        role = await db.roles.find_one({"id": user["role_id"]}, {"_id": 0})
+        if role:
+            return role.get("permissions", {})
+    
+    # Fallback to role name matching
+    role_name = user.get("role", "technician").lower()
+    for default_role in DEFAULT_ROLES:
+        if default_role["name"].lower() == role_name:
+            return default_role["permissions"]
+    
+    # Default to technician permissions
+    return DEFAULT_ROLES[2]["permissions"]
+
+# Helper function to check branch access
+def user_can_access_branch(user: dict, branch_id: str) -> bool:
+    """Check if user can access a specific branch"""
+    # Admin has access to all branches
+    if user.get("role") == "admin":
+        return True
+    
+    # No branch restriction means all branches
+    user_branches = user.get("branch_ids", [])
+    if not user_branches and not user.get("branch_id"):
+        return True
+    
+    # Check branch_ids array first
+    if user_branches and branch_id in user_branches:
+        return True
+    
+    # Fallback to single branch_id
+    if user.get("branch_id") == branch_id:
+        return True
+    
+    return False
+
 # ==================== BRANCH ROUTES ====================
 
 @api_router.post("/branches", response_model=BranchResponse)
