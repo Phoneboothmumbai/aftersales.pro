@@ -94,7 +94,10 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     role: str = "technician"
+    role_id: Optional[str] = None
     branch_id: Optional[str] = None
+    branch_ids: Optional[List[str]] = None
+    phone: Optional[str] = None
 
 class UserResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -103,8 +106,10 @@ class UserResponse(BaseModel):
     name: str
     email: str
     role: str
+    role_id: Optional[str] = None
     phone: Optional[str] = None
     branch_id: Optional[str] = None
+    branch_ids: Optional[List[str]] = None
     created_at: str
 
 class LoginRequest(BaseModel):
