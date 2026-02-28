@@ -1123,7 +1123,10 @@ async def create_user(data: UserCreate, admin: dict = Depends(require_admin)):
         "email": data.email.lower(),
         "password": hash_password(data.password),
         "role": data.role,
+        "role_id": data.role_id,
+        "phone": data.phone,
         "branch_id": data.branch_id,
+        "branch_ids": data.branch_ids or [],
         "created_at": now
     }
     await db.users.insert_one(user)
