@@ -266,7 +266,42 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     role: Optional[str] = None
+    role_id: Optional[str] = None
     branch_id: Optional[str] = None
+    branch_ids: Optional[List[str]] = None
+
+# ==================== ROLE & PERMISSIONS MODELS ====================
+
+class ModulePermissions(BaseModel):
+    view: bool = False
+    create: bool = False
+    edit: bool = False
+    delete: bool = False
+
+class RolePermissions(BaseModel):
+    modules: Dict[str, ModulePermissions] = {}
+    actions: Dict[str, bool] = {}
+
+class RoleCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    permissions: RolePermissions
+
+class RoleUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    permissions: Optional[RolePermissions] = None
+
+class RoleResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    tenant_id: Optional[str] = None
+    name: str
+    description: Optional[str] = None
+    is_default: bool = False
+    is_system: bool = False
+    permissions: dict
+    created_at: str
 
 # ==================== INVENTORY MODELS ====================
 
