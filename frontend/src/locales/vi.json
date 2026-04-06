@@ -65,6 +65,14 @@
       "multi_branch": {
         "title": "Hỗ trợ nhiều chi nhánh",
         "description": "Quản lý nhiều địa điểm từ một bảng điều khiển duy nhất"
+      },
+      "dispute_prevention": {
+        "title": "Ngăn ngừa tranh chấp",
+        "description": "Danh sách phụ kiện, ghi chú tình trạng thiết bị, và lịch sử kiểm tra đầy đủ. Bảo vệ doanh nghiệp của bạn."
+      },
+      "status_timeline": {
+        "title": "Dòng thời gian trạng thái",
+        "description": "Mọi thay đổi trạng thái đều được ghi nhận thời gian. Minh bạch hoàn toàn cho bạn và khách hàng."
       }
     },
     "pricing": {
@@ -108,16 +116,6 @@
       "step3_desc": "Hoàn thành công việc và cập nhật trạng thái",
       "step4_title": "Giao hàng",
       "step4_desc": "Đóng công việc và thu tiền"
-    },
-    "features": {
-      "dispute_prevention": {
-        "title": "Ngăn ngừa tranh chấp",
-        "description": "Danh sách phụ kiện, ghi chú tình trạng thiết bị, và lịch sử kiểm tra đầy đủ. Bảo vệ doanh nghiệp của bạn."
-      },
-      "status_timeline": {
-        "title": "Dòng thời gian trạng thái",
-        "description": "Mọi thay đổi trạng thái đều được ghi nhận thời gian. Minh bạch hoàn toàn cho bạn và khách hàng."
-      }
     },
     "footer": {
       "product": "Sản phẩm",

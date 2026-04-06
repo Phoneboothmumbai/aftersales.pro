@@ -65,6 +65,14 @@
       "multi_branch": {
         "title": "Multi-Branch Support",
         "description": "Manage multiple locations from a single dashboard"
+      },
+      "dispute_prevention": {
+        "title": "Dispute Prevention",
+        "description": "Accessories checklist, device condition notes, and full audit trail. Protect your business."
+      },
+      "status_timeline": {
+        "title": "Status Timeline",
+        "description": "Every status change is timestamped and logged. Complete transparency for you and your customers."
       }
     },
     "pricing": {
@@ -108,16 +116,6 @@
       "step3_desc": "Complete work and update status",
       "step4_title": "Deliver",
       "step4_desc": "Close job and collect payment"
-    },
-    "features": {
-      "dispute_prevention": {
-        "title": "Dispute Prevention",
-        "description": "Accessories checklist, device condition notes, and full audit trail. Protect your business."
-      },
-      "status_timeline": {
-        "title": "Status Timeline",
-        "description": "Every status change is timestamped and logged. Complete transparency for you and your customers."
-      }
     },
     "footer": {
       "product": "Product",

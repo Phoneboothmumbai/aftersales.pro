@@ -65,6 +65,14 @@
       "multi_branch": {
         "title": "Soporte Multi-Sucursal",
         "description": "Gestiona múltiples ubicaciones desde un solo panel de control"
+      },
+      "dispute_prevention": {
+        "title": "Prevención de Disputas",
+        "description": "Lista de accesorios, notas de condición del dispositivo y registro completo. Protege tu negocio."
+      },
+      "status_timeline": {
+        "title": "Línea de Tiempo de Estado",
+        "description": "Cada cambio de estado tiene marca de tiempo y registro. Transparencia total para ti y tus clientes."
       }
     },
     "pricing": {
@@ -108,16 +116,6 @@
       "step3_desc": "Completa el trabajo y actualiza el estado",
       "step4_title": "Entregar",
       "step4_desc": "Cierra el trabajo y cobra el pago"
-    },
-    "features": {
-      "dispute_prevention": {
-        "title": "Prevención de Disputas",
-        "description": "Lista de accesorios, notas de condición del dispositivo y registro completo. Protege tu negocio."
-      },
-      "status_timeline": {
-        "title": "Línea de Tiempo de Estado",
-        "description": "Cada cambio de estado tiene marca de tiempo y registro. Transparencia total para ti y tus clientes."
-      }
     },
     "footer": {
       "product": "Producto",

@@ -65,6 +65,14 @@
       "multi_branch": {
         "title": "多门店支持",
         "description": "从单一控制台管理多个门店"
+      },
+      "dispute_prevention": {
+        "title": "纠纷预防",
+        "description": "配件清单、设备状况记录和完整审计追踪。保护您的业务。"
+      },
+      "status_timeline": {
+        "title": "状态时间线",
+        "description": "每次状态变更都有时间戳和记录。为您和客户提供完全透明。"
       }
     },
     "pricing": {
@@ -108,16 +116,6 @@
       "step3_desc": "完成工作并更新状态",
       "step4_title": "交付",
       "step4_desc": "结束工单并收款"
-    },
-    "features": {
-      "dispute_prevention": {
-        "title": "纠纷预防",
-        "description": "配件清单、设备状况记录和完整审计追踪。保护您的业务。"
-      },
-      "status_timeline": {
-        "title": "状态时间线",
-        "description": "每次状态变更都有时间戳和记录。为您和客户提供完全透明。"
-      }
     },
     "footer": {
       "product": "产品",

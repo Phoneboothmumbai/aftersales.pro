@@ -65,6 +65,14 @@
       "multi_branch": {
         "title": "Dukungan Multi-Cabang",
         "description": "Kelola beberapa lokasi dari satu dashboard"
+      },
+      "dispute_prevention": {
+        "title": "Pencegahan Sengketa",
+        "description": "Daftar aksesori, catatan kondisi perangkat, dan jejak audit lengkap. Lindungi bisnis Anda."
+      },
+      "status_timeline": {
+        "title": "Timeline Status",
+        "description": "Setiap perubahan status dicatat dengan waktu. Transparansi penuh untuk Anda dan pelanggan."
       }
     },
     "pricing": {
@@ -108,16 +116,6 @@
       "step3_desc": "Selesaikan pekerjaan dan perbarui status",
       "step4_title": "Kirim",
       "step4_desc": "Tutup pekerjaan dan terima pembayaran"
-    },
-    "features": {
-      "dispute_prevention": {
-        "title": "Pencegahan Sengketa",
-        "description": "Daftar aksesori, catatan kondisi perangkat, dan jejak audit lengkap. Lindungi bisnis Anda."
-      },
-      "status_timeline": {
-        "title": "Timeline Status",
-        "description": "Setiap perubahan status dicatat dengan waktu. Transparansi penuh untuk Anda dan pelanggan."
-      }
     },
     "footer": {
       "product": "Produk",
