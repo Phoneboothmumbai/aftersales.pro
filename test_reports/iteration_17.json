@@ -1,0 +1,66 @@
+{
+  "summary": "Tested the two new trading modules (Mobile Phone Trading + IT Equipment Trading) end-to-end. Backend: created /app/backend/tests/test_used_devices_modules.py with 26 pytest cases covering module settings API, list/stats per module, create (BUY intake) for both modules, IMEI Luhn + duplicate validation, serial/MAC duplicate validation, category-vs-module validation, update, declaration generate/sign, sell, margin masking, profit-password gating and 404/400/401 paths. All 26 pass AFTER fixing a seed-data problem (demo tenant had no subscription_plan -> defaulted to Free -> every trading endpoint returned 403). Frontend: verified both list pages, stats cards, sidebar links, both Buy forms (IMEI vs Serial, module-specific categories/accessories/specs), successful IT device creation via UI, and server-side IMEI error surfacing. Found 4 significant frontend defects - most critically ALL post-create/row-action navigations point to routes that do not exist in App.js, so users are dumped onto the public marketing landing page.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "subscription_plans seed data", "issue": "Plans 'basic', 'starter' and especially 'enterprise' have NO mobile_phone_trading / it_equipment_trading feature keys, so check_feature_access() returns False. An Enterprise (top-tier) tenant is denied both trading modules with 'not available in your current plan'. Only 'pro' and 'free' have the keys."},
+      {"endpoint": "tenants (demo)", "issue": "Demo tenant document had no 'subscription_plan' field -> get_tenant_plan() falls back to 'free' -> all /api/used-devices/* returned 403. I set demo tenant subscription_plan='pro' to unblock testing; seeding should set this explicitly."},
+      {"endpoint": "POST /api/auth/login (TenantResponse)", "issue": "TenantResponse model does not expose 'enabled_modules' (model_config extra='ignore'), so the frontend can never read per-tenant module toggles. Root cause of the sidebar gating bug below."},
+      {"endpoint": "GET /api/tenants/modules", "issue": "Returns available_modules with 'enabled: true' defaults even when available_in_plan is false; enabled flag is not intersected with plan availability, so UI would show a module as enabled while the API 403s."},
+      {"endpoint": "generate_device_id()", "issue": "Device ID is derived from count_documents(module) + 1 — not atomic and not collision-safe under concurrent intake or after any hard delete. Use a counters collection with findAndModify."},
+      {"endpoint": "GET /api/used-devices/{module}", "issue": "days_in_stock is computed as (now - created_at) even for status='sold'/'cancelled' devices, so sold items keep ageing. Should freeze at sale/cancel date."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "BuyDevice.js:188", "issue": "CRITICAL: after a successful POST the code does navigate(`${backPath}/${response.data.id}`) e.g. /it-equipment/<uuid>. No such route exists in App.js, so the catch-all `<Route path='*' element={<Navigate to='/' replace/>}/>` throws the logged-in user onto the PUBLIC marketing landing page. Device is created but the user appears logged out. Reproduced via UI.", "selector": "[data-testid=\"submit-btn\"]", "priority": "CRITICAL"},
+      {"component": "MobileTrading.js:332-349 / ITEquipment.js:368-385", "issue": "CRITICAL: every row action menu item (View Details, Generate Declaration, Mark Signed & Pay, Sell) navigates to /mobile-trading/{id}, /{id}/declaration, /{id}/sign, /{id}/sell — none of these routes exist -> redirected to public landing page. The whole post-purchase workflow (declaration PDF, signature, sale) is unreachable from the UI even though the backend endpoints work.", "selector": "[data-testid^=\"device-row-\"] button", "priority": "CRITICAL"},
+      {"component": "MobileTrading.js:138 / ITEquipment.js:160 (Declined Log)", "issue": "'Declined Log' button navigates to /mobile-trading/declined and /it-equipment/declined — routes not registered -> lands on public landing page. Verified.", "selector": "[data-testid=\"view-declined-btn\"]", "priority": "HIGH"},
+      {"component": "Layout.js:43-45", "issue": "Module gating never works: enabledModules = tenant?.enabled_modules is always undefined (login API does not return the field), and the fallback is `!== false` i.e. always true. Verified by disabling BOTH modules via PUT /api/tenants/modules — sidebar still showed 'Mobile Trading' and 'IT Equipment'. Also not gated on plan features, so Free-plan tenants see links that 403.", "selector": "[data-testid=\"nav-mobile trading\"]", "priority": "HIGH"},
+      {"component": "Module settings UI", "issue": "No screen anywhere consumes GET/PUT /api/tenants/modules (grep for 'tenants/modules' in /app/frontend/src returns nothing). The per-tenant enable/disable requirement has no UI in Settings.", "selector": "n/a", "priority": "HIGH"},
+      {"component": "MobileTrading.js / ITEquipment.js error handling", "issue": "When the module API returns 403 (plan/module disabled) the page silently renders 'No devices found' with no stats cards and no error/upgrade CTA — misleading empty state instead of the backend's message. No loading/error state surfaced.", "selector": "[data-testid=\"mobile-trading-page\"]", "priority": "MEDIUM"},
+      {"component": "Layout.js:135", "issue": "nav data-testid is generated as `nav-${item.name.toLowerCase()}` producing IDs containing spaces ('nav-mobile trading', 'nav-it equipment'). Works but fragile; slugify with '-'.", "selector": "[data-testid=\"nav-it equipment\"]", "priority": "LOW"},
+      {"component": "MobileTrading/ITEquipment stats cards", "issue": "The 5 stat cards (In Stock, Pending, Needs Repair, Sold MTD, Stock Value) have no data-testid, so values can only be asserted via text scraping.", "selector": "n/a", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "Buy IT Equipment via UI", "issue": "POST succeeds (device ITE-0005 created and visible in list) but the post-success redirect lands on the public landing page — user loses session context and never sees the created device.", "affected_selectors": ["[data-testid=\"submit-btn\"]"]},
+      {"flow": "Declaration / Sign / Sell workflow", "issue": "Backend endpoints work (verified by pytest: generate-declaration 200, sign-declaration -> in_stock, sell -> sold with margin masked) but there is no UI route/page to reach any of them.", "affected_selectors": ["[data-testid^=\"device-row-\"]"]}
+    ],
+    "design_issues": [
+      {"screen": "Mobile Trading / IT Equipment list", "issues": ["Layout, spacing, contrast and stat-card grid look correct at 1920x1080; module-specific search placeholder (IMEI vs Serial/MAC) is correct.", "Page-title Smartphone icon renders as a thin outline box at small size — low visual weight compared to the IT Equipment monitor icon."]},
+      {"screen": "Buy Device form", "issues": ["Correct module-specific fields confirmed: mobile shows IMEI 1/IMEI 2 + storage/RAM/battery/FRP specs and mobile accessories; IT shows Serial Number/MAC/Custom Tag + processor/RAM/storage/screen/OS-license specs and IT accessories.", "Condition, spec and accessory controls have no data-testid.", "Purchase Date is not exposed on the form (backend defaults to today) — acceptable but not user-editable."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_used_devices_modules.py",
+    "/app/test_reports/pytest/used_devices.xml"
+  ],
+  "action_items": [
+    "Register the missing routes in App.js: /mobile-trading/:id, /mobile-trading/:id/declaration, /mobile-trading/:id/sign, /mobile-trading/:id/sell, /mobile-trading/declined and the equivalent /it-equipment/* routes (build the device-detail / declaration / sign / sell pages), OR change navigate() targets to existing routes. Currently every one of these lands on the public landing page.",
+    "Add 'enabled_modules' to TenantResponse (and to /api/auth/me tenant payload) so Layout.js can actually gate the sidebar; also gate on plan feature availability, not just the toggle.",
+    "Build the Settings UI for GET/PUT /api/tenants/modules — no frontend code calls these endpoints today.",
+    "Add mobile_phone_trading / it_equipment_trading feature flags to the 'basic', 'starter' and 'enterprise' seeded subscription plans (enterprise currently denies both).",
+    "Ensure tenant seeding/signup writes 'subscription_plan' explicitly (demo tenant had none -> silently treated as Free -> 403 on all trading endpoints).",
+    "Show the backend 403 message / upgrade CTA on MobileTrading & ITEquipment pages instead of an empty 'No devices found' state.",
+    "Make generate_device_id atomic (counters collection) instead of count_documents+1.",
+    "Add data-testid to stat cards, condition/spec selects and accessory checkboxes."
+  ],
+  "critical_code_review_comments": [
+    "BuyDevice.js:188 navigates to a non-existent route after successful creation — the single most user-visible defect; the catch-all route silently sends users to the marketing site.",
+    "Layout.js module gating is dead code because the tenant payload never contains enabled_modules; the 'enable/disable per tenant' requirement is therefore not implemented on the frontend.",
+    "check_used_device_feature() defaults enabled_modules to True when absent, so a tenant that has never toggled modules is implicitly opted-in; combined with the missing plan flags this makes access behaviour inconsistent across plans.",
+    "server.py is 8503 lines — the used-device module (approx. 800 lines) should be extracted into its own router file.",
+    "MobileTrading.js and ITEquipment.js are ~90% duplicated (stats cards, filters, table, action menu); extract a shared TradingList component parameterised by module."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_used_devices_modules.py",
+    "/app/test_reports/iteration_17.json"
+  ],
+  "success_rate": {"backend": "100% (26/26 after seed-plan fix; 0% before - all trading endpoints 403)", "frontend": "55% (pages/forms/APIs render and create works; all detail/declaration/sign/sell/declined navigation broken, module gating broken)"},
+  "seed_data_creation": "Set demo tenant subscription_plan='pro' in MongoDB (was missing -> Free -> 403 on all trading endpoints). Created and then cancelled several TEST_ prefixed devices (mobile + IT). One record remains: MPT-0006 'TEST_Lenovo TEST_Tab P11' in 'sold' status - it cannot be cancelled by design (sold devices are not cancellable); delete manually if unwanted.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "demo / admin@demo.com / demo123 (subdomain 'demo'); login testids are login-subdomain-input, login-email-input, login-password-input, login-submit-btn",
+  "context_for_next_testing_agent": "Backend suite: /app/backend/tests/test_used_devices_modules.py (26 tests, all green). It depends on the demo tenant being on the 'pro' plan with both modules enabled — the suite re-enables modules via PUT /api/tenants/modules in test_update_modules_roundtrip, and cancels TEST_ devices in a session teardown. Frontend blockers to re-verify after fixes: (1) routes /mobile-trading/:id, /:id/declaration, /:id/sign, /:id/sell, /declined and IT equivalents; (2) enabled_modules present in login tenant payload and sidebar hiding when a module is disabled; (3) 403 error state on list pages; (4) Settings module toggle UI. Note nav testids contain spaces: 'nav-mobile trading', 'nav-it equipment'.",
+  "rca_of_the_issue": "Two independent root causes. (1) Routing: App.js only registers /mobile-trading, /mobile-trading/buy, /it-equipment, /it-equipment/buy. BuyDevice.js and both list pages navigate to /{module}/{id}[/declaration|/sign|/sell] and /{module}/declined which are unregistered, so `<Route path='*' element={<Navigate to='/' replace/>}/>` redirects to the public Landing page. (2) Module gating: TenantResponse (server.py:104) uses ConfigDict(extra='ignore') and does not declare enabled_modules, so the field is stripped from the login response; Layout.js then reads tenant?.enabled_modules === undefined and its `!== false` fallback always evaluates true, making both sidebar links permanently visible regardless of tenant toggle or plan. Additionally the demo tenant lacked 'subscription_plan', so get_tenant_plan() fell back to 'free' whose features set both trading flags to false, making every trading endpoint return 403 until the plan was set to 'pro'."
+}

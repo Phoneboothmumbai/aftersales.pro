@@ -375,6 +375,252 @@ class StockAdjustment(BaseModel):
     reason: str
     job_id: Optional[str] = None  # Link to job if used in repair
 
+# ==================== USED DEVICE MODELS ====================
+
+# Module types
+MOBILE_TRADING_MODULE = "mobile"
+IT_EQUIPMENT_MODULE = "it"
+
+# Category configurations
+MOBILE_CATEGORIES = ["smartphone", "feature_phone", "tablet", "smartwatch"]
+IT_CATEGORIES = ["laptop", "desktop", "monitor", "printer", "networking", "storage", "component", "ups_power", "peripheral", "other_it"]
+
+class MobileSpecs(BaseModel):
+    """Specs specific to mobile devices"""
+    storage: Optional[str] = None  # 32GB, 64GB, 128GB, etc.
+    ram: Optional[str] = None  # 2GB, 4GB, 6GB, etc.
+    network_lock: Optional[str] = None  # Unlocked / Carrier Locked
+    frp_icloud_status: Optional[str] = None  # Removed / Present / Unknown
+    battery_health: Optional[str] = None  # Good / Average / Poor
+
+class ITSpecs(BaseModel):
+    """Specs specific to IT equipment"""
+    # Common
+    processor: Optional[str] = None
+    ram: Optional[str] = None
+    storage_type: Optional[str] = None  # HDD / SSD / NVMe / Both
+    storage_capacity: Optional[str] = None
+    # Laptop specific
+    screen_size: Optional[str] = None
+    battery_health: Optional[str] = None
+    os_license: Optional[str] = None  # Genuine / Not Activated / Linux / None
+    # Desktop specific
+    form_factor: Optional[str] = None  # Tower / Mini / AIO
+    gpu: Optional[str] = None  # Integrated / Dedicated model
+    psu_wattage: Optional[str] = None
+    # Monitor specific
+    resolution: Optional[str] = None  # HD / FHD / 2K / 4K
+    panel_type: Optional[str] = None  # IPS / VA / TN / OLED
+    refresh_rate: Optional[str] = None
+    ports: Optional[str] = None  # HDMI, VGA, DP, USB-C
+    dead_pixels: Optional[str] = None  # None / 1-3 / More
+    # Printer specific
+    printer_type: Optional[str] = None  # Inkjet / Laser / Thermal
+    printer_function: Optional[str] = None  # Print Only / All-in-One
+    connectivity: Optional[str] = None  # USB / WiFi / Ethernet / All
+    page_count: Optional[str] = None
+    # Networking specific
+    mac_address: Optional[str] = None
+    wifi_standard: Optional[str] = None  # WiFi 5 / WiFi 6
+    lan_ports: Optional[str] = None
+    admin_reset: Optional[str] = None  # Yes / No
+    # Component specific
+    component_type: Optional[str] = None  # DDR3 / DDR4 / DDR5 (RAM), Model (GPU/CPU)
+    working_status: Optional[str] = None  # Tested OK / Untested / Faulty
+    warranty_seal: Optional[str] = None  # Intact / Broken
+    # UPS specific
+    capacity_va: Optional[str] = None
+    backup_time: Optional[str] = None
+
+class UsedDeviceCreate(BaseModel):
+    """Create a new used device (BUY intake)"""
+    # Module
+    module: str  # "mobile" or "it"
+    
+    # Device Info
+    category: str
+    brand: str
+    model: str
+    variant: Optional[str] = None
+    color: Optional[str] = None
+    
+    # Identification (module-specific)
+    imei_1: Optional[str] = None  # Mobile - Luhn validated
+    imei_2: Optional[str] = None  # Dual SIM
+    serial_number: Optional[str] = None  # IT equipment
+    mac_address: Optional[str] = None  # Networking
+    custom_tag: Optional[str] = None  # Assembled PCs
+    
+    # Specs (dynamic based on module/category)
+    specs: Optional[Dict] = None
+    
+    # Condition
+    physical_condition: Optional[str] = None  # Excellent / Good / Fair / Poor
+    working_status: Optional[str] = None  # Fully Working / Partially Working / Not Working / Untested
+    cosmetic_issues: Optional[str] = None  # None / Minor Scratches / Dents / Cracks / Heavy Damage
+    condition_notes: Optional[str] = None
+    accessories: Optional[List[str]] = []
+    
+    # Purchase Details
+    purchase_price: float
+    purchase_date: Optional[str] = None
+    payment_mode: str
+    
+    # Seller KYC
+    seller_name: str
+    seller_phone: str
+    seller_address: Optional[str] = None
+    id_proof_type: str
+    id_proof_number: str
+    
+    # Branch
+    branch_id: Optional[str] = None
+
+class UsedDeviceUpdate(BaseModel):
+    """Update used device - only allowed in pending_signature status"""
+    category: Optional[str] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    variant: Optional[str] = None
+    color: Optional[str] = None
+    imei_1: Optional[str] = None
+    imei_2: Optional[str] = None
+    serial_number: Optional[str] = None
+    mac_address: Optional[str] = None
+    custom_tag: Optional[str] = None
+    specs: Optional[Dict] = None
+    physical_condition: Optional[str] = None
+    working_status: Optional[str] = None
+    cosmetic_issues: Optional[str] = None
+    condition_notes: Optional[str] = None
+    accessories: Optional[List[str]] = None
+    purchase_price: Optional[float] = None
+    payment_mode: Optional[str] = None
+    seller_name: Optional[str] = None
+    seller_phone: Optional[str] = None
+    seller_address: Optional[str] = None
+    id_proof_type: Optional[str] = None
+    id_proof_number: Optional[str] = None
+    edit_reason: Optional[str] = None
+
+class UsedDeviceResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    device_id: str
+    tenant_id: str
+    branch_id: Optional[str] = None
+    module: str
+    
+    # Device Info
+    category: str
+    brand: str
+    model: str
+    variant: Optional[str] = None
+    color: Optional[str] = None
+    
+    # Identification
+    imei_1: Optional[str] = None
+    imei_2: Optional[str] = None
+    serial_number: Optional[str] = None
+    mac_address: Optional[str] = None
+    custom_tag: Optional[str] = None
+    
+    # Specs
+    specs: Optional[Dict] = None
+    
+    # Condition
+    physical_condition: Optional[str] = None
+    working_status: Optional[str] = None
+    cosmetic_issues: Optional[str] = None
+    condition_notes: Optional[str] = None
+    accessories: List[str] = []
+    
+    # Purchase
+    purchase_price: float
+    purchase_date: str
+    payment_mode: str
+    
+    # Status
+    status: str  # pending_signature / in_stock / needs_repair / sold / cancelled
+    days_in_stock: int = 0
+    
+    # Seller KYC
+    seller_name: str
+    seller_phone: str
+    seller_address: Optional[str] = None
+    id_proof_type: str
+    id_proof_number_masked: str
+    declaration_generated: bool = False
+    declaration_signed: bool = False
+    
+    # Sale Info (if sold)
+    selling_price: Optional[float] = None
+    sale_date: Optional[str] = None
+    buyer_name: Optional[str] = None
+    margin: Optional[float] = None  # Only shown if password verified
+    
+    # Edit tracking
+    last_edited_by: Optional[str] = None
+    last_edited_at: Optional[str] = None
+    edit_reason: Optional[str] = None
+    
+    # Cancellation
+    cancelled_at: Optional[str] = None
+    cancelled_by: Optional[str] = None
+    cancelled_reason: Optional[str] = None
+    
+    created_by: str
+    created_at: str
+
+class UsedDeviceSale(BaseModel):
+    """Record sale of used device"""
+    selling_price: float
+    sale_date: Optional[str] = None  # Default today
+    payment_mode: str  # Cash / UPI / Bank Transfer
+    buyer_name: str
+    buyer_phone: str
+    buyer_address: Optional[str] = None
+
+class UsedDeviceCancel(BaseModel):
+    """Cancel a used device purchase"""
+    reason: str
+
+class UsedDeviceStatusUpdate(BaseModel):
+    """Update device status"""
+    status: str  # in_stock / needs_repair
+    notes: Optional[str] = None
+
+class DeclinedIntakeCreate(BaseModel):
+    """Log a declined device intake"""
+    category: str
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    imei_serial: Optional[str] = None
+    seller_name: str
+    seller_phone: str
+    seller_id_type: Optional[str] = None
+    seller_id_masked: Optional[str] = None
+    reason_declined: str
+    staff_notes: Optional[str] = None
+
+class DeclinedIntakeResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    tenant_id: str
+    branch_id: Optional[str] = None
+    category: str
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    imei_serial: Optional[str] = None
+    seller_name: str
+    seller_phone: str
+    seller_id_type: Optional[str] = None
+    seller_id_masked: Optional[str] = None
+    reason_declined: str
+    staff_notes: Optional[str] = None
+    created_by: str
+    created_at: str
+
 # ==================== LEGAL PAGES MODELS ====================
 
 class LegalPageUpdate(BaseModel):
@@ -766,6 +1012,74 @@ async def generate_job_number(tenant_id: str) -> str:
     year = datetime.now(timezone.utc).year
     count = await db.jobs.count_documents({"tenant_id": tenant_id})
     return f"JOB-{year}-{str(count + 1).zfill(6)}"
+
+async def generate_device_id(tenant_id: str, module: str) -> str:
+    """Generate unique device ID for used devices (per tenant, per module)"""
+    prefix = "MPT" if module == "mobile" else "ITE"  # Mobile Phone Trading / IT Equipment
+    count = await db.used_devices.count_documents({"tenant_id": tenant_id, "module": module})
+    return f"{prefix}-{str(count + 1).zfill(4)}"
+
+def validate_imei(imei: str) -> bool:
+    """Validate IMEI using Luhn algorithm"""
+    if not imei or not imei.isdigit():
+        return False
+    if len(imei) not in [15, 16]:  # 15 for IMEI, 16 for IMEISV
+        return False
+    # Luhn check on first 14 digits
+    digits = [int(d) for d in imei[:14]]
+    checksum = 0
+    for i, digit in enumerate(digits):
+        if i % 2 == 1:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        checksum += digit
+    expected_check = (10 - (checksum % 10)) % 10
+    return int(imei[14]) == expected_check
+
+def mask_id_number(id_type: str, id_number: str) -> str:
+    """Mask ID proof number - show only last 4 digits for Aadhaar"""
+    if not id_number:
+        return ""
+    if id_type.lower() == "aadhaar" and len(id_number) >= 4:
+        return f"XXXX-XXXX-{id_number[-4:]}"
+    elif len(id_number) > 4:
+        return f"{'X' * (len(id_number) - 4)}{id_number[-4:]}"
+    return id_number
+
+async def check_used_device_feature(tenant_id: str, module: str = None) -> dict:
+    """Check if tenant has used device trading feature enabled for specific module"""
+    # Determine feature name based on module
+    if module == "mobile":
+        feature_name = "mobile_phone_trading"
+    elif module == "it":
+        feature_name = "it_equipment_trading"
+    else:
+        # Check if either module is enabled
+        mobile_check = await check_used_device_feature(tenant_id, "mobile")
+        it_check = await check_used_device_feature(tenant_id, "it")
+        if mobile_check.get("allowed") or it_check.get("allowed"):
+            return {"allowed": True, "mobile": mobile_check.get("allowed"), "it": it_check.get("allowed")}
+        return {"allowed": False, "message": "No trading modules enabled. Enable them in Settings or upgrade your plan."}
+    
+    # Check plan feature
+    plan_check = await check_feature_access(tenant_id, feature_name)
+    if not plan_check.get("allowed"):
+        return plan_check
+    
+    # Check tenant module toggle
+    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0, "enabled_modules": 1})
+    if tenant:
+        enabled_modules = tenant.get("enabled_modules", {})
+        # Default to True if not explicitly set
+        if not enabled_modules.get(feature_name, True):
+            module_label = "Mobile Phone Trading" if module == "mobile" else "IT Equipment Trading"
+            return {
+                "allowed": False,
+                "message": f"{module_label} module is disabled. Enable it in Settings.",
+                "feature": feature_name
+            }
+    return {"allowed": True}
 
 # ==================== ROUTES ====================
 
@@ -3137,6 +3451,790 @@ Update on your device.
         "whatsapp_url": whatsapp_url,
         "phone": phone
     }
+
+# ==================== USED DEVICE TRADING ROUTES ====================
+
+@api_router.get("/used-devices/{module}")
+async def list_used_devices(
+    module: str,  # "mobile" or "it"
+    status: Optional[str] = None,
+    category: Optional[str] = None,
+    brand: Optional[str] = None,
+    search: Optional[str] = None,
+    declaration_signed: Optional[bool] = None,
+    days_in_stock_min: Optional[int] = None,
+    branch_id: Optional[str] = None,
+    include_cancelled: bool = False,
+    user: dict = Depends(get_current_user)
+):
+    """List used devices with filters for specific module"""
+    if module not in ["mobile", "it"]:
+        raise HTTPException(status_code=400, detail="Invalid module. Use 'mobile' or 'it'")
+    
+    # Check feature access for specific module
+    feature_check = await check_used_device_feature(user["tenant_id"], module)
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    query = {"tenant_id": user["tenant_id"], "module": module}
+    
+    # Branch filtering based on user access
+    user_branch_ids = user.get("branch_ids", [])
+    if user.get("branch_id"):
+        user_branch_ids.append(user["branch_id"])
+    
+    if branch_id:
+        query["branch_id"] = branch_id
+    elif user_branch_ids and user.get("role") not in ["admin", "super_admin"]:
+        query["branch_id"] = {"$in": user_branch_ids}
+    
+    # Status filter
+    if status:
+        query["status"] = status
+    elif not include_cancelled:
+        query["status"] = {"$ne": "cancelled"}
+    
+    # Category filter
+    if category:
+        query["category"] = category
+    
+    # Brand filter
+    if brand:
+        query["brand"] = {"$regex": brand, "$options": "i"}
+    
+    # Declaration signed filter
+    if declaration_signed is not None:
+        query["declaration_signed"] = declaration_signed
+    
+    # Search by device_id, IMEI, serial, MAC, or model
+    if search:
+        search_conditions = [
+            {"device_id": {"$regex": search, "$options": "i"}},
+            {"model": {"$regex": search, "$options": "i"}},
+            {"brand": {"$regex": search, "$options": "i"}},
+            {"seller_name": {"$regex": search, "$options": "i"}},
+            {"seller_phone": {"$regex": search, "$options": "i"}},
+        ]
+        if module == "mobile":
+            search_conditions.extend([
+                {"imei_1": {"$regex": search, "$options": "i"}},
+                {"imei_2": {"$regex": search, "$options": "i"}},
+            ])
+        else:
+            search_conditions.extend([
+                {"serial_number": {"$regex": search, "$options": "i"}},
+                {"mac_address": {"$regex": search, "$options": "i"}},
+                {"custom_tag": {"$regex": search, "$options": "i"}},
+            ])
+        query["$or"] = search_conditions
+    
+    devices = await db.used_devices.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
+    
+    now = datetime.now(timezone.utc)
+    for device in devices:
+        # Calculate days in stock
+        created = datetime.fromisoformat(device["created_at"].replace("Z", "+00:00"))
+        device["days_in_stock"] = (now - created).days
+        
+        # Mask margin unless verified
+        if "margin" in device:
+            device["margin"] = None
+    
+    # Apply days_in_stock filter
+    if days_in_stock_min:
+        devices = [d for d in devices if d.get("days_in_stock", 0) >= days_in_stock_min]
+    
+    return devices
+
+@api_router.get("/used-devices/{module}/stats")
+async def get_used_device_stats(module: str, user: dict = Depends(get_current_user)):
+    """Get dashboard stats for used devices by module"""
+    if module not in ["mobile", "it"]:
+        raise HTTPException(status_code=400, detail="Invalid module. Use 'mobile' or 'it'")
+    
+    feature_check = await check_used_device_feature(user["tenant_id"], module)
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    tenant_id = user["tenant_id"]
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    
+    base_query = {"tenant_id": tenant_id, "module": module}
+    
+    # Count by status
+    in_stock = await db.used_devices.count_documents({**base_query, "status": "in_stock"})
+    pending_signature = await db.used_devices.count_documents({**base_query, "status": "pending_signature"})
+    needs_repair = await db.used_devices.count_documents({**base_query, "status": "needs_repair"})
+    sold_this_month = await db.used_devices.count_documents({
+        **base_query,
+        "status": "sold",
+        "sale_date": {"$gte": month_start}
+    })
+    
+    # Calculate total inventory value
+    pipeline = [
+        {"$match": {**base_query, "status": {"$in": ["in_stock", "pending_signature", "needs_repair"]}}},
+        {"$group": {"_id": None, "total": {"$sum": "$purchase_price"}}}
+    ]
+    value_result = await db.used_devices.aggregate(pipeline).to_list(1)
+    inventory_value = value_result[0]["total"] if value_result else 0
+    
+    module_label = "Mobile Phone Trading" if module == "mobile" else "IT Equipment"
+    
+    return {
+        "module": module,
+        "module_label": module_label,
+        "in_stock": in_stock,
+        "pending_signature": pending_signature,
+        "needs_repair": needs_repair,
+        "sold_this_month": sold_this_month,
+        "inventory_value": inventory_value,
+        "total_devices": in_stock + pending_signature + needs_repair,
+        "profit_this_month": None  # Hidden by default
+    }
+
+@api_router.post("/used-devices/{module}/stats/verify-profit")
+async def verify_profit_access(module: str, data: ProfitPasswordVerify, user: dict = Depends(get_current_user)):
+    """Verify password to view profit/margin data for module"""
+    if module not in ["mobile", "it"]:
+        raise HTTPException(status_code=400, detail="Invalid module")
+    
+    feature_check = await check_used_device_feature(user["tenant_id"], module)
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    tenant = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0, "settings": 1})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    stored_hash = tenant.get("settings", {}).get("profit_password_hash")
+    if not stored_hash:
+        raise HTTPException(status_code=400, detail="Profit password not set. Set it in Settings first.")
+    
+    if not verify_password(data.password, stored_hash):
+        raise HTTPException(status_code=401, detail="Invalid password")
+    
+    # Return profit stats
+    tenant_id = user["tenant_id"]
+    now = datetime.now(timezone.utc)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    
+    profit_pipeline = [
+        {"$match": {"tenant_id": tenant_id, "module": module, "status": "sold", "sale_date": {"$gte": month_start}}},
+        {"$group": {
+            "_id": None,
+            "total_profit": {"$sum": "$margin"},
+            "total_revenue": {"$sum": "$selling_price"},
+            "total_cost": {"$sum": "$purchase_price"},
+            "count": {"$sum": 1}
+        }}
+    ]
+    profit_result = await db.used_devices.aggregate(profit_pipeline).to_list(1)
+    
+    if profit_result:
+        result = profit_result[0]
+        avg_margin = (result["total_profit"] / result["total_revenue"] * 100) if result["total_revenue"] > 0 else 0
+        return {
+            "module": module,
+            "profit_this_month": result["total_profit"],
+            "revenue_this_month": result["total_revenue"],
+            "cost_this_month": result["total_cost"],
+            "devices_sold": result["count"],
+            "avg_margin_percent": round(avg_margin, 2)
+        }
+    
+    return {
+        "module": module,
+        "profit_this_month": 0,
+        "revenue_this_month": 0,
+        "cost_this_month": 0,
+        "devices_sold": 0,
+        "avg_margin_percent": 0
+    }
+
+@api_router.get("/used-devices/detail/{device_id}")
+async def get_used_device(device_id: str, user: dict = Depends(get_current_user)):
+    """Get single used device details"""
+    # Check if user has access to any module
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    device = await db.used_devices.find_one(
+        {"tenant_id": user["tenant_id"], "$or": [{"id": device_id}, {"device_id": device_id}]},
+        {"_id": 0}
+    )
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    # Calculate days in stock
+    now = datetime.now(timezone.utc)
+    created = datetime.fromisoformat(device["created_at"].replace("Z", "+00:00"))
+    device["days_in_stock"] = (now - created).days
+    
+    # Hide margin by default
+    device["margin"] = None
+    
+    return device
+
+@api_router.post("/used-devices", response_model=UsedDeviceResponse)
+async def create_used_device(data: UsedDeviceCreate, user: dict = Depends(get_current_user)):
+    """Create new used device (BUY intake)"""
+    # Validate module
+    if data.module not in ["mobile", "it"]:
+        raise HTTPException(status_code=400, detail="Invalid module. Use 'mobile' or 'it'")
+    
+    feature_check = await check_used_device_feature(user["tenant_id"], data.module)
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    tenant_id = user["tenant_id"]
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Validate category matches module
+    if data.module == "mobile" and data.category not in MOBILE_CATEGORIES:
+        raise HTTPException(status_code=400, detail=f"Invalid category for Mobile module. Use: {', '.join(MOBILE_CATEGORIES)}")
+    if data.module == "it" and data.category not in IT_CATEGORIES:
+        raise HTTPException(status_code=400, detail=f"Invalid category for IT module. Use: {', '.join(IT_CATEGORIES)}")
+    
+    # Validate IMEI for mobile devices
+    if data.module == "mobile":
+        if not data.imei_1:
+            raise HTTPException(status_code=400, detail="IMEI 1 is required for mobile devices")
+        if not validate_imei(data.imei_1):
+            raise HTTPException(status_code=400, detail="Invalid IMEI 1 format. IMEI must be 15 digits and pass Luhn validation.")
+        # Check for duplicate
+        existing = await db.used_devices.find_one({
+            "tenant_id": tenant_id,
+            "imei_1": data.imei_1,
+            "status": {"$ne": "cancelled"}
+        })
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Device with IMEI {data.imei_1} already exists (ID: {existing['device_id']}, Status: {existing['status']})"
+            )
+        if data.imei_2 and not validate_imei(data.imei_2):
+            raise HTTPException(status_code=400, detail="Invalid IMEI 2 format.")
+    
+    # Validate serial/MAC for IT equipment (optional but check duplicates if provided)
+    if data.module == "it":
+        if data.serial_number:
+            existing = await db.used_devices.find_one({
+                "tenant_id": tenant_id,
+                "serial_number": data.serial_number,
+                "status": {"$ne": "cancelled"}
+            })
+            if existing:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Device with Serial {data.serial_number} already exists (ID: {existing['device_id']}, Status: {existing['status']})"
+                )
+        if data.mac_address:
+            existing = await db.used_devices.find_one({
+                "tenant_id": tenant_id,
+                "mac_address": data.mac_address,
+                "status": {"$ne": "cancelled"}
+            })
+            if existing:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Device with MAC {data.mac_address} already exists (ID: {existing['device_id']}, Status: {existing['status']})"
+                )
+    
+    # Generate device ID
+    device_id = await generate_device_id(tenant_id, data.module)
+    
+    # Mask ID proof number
+    id_proof_masked = mask_id_number(data.id_proof_type, data.id_proof_number)
+    
+    device = {
+        "id": str(uuid.uuid4()),
+        "device_id": device_id,
+        "tenant_id": tenant_id,
+        "branch_id": data.branch_id or user.get("branch_id"),
+        "module": data.module,
+        
+        # Device Info
+        "category": data.category,
+        "brand": data.brand,
+        "model": data.model,
+        "variant": data.variant,
+        "color": data.color,
+        
+        # Identification
+        "imei_1": data.imei_1,
+        "imei_2": data.imei_2,
+        "serial_number": data.serial_number,
+        "mac_address": data.mac_address,
+        "custom_tag": data.custom_tag,
+        
+        # Specs
+        "specs": data.specs or {},
+        
+        # Condition
+        "physical_condition": data.physical_condition,
+        "working_status": data.working_status,
+        "cosmetic_issues": data.cosmetic_issues,
+        "condition_notes": data.condition_notes,
+        "accessories": data.accessories or [],
+        
+        # Purchase
+        "purchase_price": data.purchase_price,
+        "purchase_date": data.purchase_date or now[:10],
+        "payment_mode": data.payment_mode,
+        
+        # Status - starts as pending signature
+        "status": "pending_signature",
+        
+        # Seller KYC
+        "seller_name": data.seller_name,
+        "seller_phone": data.seller_phone,
+        "seller_address": data.seller_address,
+        "id_proof_type": data.id_proof_type,
+        "id_proof_number_masked": id_proof_masked,
+        "declaration_generated": False,
+        "declaration_signed": False,
+        
+        # Metadata
+        "created_by": user["id"],
+        "created_at": now,
+        "last_edited_by": None,
+        "last_edited_at": None,
+        "edit_reason": None
+    }
+    
+    await db.used_devices.insert_one(device)
+    
+    device["days_in_stock"] = 0
+    return UsedDeviceResponse(**device)
+
+@api_router.put("/used-devices/{device_id}")
+async def update_used_device(device_id: str, data: UsedDeviceUpdate, user: dict = Depends(get_current_user)):
+    """Update used device - only allowed in pending_signature status"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    device = await db.used_devices.find_one(
+        {"tenant_id": user["tenant_id"], "$or": [{"id": device_id}, {"device_id": device_id}]},
+        {"_id": 0}
+    )
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    # Check if editable
+    if device["status"] not in ["pending_signature"]:
+        # Allow limited edits for in_stock
+        if device["status"] == "in_stock":
+            allowed_fields = ["condition_notes", "accessories"]
+            update_data = {k: v for k, v in data.model_dump(exclude_unset=True).items() if k in allowed_fields}
+            if not update_data:
+                raise HTTPException(status_code=400, detail="Only condition_notes and accessories can be edited after payment.")
+        else:
+            raise HTTPException(status_code=400, detail=f"Cannot edit device in {device['status']} status")
+    else:
+        update_data = data.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    # Require edit_reason for price changes
+    if "purchase_price" in update_data and update_data["purchase_price"] != device["purchase_price"]:
+        if not data.edit_reason:
+            raise HTTPException(status_code=400, detail="Edit reason required when changing purchase price")
+    
+    # Validate IMEI if being updated
+    if "imei_1" in update_data and update_data["imei_1"]:
+        if not validate_imei(update_data["imei_1"]):
+            raise HTTPException(status_code=400, detail="Invalid IMEI format")
+    
+    # Mask ID if being updated
+    if "id_proof_number" in update_data:
+        id_type = update_data.get("id_proof_type") or device["id_proof_type"]
+        update_data["id_proof_number_masked"] = mask_id_number(id_type, update_data["id_proof_number"])
+        del update_data["id_proof_number"]
+    
+    # Remove edit_reason from update if present (we store it separately)
+    edit_reason = update_data.pop("edit_reason", None)
+    
+    now = datetime.now(timezone.utc).isoformat()
+    update_data["last_edited_by"] = user["id"]
+    update_data["last_edited_at"] = now
+    if edit_reason:
+        update_data["edit_reason"] = edit_reason
+    
+    await db.used_devices.update_one(
+        {"id": device["id"]},
+        {"$set": update_data}
+    )
+    
+    return {"message": "Device updated successfully", "device_id": device["device_id"]}
+
+@api_router.post("/used-devices/{device_id}/generate-declaration")
+async def generate_declaration(device_id: str, user: dict = Depends(get_current_user)):
+    """Generate declaration letter PDF"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    device = await db.used_devices.find_one(
+        {"tenant_id": user["tenant_id"], "$or": [{"id": device_id}, {"device_id": device_id}]},
+        {"_id": 0}
+    )
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    tenant = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0})
+    
+    # Generate PDF
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=20*mm, bottomMargin=20*mm, leftMargin=15*mm, rightMargin=15*mm)
+    styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle('Title', parent=styles['Title'], fontSize=14, spaceAfter=20, alignment=1)
+    body_style = ParagraphStyle('Body', parent=styles['Normal'], fontSize=10, leading=14, spaceAfter=8)
+    bold_style = ParagraphStyle('Bold', parent=styles['Normal'], fontSize=10, leading=14, fontName='Helvetica-Bold')
+    
+    story = []
+    
+    # Title
+    story.append(Paragraph("DECLARATION OF OWNERSHIP — SALE OF USED DEVICE", title_style))
+    story.append(Spacer(1, 10*mm))
+    
+    # Declaration text
+    declaration_text = f"""
+    I, <b>{device['seller_name']}</b>, residing at <b>{device.get('seller_address', 'N/A')}</b>, 
+    holder of <b>{device['id_proof_type']}</b> bearing number <b>{device['id_proof_number_masked']}</b>, 
+    do hereby declare and confirm that:
+    """
+    story.append(Paragraph(declaration_text, body_style))
+    story.append(Spacer(1, 5*mm))
+    
+    # Points
+    points = [
+        "I am the sole and lawful owner of the device described below, and I have full right and authority to sell it.",
+        "The device is not stolen, lost, pledged, financed (under EMI), or under any lien/loan with any bank, NBFC, or third party.",
+        "The device has not been reported to any police station or blocked with any telecom authority (CEIR/KYM).",
+        "I have removed all personal accounts (Google/iCloud/FRP lock, Find My Device) from this device prior to sale.",
+        f"I have received the full and agreed sale amount from {tenant.get('company_name', 'the shop')} and have no further claim on this device.",
+        "I understand that providing false information above may attract legal liability, and I take full responsibility for the authenticity of the above declaration."
+    ]
+    
+    for i, point in enumerate(points, 1):
+        story.append(Paragraph(f"{i}. {point}", body_style))
+    
+    story.append(Spacer(1, 10*mm))
+    
+    # Device Details
+    story.append(Paragraph("<b>Device Details:</b>", bold_style))
+    device_info = f"""
+    Device ID: {device['device_id']} | Category: {device['category']}<br/>
+    Brand/Model: {device['brand']} {device['model']} {device.get('variant', '')}<br/>
+    IMEI/Serial: {device.get('imei_1') or device.get('serial_number', 'N/A')}<br/>
+    Sale Amount: ₹{device['purchase_price']:,.2f} | Date: {device['purchase_date']}
+    """
+    story.append(Paragraph(device_info, body_style))
+    
+    story.append(Spacer(1, 15*mm))
+    
+    # Signatures
+    sig_data = [
+        ["Signature of Seller:", "Shop Representative Signature:"],
+        ["", ""],
+        ["", ""],
+        [f"Name: {device['seller_name']}", f"{tenant.get('company_name', '')}"],
+        ["ID Proof Copy Attached: ☐ Yes", tenant.get('settings', {}).get('address', '')]
+    ]
+    sig_table = Table(sig_data, colWidths=[90*mm, 90*mm])
+    sig_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    story.append(sig_table)
+    
+    doc.build(story)
+    buffer.seek(0)
+    
+    # Mark declaration as generated
+    await db.used_devices.update_one(
+        {"id": device["id"]},
+        {"$set": {"declaration_generated": True}}
+    )
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"inline; filename=declaration_{device['device_id']}.pdf"}
+    )
+
+@api_router.post("/used-devices/{device_id}/sign-declaration")
+async def sign_declaration(device_id: str, user: dict = Depends(get_current_user)):
+    """Mark declaration as signed and move to in_stock status"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    device = await db.used_devices.find_one(
+        {"tenant_id": user["tenant_id"], "$or": [{"id": device_id}, {"device_id": device_id}]},
+        {"_id": 0}
+    )
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    if device["status"] != "pending_signature":
+        raise HTTPException(status_code=400, detail="Device is not pending signature")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    await db.used_devices.update_one(
+        {"id": device["id"]},
+        {"$set": {
+            "declaration_signed": True,
+            "status": "in_stock",
+            "payment_released_at": now
+        }}
+    )
+    
+    return {"message": "Declaration signed and payment released. Device is now in stock.", "device_id": device["device_id"]}
+
+@api_router.post("/used-devices/{device_id}/update-status")
+async def update_device_status(device_id: str, data: UsedDeviceStatusUpdate, user: dict = Depends(get_current_user)):
+    """Update device status (in_stock <-> needs_repair)"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    device = await db.used_devices.find_one(
+        {"tenant_id": user["tenant_id"], "$or": [{"id": device_id}, {"device_id": device_id}]},
+        {"_id": 0}
+    )
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    allowed_transitions = {
+        "in_stock": ["needs_repair"],
+        "needs_repair": ["in_stock"],
+    }
+    
+    if data.status not in allowed_transitions.get(device["status"], []):
+        raise HTTPException(status_code=400, detail=f"Cannot change status from {device['status']} to {data.status}")
+    
+    update_data = {"status": data.status}
+    if data.notes:
+        update_data["condition_notes"] = data.notes
+    
+    await db.used_devices.update_one({"id": device["id"]}, {"$set": update_data})
+    
+    return {"message": f"Device status updated to {data.status}", "device_id": device["device_id"]}
+
+@api_router.post("/used-devices/{device_id}/sell")
+async def sell_used_device(device_id: str, data: UsedDeviceSale, user: dict = Depends(get_current_user)):
+    """Record sale of used device"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    device = await db.used_devices.find_one(
+        {"tenant_id": user["tenant_id"], "$or": [{"id": device_id}, {"device_id": device_id}]},
+        {"_id": 0}
+    )
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    if device["status"] != "in_stock":
+        raise HTTPException(status_code=400, detail=f"Cannot sell device in {device['status']} status. Only 'in_stock' devices can be sold.")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    sale_date = data.sale_date or now[:10]
+    margin = data.selling_price - device["purchase_price"]
+    
+    # Update device with sale info
+    await db.used_devices.update_one(
+        {"id": device["id"]},
+        {"$set": {
+            "status": "sold",
+            "selling_price": data.selling_price,
+            "sale_date": sale_date,
+            "sale_payment_mode": data.payment_mode,
+            "buyer_name": data.buyer_name,
+            "buyer_phone": data.buyer_phone,
+            "buyer_address": data.buyer_address,
+            "margin": margin,
+            "sold_by": user["id"],
+            "sold_at": now
+        }}
+    )
+    
+    return {
+        "message": "Device sold successfully",
+        "device_id": device["device_id"],
+        "selling_price": data.selling_price,
+        "margin": margin  # Shown immediately after sale, but hidden in lists
+    }
+
+@api_router.post("/used-devices/{device_id}/cancel")
+async def cancel_used_device(device_id: str, data: UsedDeviceCancel, user: dict = Depends(get_current_user)):
+    """Cancel a used device purchase"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    device = await db.used_devices.find_one(
+        {"tenant_id": user["tenant_id"], "$or": [{"id": device_id}, {"device_id": device_id}]},
+        {"_id": 0}
+    )
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    if device["status"] == "sold":
+        raise HTTPException(status_code=400, detail="Cannot cancel a sold device. Use return flow instead.")
+    
+    if device["status"] == "cancelled":
+        raise HTTPException(status_code=400, detail="Device is already cancelled")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Warn if payment was already released
+    warning = None
+    if device["status"] in ["in_stock", "needs_repair"]:
+        warning = "Payment was already released for this device."
+    
+    await db.used_devices.update_one(
+        {"id": device["id"]},
+        {"$set": {
+            "status": "cancelled",
+            "cancelled_at": now,
+            "cancelled_by": user["id"],
+            "cancelled_reason": data.reason
+        }}
+    )
+    
+    result = {"message": "Device purchase cancelled", "device_id": device["device_id"]}
+    if warning:
+        result["warning"] = warning
+    
+    return result
+
+# ==================== DECLINED INTAKE ROUTES ====================
+
+@api_router.get("/declined-intakes")
+async def list_declined_intakes(
+    search: Optional[str] = None,
+    user: dict = Depends(get_current_user)
+):
+    """List declined device intakes"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    query = {"tenant_id": user["tenant_id"]}
+    
+    if search:
+        query["$or"] = [
+            {"seller_name": {"$regex": search, "$options": "i"}},
+            {"seller_phone": {"$regex": search, "$options": "i"}},
+            {"brand": {"$regex": search, "$options": "i"}},
+            {"model": {"$regex": search, "$options": "i"}},
+            {"imei_serial": {"$regex": search, "$options": "i"}},
+        ]
+    
+    intakes = await db.declined_intakes.find(query, {"_id": 0}).sort("created_at", -1).to_list(200)
+    return intakes
+
+@api_router.post("/declined-intakes", response_model=DeclinedIntakeResponse)
+async def create_declined_intake(data: DeclinedIntakeCreate, user: dict = Depends(get_current_user)):
+    """Log a declined device intake"""
+    feature_check = await check_used_device_feature(user["tenant_id"])
+    if not feature_check.get("allowed"):
+        raise HTTPException(status_code=403, detail=feature_check.get("message"))
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    intake = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": user["tenant_id"],
+        "branch_id": user.get("branch_id"),
+        "category": data.category,
+        "brand": data.brand,
+        "model": data.model,
+        "imei_serial": data.imei_serial,
+        "seller_name": data.seller_name,
+        "seller_phone": data.seller_phone,
+        "seller_id_type": data.seller_id_type,
+        "seller_id_masked": mask_id_number(data.seller_id_type or "", data.seller_id_masked or "") if data.seller_id_masked else None,
+        "reason_declined": data.reason_declined,
+        "staff_notes": data.staff_notes,
+        "created_by": user["id"],
+        "created_at": now
+    }
+    
+    await db.declined_intakes.insert_one(intake)
+    return DeclinedIntakeResponse(**intake)
+
+# ==================== MODULE SETTINGS ROUTES ====================
+
+@api_router.get("/tenants/modules")
+async def get_tenant_modules(user: dict = Depends(get_current_user)):
+    """Get tenant's enabled modules"""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can view module settings")
+    
+    tenant = await db.tenants.find_one({"id": user["tenant_id"]}, {"_id": 0, "enabled_modules": 1})
+    
+    # Get plan features to check what's available
+    plan = await get_tenant_plan(user["tenant_id"])
+    plan_features = plan.get("features", {}) if plan else {}
+    
+    # Default modules - both enabled by default if available in plan
+    default_modules = {
+        "mobile_phone_trading": True,
+        "it_equipment_trading": True,
+    }
+    
+    enabled_modules = tenant.get("enabled_modules", default_modules) if tenant else default_modules
+    
+    return {
+        "enabled_modules": enabled_modules,
+        "available_modules": {
+            "mobile_phone_trading": {
+                "name": "Mobile Phone Trading",
+                "description": "Buy and sell used mobile phones, tablets, smartwatches",
+                "icon": "smartphone",
+                "categories": ["Smartphone", "Feature Phone", "Tablet", "Smartwatch"],
+                "enabled": enabled_modules.get("mobile_phone_trading", True),
+                "available_in_plan": plan_features.get("mobile_phone_trading", False)
+            },
+            "it_equipment_trading": {
+                "name": "IT Equipment Trading",
+                "description": "Buy and sell laptops, desktops, monitors, printers, and IT equipment",
+                "icon": "monitor",
+                "categories": ["Laptop", "Desktop", "Monitor", "Printer", "Networking", "Storage", "Components", "UPS/Power", "Peripherals"],
+                "enabled": enabled_modules.get("it_equipment_trading", True),
+                "available_in_plan": plan_features.get("it_equipment_trading", False)
+            }
+        }
+    }
+
+@api_router.put("/tenants/modules")
+async def update_tenant_modules(modules: dict, user: dict = Depends(get_current_user)):
+    """Update tenant's enabled modules"""
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can update module settings")
+    
+    # Validate module keys
+    valid_modules = ["mobile_phone_trading", "it_equipment_trading"]
+    for key in modules.keys():
+        if key not in valid_modules:
+            raise HTTPException(status_code=400, detail=f"Invalid module: {key}")
+    
+    await db.tenants.update_one(
+        {"id": user["tenant_id"]},
+        {"$set": {"enabled_modules": modules}}
+    )
+    
+    return {"message": "Module settings updated", "enabled_modules": modules}
 
 # ==================== SUPER ADMIN MODELS ====================
 

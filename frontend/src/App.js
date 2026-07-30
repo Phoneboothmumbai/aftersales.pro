@@ -29,6 +29,11 @@ import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import PublicTrack from "./pages/PublicTrack";
 import LegalPage from "./pages/LegalPage";
 
+// Trading Modules
+import MobileTrading from "./pages/MobileTrading";
+import ITEquipment from "./pages/ITEquipment";
+import BuyDevice from "./pages/BuyDevice";
+
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -217,6 +222,43 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* Mobile Phone Trading Module */}
+      <Route
+        path="/mobile-trading"
+        element={
+          <ProtectedRoute>
+            <MobileTrading />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mobile-trading/buy"
+        element={
+          <ProtectedRoute>
+            <BuyDevice />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* IT Equipment Trading Module */}
+      <Route
+        path="/it-equipment"
+        element={
+          <ProtectedRoute>
+            <ITEquipment />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/it-equipment/buy"
+        element={
+          <ProtectedRoute>
+            <BuyDevice />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/billing"
         element={

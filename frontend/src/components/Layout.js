@@ -30,6 +30,8 @@ import {
   UserCircle,
   Shield,
   CreditCard,
+  Smartphone,
+  Monitor,
 } from "lucide-react";
 
 export const Layout = ({ children }) => {
@@ -39,11 +41,18 @@ export const Layout = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Check enabled modules from tenant
+  const enabledModules = tenant?.enabled_modules || {};
+  const hasMobileTrading = enabledModules.mobile_phone_trading !== false;
+  const hasITEquipment = enabledModules.it_equipment_trading !== false;
+
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Jobs", href: "/jobs", icon: ClipboardList },
     { name: "Customers", href: "/customers", icon: UserCircle },
     { name: "Inventory", href: "/inventory", icon: Package },
+    ...(hasMobileTrading ? [{ name: "Mobile Trading", href: "/mobile-trading", icon: Smartphone }] : []),
+    ...(hasITEquipment ? [{ name: "IT Equipment", href: "/it-equipment", icon: Monitor }] : []),
     { name: "Analytics", href: "/metrics", icon: BarChart3 },
     ...(isAdmin ? [{ name: "Team", href: "/team", icon: Users }] : []),
     ...(isAdmin ? [{ name: "Branches", href: "/branches", icon: Building }] : []),
