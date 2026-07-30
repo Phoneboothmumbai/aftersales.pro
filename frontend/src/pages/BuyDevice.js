@@ -185,7 +185,7 @@ export default function BuyDevice() {
       });
 
       toast.success(`Device ${response.data.device_id} created successfully!`);
-      navigate(`${backPath}/${response.data.id}`);
+      navigate(backPath); // Go back to list page
     } catch (err) {
       const message = err.response?.data?.detail || "Failed to create device";
       setError(message);

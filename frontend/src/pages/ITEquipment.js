@@ -29,6 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import { toast } from "sonner";
 import {
   Monitor,
   Plus,
@@ -365,26 +366,57 @@ export default function ITEquipment() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => navigate(`/it-equipment/${device.id}`)}>
+                              <DropdownMenuItem onClick={() => toast.info(`Device ${device.device_id}: ${device.brand} ${device.model}`)}>
                                 <Eye className="w-4 h-4 mr-2" />
                                 View Details
                               </DropdownMenuItem>
                               {device.status === "pending_signature" && (
                                 <>
-                                  <DropdownMenuItem onClick={() => navigate(`/it-equipment/${device.id}/declaration`)}>
+                                  <DropdownMenuItem onClick={() => window.open(`${process.env.REACT_APP_BACKEND_URL}/api/used-devices/${device.id}/generate-declaration`, '_blank')}>
                                     <FileText className="w-4 h-4 mr-2" />
                                     Generate Declaration
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => navigate(`/it-equipment/${device.id}/sign`)}>
+                                  <DropdownMenuItem onClick={async () => {
+                                    try {
+                                      await axios.post(`${API}/used-devices/${device.id}/sign-declaration`, {}, {
+                                        headers: { Authorization: `Bearer ${token}` }
+                                      });
+                                      toast.success("Declaration signed! Equipment moved to stock.");
+                                      fetchData();
+                                    } catch (err) {
+                                      toast.error(err.response?.data?.detail || "Failed to sign declaration");
+                                    }
+                                  }}>
                                     <CheckCircle className="w-4 h-4 mr-2" />
                                     Mark Signed & Pay
                                   </DropdownMenuItem>
                                 </>
                               )}
                               {device.status === "in_stock" && (
-                                <DropdownMenuItem onClick={() => navigate(`/it-equipment/${device.id}/sell`)}>
+                                <DropdownMenuItem onClick={() => toast.info("Sell feature coming soon")}>
                                   <ShoppingCart className="w-4 h-4 mr-2" />
                                   Sell Equipment
+                                </DropdownMenuItem>
+                              )}
+                              {!["sold", "cancelled"].includes(device.status) && (
+                                <DropdownMenuItem 
+                                  className="text-destructive"
+                                  onClick={async () => {
+                                    if (!window.confirm("Cancel this equipment purchase?")) return;
+                                    try {
+                                      await axios.post(`${API}/used-devices/${device.id}/cancel`, 
+                                        { reason: "Cancelled from list" },
+                                        { headers: { Authorization: `Bearer ${token}` }}
+                                      );
+                                      toast.success("Equipment cancelled");
+                                      fetchData();
+                                    } catch (err) {
+                                      toast.error(err.response?.data?.detail || "Failed to cancel");
+                                    }
+                                  }}
+                                >
+                                  <XCircle className="w-4 h-4 mr-2" />
+                                  Cancel Purchase
                                 </DropdownMenuItem>
                               )}
                             </DropdownMenuContent>

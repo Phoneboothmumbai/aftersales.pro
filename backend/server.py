@@ -109,6 +109,8 @@ class TenantResponse(BaseModel):
     settings: dict
     trial_ends_at: str
     created_at: str
+    enabled_modules: Optional[dict] = None
+    subscription_plan: Optional[str] = None
 
 class UserCreate(BaseModel):
     name: str

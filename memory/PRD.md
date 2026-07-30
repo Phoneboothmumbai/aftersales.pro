@@ -296,6 +296,7 @@ class DeviceInfo(BaseModel):
 - `/app/test_reports/iteration_13.json` - Multi-language Support (i18n) - 100% Pass
 - `/app/test_reports/iteration_15.json` - Resend Email Integration (19 tests) - 100% Pass
 - `/app/test_reports/iteration_16.json` - Password Reset UI & Plan Usage (8 tests) - 100% Pass
+- `/app/test_reports/iteration_17.json` - Used Device Trading Modules (9 tests)
 
 ## Prioritized Backlog
 
@@ -393,3 +394,21 @@ class DeviceInfo(BaseModel):
 - ✅ **At Limit Indication** - Red progress bars when usage >= 100%
 - ✅ **Upgrade CTA** - "Upgrade to Pro" button for Free plan users
 - ✅ **Dashboard Integration** - PlanUsageCard added to main Dashboard page
+
+### Used Device Trading Modules - July 2026
+- ✅ **Two Separate Modules**:
+  - Mobile Phone Trading (`/mobile-trading`) - For mobile dealers
+  - IT Equipment Trading (`/it-equipment`) - For laptop/IT dealers
+- ✅ **Module Toggle** - Each tenant can enable/disable modules independently
+- ✅ **Plan Integration** - Both modules are Pro plan features
+- ✅ **Mobile Categories**: Smartphone, Feature Phone, Tablet, Smartwatch
+- ✅ **IT Categories**: Laptop, Desktop, Monitor, Printer, Networking, Storage, Components, UPS/Power, Peripherals
+- ✅ **IMEI Validation** - Luhn algorithm validation for mobile devices
+- ✅ **Serial/MAC Support** - For IT equipment identification
+- ✅ **Seller KYC** - Name, phone, address, ID proof (masked storage)
+- ✅ **Declaration Flow** - Generate PDF, sign, release payment
+- ✅ **Device IDs** - `MPT-XXXX` for mobile, `ITE-XXXX` for IT equipment
+- ✅ **Status Workflow**: pending_signature → in_stock → sold (or cancelled)
+- ✅ **Edit/Cancel Flow** - Edits allowed in pending_signature, cancel with reason tracking
+- ✅ **No Photo Storage** - Text-based KYC only (as per user request)
+- ✅ **Margin Protection** - Profit data password-protected like existing profit tracking
