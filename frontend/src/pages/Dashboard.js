@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { formatDate, getStatusColor, getStatusLabel } from "../lib/utils";
 import Layout from "../components/Layout";
+import PlanUsageCard from "../components/PlanUsageCard";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -232,6 +233,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Plan Usage Section */}
+        <PlanUsageCard />
       </div>
     </Layout>
   );

@@ -9,6 +9,8 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
 import JobCreate from "./pages/JobCreate";
@@ -108,6 +110,18 @@ function AppRoutes() {
             <Signup />
           </PublicRoute>
         }
+      />
+      <Route
+        path="/forgot-password"
+        element={
+          <PublicRoute>
+            <ForgotPassword />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={<ResetPassword />}
       />
 
       {/* Protected Routes */}

@@ -1,0 +1,30 @@
+{
+  "summary": "Frontend-only testing of 3 new features: Forgot Password page, Reset Password page, and Dashboard Plan Usage Card. All 8 requested scenarios PASSED. Login -> forgot-password link nav works; forgot-password form submits and shows 'Reset link sent!' with masked/generic message including entered email; reset-password without token shows 'Invalid Reset Link' + working 'Request New Reset Link' CTA; reset-password with fake token renders form, client-side mismatch validation works, and backend returns 400 with 'Invalid or expired reset token' surfaced in the UI. Dashboard PlanUsageCard loads from GET /api/tenants/plan-usage (200), shows all 4 metrics (Jobs 0/50, Team Members 1/1, Branches 1/1, Inventory 0/50), 'Near Limits' badge (triggered by 1/1 team/branches) and 'Upgrade to Pro' button which navigates to /billing.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Dashboard plan usage load", "issue": "GET /api/tenants/plan-usage is fired twice on dashboard mount (duplicate request). Likely React StrictMode double-invoke or PlanUsageCard mounted/re-rendered twice; harmless but wasteful.", "affected_selectors": ["[data-testid=\"plan-usage-card\"]"]}
+    ],
+    "design_issues": [
+      {"screen": "Dashboard - PlanUsageCard", "issues": ["Tailwind class names are built via string interpolation (`[&>div]:${bgColor}` and `${bgColor}/10`) in PlanUsageCard.jsx lines 165 & 177. These classes are not statically analyzable by Tailwind's JIT/purge, so per-metric colors (blue/green/purple/orange) and the icon tint backgrounds never render - bars fall back to default primary and icon chips have no background. Use an explicit class map instead.", "Reset Password: entering a password shorter than 6 chars relies on native HTML minLength validation (browser tooltip); the custom 'Password must be at least 6 characters long' error never appears. Acceptable but inconsistent with the styled error box used for mismatch."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_email_integration.py"],
+  "action_items": [
+    "Replace interpolated Tailwind classes in PlanUsageCard.jsx with a static class map so progress bar / icon colors render",
+    "De-duplicate the /api/tenants/plan-usage fetch on dashboard mount (optional)"
+  ],
+  "critical_code_review_comments": [
+    "PlanUsageCard: no error UI state - on API failure it silently returns null (only console.error). Add an error/empty state so admins know usage could not load.",
+    "ForgotPassword/ResetPassword import useTranslation but never use `t`; all copy is hardcoded English while the rest of app is i18n-enabled."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (frontend-only request)", "frontend": "100% (8/8 requested scenarios)"},
+  "seed_data_creation": "None. Used existing demo tenant (demo / admin@demo.com). A password reset token was generated for admin@demo.com via forgot-password but was not consumed.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "demo / admin@demo.com / demo123 (worked)",
+  "context_for_next_testing_agent": "All 3 new features verified working end-to-end on the preview URL. Remaining items are cosmetic (Tailwind dynamic class interpolation in PlanUsageCard) and a duplicate plan-usage fetch. Backend forgot/reset password endpoints already have pytest coverage in /app/backend/tests/test_email_integration.py.",
+  "rca_of_the_issue": "N/A - no functional defects found. Dynamic Tailwind class issue root cause: Tailwind only emits classes it finds as literal strings in source; template-literal composed classes such as `[&>div]:${bgColor}` are never emitted to the CSS bundle."
+}
