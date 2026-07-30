@@ -397,16 +397,24 @@ export default function Landing() {
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className={`grid gap-8 max-w-6xl mx-auto ${plans.length <= 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'}`}>
+            <div className="flex justify-center">
+              <div className={`grid gap-8 max-w-md mx-auto ${plans.length > 1 ? 'md:grid-cols-' + Math.min(plans.length, 3) + ' max-w-6xl' : ''}`}>
               {plans.map((plan, index) => (
                 <Card
                   key={plan.id || index}
-                  className={`relative ${isPopular(plan, index) ? "border-primary shadow-lg scale-105" : ""}`}
+                  className={`relative ${plans.length === 1 ? 'border-primary shadow-lg' : isPopular(plan, index) ? "border-primary shadow-lg scale-105" : ""}`}
                 >
-                  {isPopular(plan, index) && (
+                  {plans.length === 1 && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-full">
-                        {t("landing.pricing.popular")}
+                        Free Forever
+                      </span>
+                    </div>
+                  )}
+                  {plans.length > 1 && isPopular(plan, index) && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-full">
+                      {t("landing.pricing.popular")}
                       </span>
                     </div>
                   )}
@@ -435,6 +443,7 @@ export default function Landing() {
                   </CardContent>
                 </Card>
               ))}
+              </div>
             </div>
           )}
         </div>
