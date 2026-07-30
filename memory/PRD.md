@@ -295,6 +295,7 @@ class DeviceInfo(BaseModel):
 - `/app/test_reports/iteration_12.json` - Inventory-Linked Parts System
 - `/app/test_reports/iteration_13.json` - Multi-language Support (i18n) - 100% Pass
 - `/app/test_reports/iteration_15.json` - Resend Email Integration (19 tests) - 100% Pass
+- `/app/test_reports/iteration_16.json` - Password Reset UI & Plan Usage (8 tests) - 100% Pass
 
 ## Prioritized Backlog
 
@@ -311,8 +312,9 @@ class DeviceInfo(BaseModel):
 - [x] Multi-language Support (i18n) ✅ COMPLETED January 2026
 - [x] Self-Service Billing with Razorpay ✅ COMPLETED February 2026
 - [x] Email notifications (Resend) ✅ COMPLETED July 2026
+- [x] Password Reset UI ✅ COMPLETED July 2026
+- [x] Plan Usage Progress Bars ✅ COMPLETED July 2026
 - [ ] WhatsApp alerts for expiring subscriptions
-- [ ] Plan usage progress bars in tenant dashboard
 - [ ] SSL setup for aftersales.pro
 - [ ] AMC/repeat customer tagging
 
@@ -376,3 +378,18 @@ class DeviceInfo(BaseModel):
 - ✅ **Forgot Password Flow** - `POST /api/auth/forgot-password` and `POST /api/auth/reset-password`
 - ✅ **Super Admin Email Trigger** - `POST /api/super-admin/trigger-email-checks`
 - ⚠️ **Domain Verification Pending** - Resend requires domain verification for production use (currently using onboarding@resend.dev for testing)
+
+### Password Reset Flow - July 2026
+- ✅ **Forgot Password Page** (`/forgot-password`) - Request password reset link
+- ✅ **Reset Password Page** (`/reset-password`) - Set new password using token
+- ✅ **Forgot Password Link** - Added to login page
+- ✅ **Secure Token System** - 1-hour expiry, single-use tokens stored in password_resets collection
+- ✅ **User-Friendly UX** - Success/error states, "Back to Login" links
+
+### Plan Usage Dashboard - July 2026
+- ✅ **PlanUsageCard Component** (`/app/frontend/src/components/PlanUsageCard.jsx`) - Reusable plan usage display
+- ✅ **Progress Bars** - Visual indicators for Jobs, Team Members, Branches, Inventory Items
+- ✅ **Near Limits Warning** - Orange badge when any usage >= 80%
+- ✅ **At Limit Indication** - Red progress bars when usage >= 100%
+- ✅ **Upgrade CTA** - "Upgrade to Pro" button for Free plan users
+- ✅ **Dashboard Integration** - PlanUsageCard added to main Dashboard page

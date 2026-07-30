@@ -158,11 +158,32 @@ function UsageItem({ label, icon: Icon, used, limit, unlimited, color, bgColor, 
   const isNearLimit = percentage >= 80;
   const isAtLimit = percentage >= 100;
 
+  // Static class maps for Tailwind JIT compatibility
+  const bgColorMap = {
+    "bg-blue-500": "bg-blue-500/10",
+    "bg-green-500": "bg-green-500/10",
+    "bg-purple-500": "bg-purple-500/10",
+    "bg-orange-500": "bg-orange-500/10",
+  };
+  const progressColorMap = {
+    "bg-blue-500": "[&>div]:bg-blue-500",
+    "bg-green-500": "[&>div]:bg-green-500",
+    "bg-purple-500": "[&>div]:bg-purple-500",
+    "bg-orange-500": "[&>div]:bg-orange-500",
+  };
+
+  const iconBgClass = bgColorMap[bgColor] || "bg-muted";
+  const progressClass = isAtLimit 
+    ? "[&>div]:bg-destructive" 
+    : isNearLimit 
+      ? "[&>div]:bg-orange-500" 
+      : progressColorMap[bgColor] || "";
+
   return (
     <div className={`${compact ? "" : "p-3 bg-muted/30 rounded-lg"}`} data-testid={`usage-${label.toLowerCase().replace(/\s+/g, '-')}`}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <div className={`w-6 h-6 ${bgColor}/10 rounded flex items-center justify-center`}>
+          <div className={`w-6 h-6 ${iconBgClass} rounded flex items-center justify-center`}>
             <Icon className={`w-3.5 h-3.5 ${color}`} />
           </div>
           <span className="text-sm font-medium">{label}</span>
@@ -174,7 +195,7 @@ function UsageItem({ label, icon: Icon, used, limit, unlimited, color, bgColor, 
       {!isUnlimited && (
         <Progress
           value={percentage}
-          className={`h-2 ${isAtLimit ? "[&>div]:bg-destructive" : isNearLimit ? "[&>div]:bg-orange-500" : `[&>div]:${bgColor}`}`}
+          className={`h-2 ${progressClass}`}
         />
       )}
       {isUnlimited && (
