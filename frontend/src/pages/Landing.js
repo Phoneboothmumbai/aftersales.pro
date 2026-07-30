@@ -114,30 +114,31 @@ export default function Landing() {
 
   const getPlanFeatures = (plan) => {
     const features = [];
-    if (plan.max_jobs_per_month === -1) {
-      features.push("Unlimited jobs");
+    
+    // For Free plan - show limits
+    if (plan.price === 0) {
+      features.push(`${plan.max_users || 2} Team members`);
+      features.push(`${plan.max_branches || 1} Branch`);
+      features.push(`${plan.max_jobs_per_month || 30} Jobs/month`);
+      features.push("WhatsApp notifications");
+      features.push("PDF Job sheets");
+      features.push("QR Code tracking");
+      features.push("Basic reports");
     } else {
-      features.push(`Up to ${plan.max_jobs_per_month} jobs/month`);
-    }
-    if (plan.max_branches === -1) {
-      features.push("Unlimited Branches");
-    } else {
-      features.push(`${plan.max_branches} Branch${plan.max_branches > 1 ? 'es' : ''}`);
-    }
-    if (plan.max_users === -1) {
+      // For Pro plan - show unlimited features
       features.push("Unlimited Team members");
-    } else {
-      features.push(`${plan.max_users} Team member${plan.max_users > 1 ? 's' : ''}`);
+      features.push("Unlimited Branches");
+      features.push("Unlimited Jobs");
+      features.push("Inventory management");
+      features.push("Advanced analytics");
+      features.push("Profit reports");
+      features.push("Custom roles & permissions");
+      features.push("Multi-branch support");
+      features.push("Data export (CSV/Excel)");
+      features.push("Priority WhatsApp support");
     }
-    if (plan.features?.whatsapp_messages) features.push("WhatsApp messaging");
-    if (plan.features?.pdf_job_sheet) features.push("PDF job sheets");
-    if (plan.features?.photo_upload) features.push("Photo uploads");
-    if (plan.features?.inventory_management) features.push("Inventory management");
-    if (plan.features?.advanced_analytics) features.push("Advanced analytics");
-    if (plan.features?.priority_support) features.push("Priority support");
-    if (plan.features?.api_access) features.push("API access");
-    if (plan.features?.dedicated_account_manager) features.push("Dedicated support");
-    return features.slice(0, 6); // Max 6 features displayed
+    
+    return features;
   };
 
   const getCta = (plan) => {
@@ -398,31 +399,47 @@ export default function Landing() {
             </div>
           ) : (
             <div className="flex justify-center">
-              <div className={`grid gap-8 max-w-md mx-auto ${plans.length > 1 ? 'md:grid-cols-' + Math.min(plans.length, 3) + ' max-w-6xl' : ''}`}>
+              <div className={`grid gap-8 ${plans.length === 2 ? 'md:grid-cols-2 max-w-4xl' : plans.length > 2 ? 'md:grid-cols-3 max-w-6xl' : 'max-w-md'} mx-auto`}>
               {plans.map((plan, index) => (
                 <Card
                   key={plan.id || index}
-                  className={`relative ${plans.length === 1 ? 'border-primary shadow-lg' : isPopular(plan, index) ? "border-primary shadow-lg scale-105" : ""}`}
+                  className={`relative ${plan.is_featured || plan.badge ? 'border-primary border-2 shadow-xl scale-105' : 'border-border'}`}
                 >
-                  {plans.length === 1 && (
+                  {plan.badge && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-full">
-                        Free Forever
+                      <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-semibold px-4 py-1 rounded-full shadow-lg">
+                        {plan.badge}
                       </span>
                     </div>
                   )}
-                  {plans.length > 1 && isPopular(plan, index) && (
+                  {!plan.badge && plan.price === 0 && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-primary text-primary-foreground text-sm px-3 py-1 rounded-full">
-                      {t("landing.pricing.popular")}
+                      <span className="bg-green-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
+                        Forever Free
                       </span>
                     </div>
                   )}
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
+                  <CardContent className="p-8">
+                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4">{plan.description}</p>
                     <div className="mb-6">
-                      <span className="text-4xl font-bold">{formatPrice(plan)}</span>
-                      <span className="text-muted-foreground text-sm ml-1">{formatPeriod(plan)}</span>
+                      {plan.original_price && plan.original_price > plan.price && (
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg text-muted-foreground line-through">₹{plan.original_price}</span>
+                          <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded">
+                            SAVE {Math.round((1 - plan.price / plan.original_price) * 100)}%
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl font-bold">{plan.price === 0 ? '₹0' : `₹${plan.price}`}</span>
+                        <span className="text-muted-foreground">
+                          {plan.price === 0 ? '/forever' : '/year'}
+                        </span>
+                      </div>
+                      {plan.price > 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">+ 18% GST • ~₹{Math.round(plan.price/12)}/month</p>
+                      )}
                     </div>
                     <ul className="space-y-3 mb-6">
                       {getPlanFeatures(plan).map((feature, i) => (
@@ -434,11 +451,12 @@ export default function Landing() {
                     </ul>
                     <Button
                       className="w-full"
-                      variant={isPopular(plan, index) ? "default" : "outline"}
+                      variant={plan.is_featured || plan.badge ? "default" : "outline"}
+                      size="lg"
                       onClick={() => navigate("/signup")}
                       data-testid={`pricing-${plan.name?.toLowerCase().replace(/\s+/g, '-')}-btn`}
                     >
-                      {getCta(plan)}
+                      {plan.price === 0 ? 'Start Free' : 'Get Pro'}
                     </Button>
                   </CardContent>
                 </Card>
