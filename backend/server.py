@@ -26,6 +26,24 @@ import base64
 import razorpay
 import hmac
 import hashlib
+import asyncio
+from contextlib import asynccontextmanager
+
+# Import email service
+from email_service import (
+    send_welcome_email,
+    send_password_reset_email,
+    send_payment_success_email,
+    send_payment_failed_email,
+    send_trial_ending_email,
+    send_subscription_renewed_email,
+    send_subscription_expired_email,
+    send_inactive_reminder_email,
+    send_first_job_email,
+    send_milestone_email,
+    send_new_signup_alert,
+    send_weekly_summary
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -825,6 +843,25 @@ async def signup_tenant(data: TenantCreate):
     user_response = {k: v for k, v in user.items() if k != "password"}
     tenant_response = {k: v for k, v in tenant.items()}
     
+    # Send welcome email to new tenant (fire and forget)
+    try:
+        import asyncio
+        asyncio.create_task(send_welcome_email(
+            to_email=data.admin_email,
+            shop_name=data.company_name,
+            owner_name=data.admin_name,
+            subdomain=data.subdomain.lower()
+        ))
+        # Also notify admin about new signup
+        asyncio.create_task(send_new_signup_alert(
+            shop_name=data.company_name,
+            owner_email=data.admin_email,
+            subdomain=data.subdomain.lower(),
+            plan="Free Trial"
+        ))
+    except Exception as e:
+        logger.error(f"Failed to send welcome email: {e}")
+    
     return LoginResponse(token=token, user=UserResponse(**user_response), tenant=TenantResponse(**tenant_response))
 
 @api_router.get("/tenants/check-subdomain/{subdomain}")
@@ -1096,6 +1133,99 @@ async def change_password(data: ChangePasswordRequest, user: dict = Depends(get_
     )
     
     return {"message": "Password changed successfully"}
+
+# ==================== FORGOT PASSWORD ====================
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+    subdomain: str
+
+class ResetPasswordWithTokenRequest(BaseModel):
+    token: str
+    new_password: str
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(data: ForgotPasswordRequest):
+    """Request password reset - sends email with reset link"""
+    # Find tenant by subdomain
+    tenant = await db.tenants.find_one({"subdomain": data.subdomain.lower()}, {"_id": 0})
+    if not tenant:
+        # Don't reveal if subdomain exists
+        return {"message": "If the email exists, a reset link has been sent"}
+    
+    # Find user
+    user = await db.users.find_one({
+        "email": data.email.lower(),
+        "tenant_id": tenant["id"]
+    }, {"_id": 0})
+    
+    if not user:
+        # Don't reveal if user exists
+        return {"message": "If the email exists, a reset link has been sent"}
+    
+    # Generate reset token (valid for 1 hour)
+    reset_token = str(uuid.uuid4())
+    expires_at = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+    
+    # Store reset token
+    await db.password_resets.insert_one({
+        "token": reset_token,
+        "user_id": user["id"],
+        "tenant_id": tenant["id"],
+        "email": user["email"],
+        "expires_at": expires_at,
+        "used": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    # Send reset email
+    reset_link = f"https://aftersales.pro/reset-password?token={reset_token}"
+    try:
+        import asyncio
+        asyncio.create_task(send_password_reset_email(
+            to_email=user["email"],
+            name=user.get("name", "User"),
+            reset_link=reset_link
+        ))
+    except Exception as e:
+        logger.error(f"Failed to send password reset email: {e}")
+    
+    return {"message": "If the email exists, a reset link has been sent"}
+
+@api_router.post("/auth/reset-password")
+async def reset_password_with_token(data: ResetPasswordWithTokenRequest):
+    """Reset password using the token from email"""
+    # Find valid reset token
+    reset_record = await db.password_resets.find_one({
+        "token": data.token,
+        "used": False
+    })
+    
+    if not reset_record:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Check if expired
+    if reset_record["expires_at"] < datetime.now(timezone.utc).isoformat():
+        raise HTTPException(status_code=400, detail="Reset token has expired")
+    
+    # Validate new password
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    # Update password
+    new_hash = hash_password(data.new_password)
+    await db.users.update_one(
+        {"id": reset_record["user_id"]},
+        {"$set": {"password": new_hash}}
+    )
+    
+    # Mark token as used
+    await db.password_resets.update_one(
+        {"token": data.token},
+        {"$set": {"used": True}}
+    )
+    
+    return {"message": "Password reset successfully. You can now login with your new password."}
 
 # ==================== USER ROUTES ====================
 
@@ -1607,6 +1737,21 @@ async def create_job(data: JobCreate, user: dict = Depends(get_current_user)):
         "updated_at": now
     }
     await db.jobs.insert_one(job)
+    
+    # Check if this is the tenant's first job - send congratulations email
+    try:
+        job_count = await db.jobs.count_documents({"tenant_id": user["tenant_id"]})
+        if job_count == 1:  # This is the first job
+            admin_user = await db.users.find_one({"tenant_id": user["tenant_id"], "role": "admin"}, {"_id": 0})
+            if admin_user:
+                import asyncio
+                asyncio.create_task(send_first_job_email(
+                    to_email=admin_user.get("email"),
+                    name=admin_user.get("name"),
+                    job_id=job_number
+                ))
+    except Exception as e:
+        logger.error(f"Failed to send first job email: {e}")
     
     return JobResponse(**job)
 
@@ -6949,6 +7094,24 @@ async def razorpay_webhook(request: Request):
                     }}
                 )
                 
+                # Send payment success email
+                try:
+                    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+                    admin_user = await db.users.find_one({"tenant_id": tenant_id, "role": "admin"}, {"_id": 0})
+                    plan = await db.subscription_plans.find_one({"id": plan_id}, {"_id": 0})
+                    if tenant and admin_user and plan:
+                        amount = plan.get("price_yearly") if subscription.get("billing_cycle") == "yearly" else plan.get("price_monthly", 0)
+                        import asyncio
+                        asyncio.create_task(send_payment_success_email(
+                            to_email=admin_user.get("email"),
+                            name=admin_user.get("name"),
+                            plan_name=plan.get("name"),
+                            amount=float(amount or 0),
+                            invoice_id=f"INV-{now.strftime('%Y%m%d')}-{tenant_id[:8].upper()}"
+                        ))
+                except Exception as e:
+                    logging.error(f"Failed to send payment success email: {e}")
+                
         elif event == "subscription.charged":
             # Recurring payment successful
             subscription_data = payload.get("payload", {}).get("subscription", {}).get("entity", {})
@@ -6990,6 +7153,20 @@ async def razorpay_webhook(request: Request):
                     status="paid"
                 )
                 
+                # Send subscription renewed email
+                try:
+                    admin_user = await db.users.find_one({"tenant_id": tenant_id, "role": "admin"}, {"_id": 0})
+                    if admin_user and plan:
+                        import asyncio
+                        asyncio.create_task(send_subscription_renewed_email(
+                            to_email=admin_user.get("email"),
+                            name=admin_user.get("name"),
+                            plan_name=plan.get("name", "Pro"),
+                            next_billing=subscription_ends_at[:10]  # Date portion only
+                        ))
+                except Exception as e:
+                    logging.error(f"Failed to send subscription renewed email: {e}")
+                
         elif event == "subscription.cancelled":
             subscription_data = payload.get("payload", {}).get("subscription", {}).get("entity", {})
             razorpay_subscription_id = subscription_data.get("id")
@@ -7021,11 +7198,159 @@ async def razorpay_webhook(request: Request):
                         "created_at": now.isoformat()
                     }
                     await db.failed_payments.insert_one(failed_payment)
+                    
+                    # Send payment failed email
+                    try:
+                        tenant_id = subscription["tenant_id"]
+                        admin_user = await db.users.find_one({"tenant_id": tenant_id, "role": "admin"}, {"_id": 0})
+                        if admin_user:
+                            amount = payment_data.get("amount", 0) / 100
+                            import asyncio
+                            asyncio.create_task(send_payment_failed_email(
+                                to_email=admin_user.get("email"),
+                                name=admin_user.get("name"),
+                                amount=float(amount),
+                                retry_link="https://aftersales.pro/billing"
+                            ))
+                    except Exception as e:
+                        logging.error(f"Failed to send payment failed email: {e}")
     
     except Exception as e:
         logging.error(f"Webhook processing error: {e}")
     
     return {"status": "ok"}
+
+# ==================== BACKGROUND EMAIL TASKS ====================
+
+async def check_trial_ending_emails():
+    """Send reminder emails to tenants whose trial is ending soon"""
+    now = datetime.now(timezone.utc)
+    
+    # Check for trials ending in 3, 7 days
+    for days_left in [7, 3, 1]:
+        target_date = (now + timedelta(days=days_left)).strftime("%Y-%m-%d")
+        
+        tenants = await db.tenants.find({
+            "subscription_status": {"$in": [None, "trial", "free"]},
+            "trial_ends_at": {"$regex": f"^{target_date}"}
+        }, {"_id": 0}).to_list(100)
+        
+        for tenant in tenants:
+            try:
+                admin_user = await db.users.find_one(
+                    {"tenant_id": tenant["id"], "role": "admin"}, 
+                    {"_id": 0, "email": 1, "name": 1}
+                )
+                if admin_user:
+                    await send_trial_ending_email(
+                        to_email=admin_user.get("email"),
+                        name=admin_user.get("name"),
+                        days_left=days_left,
+                        upgrade_link="https://aftersales.pro/billing"
+                    )
+                    logger.info(f"Sent trial ending email to {admin_user.get('email')} ({days_left} days left)")
+            except Exception as e:
+                logger.error(f"Failed to send trial ending email: {e}")
+
+async def check_inactive_users():
+    """Send reminder emails to inactive users"""
+    now = datetime.now(timezone.utc)
+    
+    # Check for users inactive for 7 and 30 days
+    for days_inactive in [7, 30]:
+        cutoff_date = (now - timedelta(days=days_inactive)).isoformat()
+        
+        # Find users who haven't logged in recently
+        inactive_users = await db.users.find({
+            "role": "admin",
+            "last_login_at": {"$lt": cutoff_date}
+        }, {"_id": 0}).to_list(50)
+        
+        for user in inactive_users:
+            try:
+                # Check if we already sent an email for this period (store in collection)
+                reminder_key = f"{user['id']}_{days_inactive}"
+                existing = await db.email_reminders.find_one({"reminder_key": reminder_key})
+                
+                if not existing:
+                    await send_inactive_reminder_email(
+                        to_email=user.get("email"),
+                        name=user.get("name"),
+                        days_inactive=days_inactive,
+                        login_link="https://aftersales.pro/login"
+                    )
+                    # Mark as sent
+                    await db.email_reminders.insert_one({
+                        "reminder_key": reminder_key,
+                        "user_id": user["id"],
+                        "sent_at": now.isoformat()
+                    })
+                    logger.info(f"Sent inactive reminder to {user.get('email')} ({days_inactive} days)")
+            except Exception as e:
+                logger.error(f"Failed to send inactive reminder: {e}")
+
+async def check_subscription_expired():
+    """Send emails to tenants whose subscription has expired"""
+    now = datetime.now(timezone.utc)
+    yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+    
+    # Find tenants whose subscription expired yesterday
+    tenants = await db.tenants.find({
+        "subscription_status": "paid",
+        "subscription_ends_at": {"$regex": f"^{yesterday}"}
+    }, {"_id": 0}).to_list(50)
+    
+    for tenant in tenants:
+        try:
+            admin_user = await db.users.find_one(
+                {"tenant_id": tenant["id"], "role": "admin"}, 
+                {"_id": 0, "email": 1, "name": 1}
+            )
+            if admin_user:
+                await send_subscription_expired_email(
+                    to_email=admin_user.get("email"),
+                    name=admin_user.get("name"),
+                    reactivate_link="https://aftersales.pro/billing"
+                )
+                logger.info(f"Sent subscription expired email to {admin_user.get('email')}")
+        except Exception as e:
+            logger.error(f"Failed to send subscription expired email: {e}")
+
+async def run_scheduled_email_tasks():
+    """Run all scheduled email tasks once per day"""
+    while True:
+        try:
+            logger.info("Running scheduled email tasks...")
+            await check_trial_ending_emails()
+            await check_inactive_users()
+            await check_subscription_expired()
+            logger.info("Scheduled email tasks completed")
+        except Exception as e:
+            logger.error(f"Error in scheduled email tasks: {e}")
+        
+        # Run once every 24 hours
+        await asyncio.sleep(86400)
+
+# API endpoint to manually trigger email checks (for testing/admin use)
+@api_router.post("/super-admin/trigger-email-checks")
+async def trigger_email_checks(user: dict = Depends(get_super_admin)):
+    """Manually trigger email check tasks (Super Admin only)"""
+    try:
+        await check_trial_ending_emails()
+        await check_inactive_users()
+        await check_subscription_expired()
+        return {"message": "Email checks completed", "status": "success"}
+    except Exception as e:
+        logger.error(f"Manual email check failed: {e}")
+        return {"message": str(e), "status": "error"}
+
+# Startup event to begin background tasks
+@app.on_event("startup")
+async def startup_event():
+    """Start background tasks on app startup"""
+    import asyncio
+    asyncio.create_task(run_scheduled_email_tasks())
+    logger.info("Background email scheduler started")
 
 # Include the router in the main app
 app.include_router(api_router)

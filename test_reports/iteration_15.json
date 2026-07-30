@@ -1,0 +1,52 @@
+{
+  "summary": "Backend-only testing of the Resend email integration for aftersales.pro. Created /app/backend/tests/test_email_integration.py (19 pytest cases, all PASSED) covering POST /api/auth/forgot-password (valid user, unknown email, unknown subdomain, validation 422s, email-send attempt logged), POST /api/auth/reset-password (invalid token, short password, full E2E signup -> forgot -> token from DB -> reset -> login with new password -> old password rejected -> token reuse blocked), POST /api/tenants/signup (welcome + admin new-signup alert email triggers), POST /api/super-admin/trigger-email-checks (401 unauth, 403 with tenant token, 200 success as super admin), background scheduler startup log, and email_service module/template unit checks. Additionally proved real end-to-end delivery: sending to the Resend-verified account address (aftersales@thegoodmen.in) returned {'success': True, 'email_id': '3bd487e8-...'}. All other recipients fail only with the expected Resend domain-verification / test-mode error, which is correctly caught and logged. No 500s observed; all endpoints behave as specified.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "check_inactive_users() / POST /api/super-admin/trigger-email-checks", "issue": "Inactive-reminder emails can NEVER be sent. The query filters on users.last_login_at, but `last_login_at` is never written anywhere in server.py (POST /api/auth/login does not update it). grep confirms the field only appears in this query. Feature is effectively dead code.", "priority": "HIGH"},
+      {"endpoint": "POST /api/auth/forgot-password", "issue": "Reset link is hardcoded to https://aftersales.pro/reset-password?token=... (server.py:1182). In preview/staging the emailed link points at production, so the reset flow cannot be completed from this environment. Should be built from an env var (e.g. FRONTEND_URL); no such key exists in backend/.env. Same hardcoding at lines 7213, 7249, 7280, 7313.", "priority": "HIGH"}
+    ],
+    "minor": [
+      {"endpoint": "POST /api/super-admin/trigger-email-checks", "issue": "Returns HTTP 200 with {'status':'error'} on internal failure instead of 500 — failures are invisible to monitoring/clients."},
+      {"endpoint": "check_trial_ending_emails() / check_subscription_expired()", "issue": "No dedup guard (unlike check_inactive_users which uses email_reminders). The scheduler runs immediately on every app startup and backend hot-reloads restart the app frequently, so trial-ending / subscription-expired emails will be re-sent to the same tenant multiple times per day. Confirmed multiple 'Running scheduled email tasks...' entries within minutes in backend.err.log."},
+      {"endpoint": "POST /api/auth/forgot-password", "issue": "No rate limiting and no invalidation of previously issued unused tokens; repeated calls create unlimited password_resets rows and repeated emails (email-bombing vector). No index on password_resets.token / expires_at TTL."},
+      {"endpoint": "email_service.send_email", "issue": "No persistence/audit of send results (no email_logs collection); only logger output, so delivery failures are unqueryable from the app/admin UI."},
+      {"endpoint": "server.py signup / create_job / forgot-password", "issue": "asyncio.create_task(...) results are never awaited or referenced, so tasks may be garbage-collected before completion and exceptions inside them are only visible via email_service's own logger. Consider FastAPI BackgroundTasks or keeping a task set."},
+      {"endpoint": "email_service.py config", "issue": "SENDER_EMAIL defaults to onboarding@resend.dev; all real tenant emails currently fail with 'You can only send testing emails to your own email address (aftersales@thegoodmen.in)'. A verified sending domain must be configured before launch (expected per request, flagged for release readiness)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_email_integration.py",
+    "/app/backend/tests/manual_resend_probe.py",
+    "/app/test_reports/pytest/email_results.xml"
+  ],
+  "action_items": [
+    "Set users.last_login_at on POST /api/auth/login (and super-admin login) so check_inactive_users actually finds inactive tenants.",
+    "Add FRONTEND_URL / APP_BASE_URL to backend/.env and use it to build reset/billing/login links instead of hardcoded https://aftersales.pro/... (server.py 1182, 7213, 7249, 7280, 7313).",
+    "Add dedup records (like email_reminders) for trial-ending and subscription-expired emails, and avoid running the daily job immediately on every startup/hot-reload.",
+    "Make POST /api/super-admin/trigger-email-checks return 500 on failure instead of 200 + status:error.",
+    "Add rate limiting to /api/auth/forgot-password and invalidate prior unused reset tokens; add TTL/index on password_resets.",
+    "Optional: log every send attempt to an email_logs collection for auditability; remove unused imports send_milestone_email / send_weekly_summary (imported but never called)."
+  ],
+  "critical_code_review_comments": [
+    "check_inactive_users depends on a field (last_login_at) that no code writes — dead feature.",
+    "Hardcoded production URLs inside email bodies break the reset flow in non-production environments.",
+    "server.py is 7369 lines; email background tasks/schedulers and super-admin routes should be split into separate modules.",
+    "@app.on_event('startup')/'shutdown') is deprecated in current FastAPI; asynccontextmanager is already imported but unused — migrate to lifespan.",
+    "Fire-and-forget asyncio.create_task without holding a reference risks task GC; also duplicate 'import asyncio' inside functions while it is already imported at module level."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_email_integration.py",
+    "/app/backend/tests/manual_resend_probe.py"
+  ],
+  "success_rate": {"backend": "100% (19/19 pytest cases passed)", "frontend": "not tested (backend-only request)"},
+  "seed_data_creation": "Created and deleted two temporary tenants (subdomains testreset<hex>, testwel<hex>) with TEST_-prefixed admin emails; associated users/branches/password_resets removed in test teardown. One real probe email sent to aftersales@thegoodmen.in.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Run `cd /app/backend && python -m pytest tests/test_email_integration.py -v`. Resend API key is valid and delivery works ONLY to aftersales@thegoodmen.in (account owner) until a domain is verified; every other recipient logs 'Failed to send email to X: You can only send testing emails...' or 'Invalid `to` field' for example.com addresses — tests assert on the send ATTEMPT log, not success. Backend logs are in /var/log/supervisor/backend.err.log. Razorpay-webhook-triggered emails (payment success/failed/renewed, server.py 7100-7215) were NOT tested because they require a valid webhook HMAC signature; test them with a signed payload using RAZORPAY_WEBHOOK_SECRET. Inactive-reminder path cannot be verified until last_login_at is populated.",
+  "rca_of_the_issue": "All requested endpoints function correctly. The two high-priority findings are logic gaps rather than runtime errors: (1) check_inactive_users queries users.last_login_at which is never set by the login endpoint, so the inactive-reminder lifecycle email will never fire; (2) email link URLs are hardcoded to the production domain, so password-reset links emailed from preview/staging are unusable. Email delivery failures observed during testing are purely Resend test-mode domain-verification restrictions (verified by a successful send to the account-owner address returning a Resend email_id), and are caught and logged correctly by email_service.send_email."
+}
