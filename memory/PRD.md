@@ -294,6 +294,7 @@ class DeviceInfo(BaseModel):
 - `/app/test_reports/iteration_11.json` - Profit Tracking System (16 tests)
 - `/app/test_reports/iteration_12.json` - Inventory-Linked Parts System
 - `/app/test_reports/iteration_13.json` - Multi-language Support (i18n) - 100% Pass
+- `/app/test_reports/iteration_15.json` - Resend Email Integration (19 tests) - 100% Pass
 
 ## Prioritized Backlog
 
@@ -309,10 +310,10 @@ class DeviceInfo(BaseModel):
 ### P1 (High Priority)
 - [x] Multi-language Support (i18n) ✅ COMPLETED January 2026
 - [x] Self-Service Billing with Razorpay ✅ COMPLETED February 2026
+- [x] Email notifications (Resend) ✅ COMPLETED July 2026
 - [ ] WhatsApp alerts for expiring subscriptions
 - [ ] Plan usage progress bars in tenant dashboard
 - [ ] SSL setup for aftersales.pro
-- [ ] Email notifications for status updates
 - [ ] AMC/repeat customer tagging
 
 ### P2 (Medium Priority)
@@ -353,3 +354,25 @@ class DeviceInfo(BaseModel):
 - ✅ **Webhook Handler** - For payment events (subscription.activated, subscription.charged, payment.failed)
 - ✅ **Invoice PDF Generation** - Downloadable GST-compliant invoices
 - ✅ **Hard Block on Expiry** - Shows warning and redirects to billing page
+
+### Resend Email Integration - July 2026
+- ✅ **Email Service** (`/app/backend/email_service.py`) - Complete email templating with Resend API
+- ✅ **Lifecycle Emails**:
+  - Welcome email on new tenant signup
+  - Password reset with secure token (1-hour expiry)
+  - Trial ending reminders (7, 3, 1 days before)
+  - Inactive user reminders (7, 30 days)
+  - Subscription expired notification
+- ✅ **Transactional Emails**:
+  - Payment success receipt with invoice details
+  - Payment failed notification with retry link
+  - Subscription renewed confirmation
+  - First job congratulations
+- ✅ **Admin Alerts**:
+  - New signup notification to admin
+  - Weekly summary (template ready)
+- ✅ **Background Scheduler** - Runs daily email checks automatically
+- ✅ **Deduplication** - Prevents duplicate lifecycle emails
+- ✅ **Forgot Password Flow** - `POST /api/auth/forgot-password` and `POST /api/auth/reset-password`
+- ✅ **Super Admin Email Trigger** - `POST /api/super-admin/trigger-email-checks`
+- ⚠️ **Domain Verification Pending** - Resend requires domain verification for production use (currently using onboarding@resend.dev for testing)

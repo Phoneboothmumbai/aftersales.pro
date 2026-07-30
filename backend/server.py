@@ -63,6 +63,9 @@ RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')
 RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
 RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
 
+# Frontend URL for email links
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://aftersales.pro')
+
 # Initialize Razorpay client
 razorpay_client = None
 if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET and not RAZORPAY_KEY_ID.startswith('placeholder'):
@@ -1090,6 +1093,12 @@ async def login(data: LoginRequest):
     if not user or not verify_password(data.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
+    # Update last_login_at for inactive user tracking
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"last_login_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
     token = create_token(user["id"], user["tenant_id"], user["role"])
     
     user_response = {k: v for k, v in user.items() if k not in ["password", "_id"]}
@@ -1179,7 +1188,7 @@ async def forgot_password(data: ForgotPasswordRequest):
     })
     
     # Send reset email
-    reset_link = f"https://aftersales.pro/reset-password?token={reset_token}"
+    reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
     try:
         import asyncio
         asyncio.create_task(send_password_reset_email(
@@ -7210,7 +7219,7 @@ async def razorpay_webhook(request: Request):
                                 to_email=admin_user.get("email"),
                                 name=admin_user.get("name"),
                                 amount=float(amount),
-                                retry_link="https://aftersales.pro/billing"
+                                retry_link=f"{FRONTEND_URL}/billing"
                             ))
                     except Exception as e:
                         logging.error(f"Failed to send payment failed email: {e}")
@@ -7225,6 +7234,7 @@ async def razorpay_webhook(request: Request):
 async def check_trial_ending_emails():
     """Send reminder emails to tenants whose trial is ending soon"""
     now = datetime.now(timezone.utc)
+    today_str = now.strftime("%Y-%m-%d")
     
     # Check for trials ending in 3, 7 days
     for days_left in [7, 3, 1]:
@@ -7237,6 +7247,12 @@ async def check_trial_ending_emails():
         
         for tenant in tenants:
             try:
+                # Dedup check - only send once per tenant per days_left period per day
+                reminder_key = f"trial_ending_{tenant['id']}_{days_left}_{today_str}"
+                existing = await db.email_reminders.find_one({"reminder_key": reminder_key})
+                if existing:
+                    continue
+                
                 admin_user = await db.users.find_one(
                     {"tenant_id": tenant["id"], "role": "admin"}, 
                     {"_id": 0, "email": 1, "name": 1}
@@ -7246,8 +7262,15 @@ async def check_trial_ending_emails():
                         to_email=admin_user.get("email"),
                         name=admin_user.get("name"),
                         days_left=days_left,
-                        upgrade_link="https://aftersales.pro/billing"
+                        upgrade_link=f"{FRONTEND_URL}/billing"
                     )
+                    # Mark as sent
+                    await db.email_reminders.insert_one({
+                        "reminder_key": reminder_key,
+                        "tenant_id": tenant["id"],
+                        "type": "trial_ending",
+                        "sent_at": now.isoformat()
+                    })
                     logger.info(f"Sent trial ending email to {admin_user.get('email')} ({days_left} days left)")
             except Exception as e:
                 logger.error(f"Failed to send trial ending email: {e}")
@@ -7277,7 +7300,7 @@ async def check_inactive_users():
                         to_email=user.get("email"),
                         name=user.get("name"),
                         days_inactive=days_inactive,
-                        login_link="https://aftersales.pro/login"
+                        login_link=f"{FRONTEND_URL}/login"
                     )
                     # Mark as sent
                     await db.email_reminders.insert_one({
@@ -7293,6 +7316,7 @@ async def check_subscription_expired():
     """Send emails to tenants whose subscription has expired"""
     now = datetime.now(timezone.utc)
     yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+    today_str = now.strftime("%Y-%m-%d")
     
     # Find tenants whose subscription expired yesterday
     tenants = await db.tenants.find({
@@ -7302,6 +7326,12 @@ async def check_subscription_expired():
     
     for tenant in tenants:
         try:
+            # Dedup check - only send once per tenant per day
+            reminder_key = f"subscription_expired_{tenant['id']}_{today_str}"
+            existing = await db.email_reminders.find_one({"reminder_key": reminder_key})
+            if existing:
+                continue
+            
             admin_user = await db.users.find_one(
                 {"tenant_id": tenant["id"], "role": "admin"}, 
                 {"_id": 0, "email": 1, "name": 1}
@@ -7310,8 +7340,15 @@ async def check_subscription_expired():
                 await send_subscription_expired_email(
                     to_email=admin_user.get("email"),
                     name=admin_user.get("name"),
-                    reactivate_link="https://aftersales.pro/billing"
+                    reactivate_link=f"{FRONTEND_URL}/billing"
                 )
+                # Mark as sent
+                await db.email_reminders.insert_one({
+                    "reminder_key": reminder_key,
+                    "tenant_id": tenant["id"],
+                    "type": "subscription_expired",
+                    "sent_at": now.isoformat()
+                })
                 logger.info(f"Sent subscription expired email to {admin_user.get('email')}")
         except Exception as e:
             logger.error(f"Failed to send subscription expired email: {e}")
@@ -7342,7 +7379,7 @@ async def trigger_email_checks(user: dict = Depends(get_super_admin)):
         return {"message": "Email checks completed", "status": "success"}
     except Exception as e:
         logger.error(f"Manual email check failed: {e}")
-        return {"message": str(e), "status": "error"}
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Startup event to begin background tasks
 @app.on_event("startup")
