@@ -330,7 +330,7 @@ export default function MobileTrading() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => toast.info(`Device ${device.device_id}: ${device.brand} ${device.model}`)}>
+                              <DropdownMenuItem onClick={() => navigate(`/mobile-trading/device/${device.id}`)}>
                                 <Eye className="w-4 h-4 mr-2" />
                                 View Details
                               </DropdownMenuItem>
@@ -357,7 +357,7 @@ export default function MobileTrading() {
                                 </>
                               )}
                               {device.status === "in_stock" && (
-                                <DropdownMenuItem onClick={() => toast.info("Sell feature coming soon")}>
+                                <DropdownMenuItem onClick={() => navigate(`/mobile-trading/device/${device.id}`)}>
                                   <ShoppingCart className="w-4 h-4 mr-2" />
                                   Sell Device
                                 </DropdownMenuItem>

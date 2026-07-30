@@ -412,3 +412,52 @@ class DeviceInfo(BaseModel):
 - ✅ **Edit/Cancel Flow** - Edits allowed in pending_signature, cancel with reason tracking
 - ✅ **No Photo Storage** - Text-based KYC only (as per user request)
 - ✅ **Margin Protection** - Profit data password-protected like existing profit tracking
+
+### Used Device Trading UI - Complete (July 30, 2026)
+- ✅ **Device Detail Page** (`/mobile-trading/device/:id`, `/it-equipment/device/:id`)
+  - Full device information display (category, brand, model, IMEI/serial, specs)
+  - Purchase details (price, payment mode, declaration status)
+  - Seller information (KYC data, masked ID)
+  - Sale information (selling price, margin, buyer details) - for sold devices
+  - Timeline (created date, last edit, sale date)
+  - Edit capabilities for pending_signature devices
+  - Status change actions (mark needs repair, mark ready)
+- ✅ **Sell Device Flow**
+  - Selling price input with real-time margin preview
+  - Payment mode selection (Cash, UPI, Bank Transfer, Card)
+  - Buyer information capture (name, phone, address)
+  - Automatic status update to "sold"
+  - Success toast showing margin earned
+- ✅ **Password-Protected Margin Display**
+  - Margin hidden by default when profit password is set
+  - "Unlock to see margin" button for sold devices
+  - Password verification via existing profit password system
+  - Selling price and margin only shown after password verification
+- ✅ **Declined Intake Log** (`/mobile-trading/declined`, `/it-equipment/declined`)
+  - Log devices that were not purchased for compliance tracking
+  - Capture device info (category, brand, model, IMEI/serial)
+  - Capture seller info (name, phone, ID proof)
+  - Pre-defined decline reasons (suspicious ownership, stolen, IMEI blocked, etc.)
+  - Staff notes field
+  - Search functionality
+- ✅ **Module Settings UI** (in Settings page)
+  - Toggle switches for Mobile Phone Trading and IT Equipment Trading
+  - Module descriptions and category lists
+  - Pro Plan badge for locked modules
+  - Automatic sidebar update when modules toggled
+
+### Used Device Trading API Endpoints
+- `GET /api/used-devices/{module}` - List devices (mobile/it)
+- `GET /api/used-devices/{module}/stats` - Module statistics
+- `GET /api/used-devices/detail/{device_id}` - Device detail by ID
+- `POST /api/used-devices` - Create device intake
+- `PUT /api/used-devices/{device_id}` - Update device
+- `POST /api/used-devices/{device_id}/generate-declaration` - Generate PDF declaration
+- `POST /api/used-devices/{device_id}/sign-declaration` - Mark declaration signed
+- `POST /api/used-devices/{device_id}/update-status` - Change device status
+- `POST /api/used-devices/{device_id}/sell` - Record device sale
+- `POST /api/used-devices/{device_id}/cancel` - Cancel purchase
+- `GET /api/declined-intakes` - List declined intakes
+- `POST /api/declined-intakes` - Log declined intake
+- `GET /api/tenants/modules` - Get module settings
+- `PUT /api/tenants/modules` - Update module settings

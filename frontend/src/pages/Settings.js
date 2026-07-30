@@ -13,6 +13,7 @@ import { Switch } from "../components/ui/switch";
 import { Separator } from "../components/ui/separator";
 import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText, Key, Eye, EyeOff, TrendingUp, Lock, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import ModuleSettings from "../components/ModuleSettings";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -338,6 +339,9 @@ export default function Settings() {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Module Settings - Trading Modules */}
+        {isAdmin && <ModuleSettings />}
 
         {/* Account Info */}
         <Card className="card-shadow">

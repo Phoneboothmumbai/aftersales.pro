@@ -1,0 +1,62 @@
+{
+  "summary": "Iteration 18 focused on the newly completed Used Device Trading UI: Device Detail page, Sell Device flow with password-protected margin, Declined Intake Log, and Module Settings toggles (Mobile + IT). Backend: added /app/backend/tests/test_device_detail_declined.py (17 pytest cases) covering GET /api/used-devices/detail/{id} (uuid + device_id, 404, auth), sell-before-signature rejection, sign->sell happy path with margin math, double-sell rejection, invalid status transition, profit-password status/verify, declined-intakes list/create/persist/search/422, and module settings GET/PUT round-trip incl. 403 gating when a module is disabled. All 17 pass; the pre-existing suite test_used_devices_modules.py (26 tests) also still passes = 43/43 backend green. Frontend (Playwright, 1920x1080, demo tenant): verified sidebar -> Mobile Trading list with all 5 stats cards, row menu -> View Details -> /mobile-trading/device/:id (route now exists - previous iteration's CRITICAL routing bug is FIXED), full detail rendering (device info, purchase details, seller info, timeline), Sell dialog end-to-end (margin preview, Record Sale -> status Sold + Sale Information section + toast 'Device sold! Margin: Rs4,500'), margin visible when no profit password is set, margin masked with 'Unlock to see margin' after setting a profit password, wrong password rejected ('Invalid password' toast, stays masked), correct password unlocks margin, Declined Log button -> /mobile-trading/declined, logging a new declined intake (persisted + shown in table), Settings page Module Settings card with both toggles, disabling IT Equipment hides the sidebar link and re-enabling restores it (module gating now works because TenantResponse exposes enabled_modules). IT Equipment module verified for detail navigation, module-specific declined categories and pending-signature actions. No blocking defects found; only minor design/UX and data issues listed below.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/used-devices/detail/{id}", "issue": "Endpoint always returns margin: null but returns the raw selling_price, so DeviceDetail.js computes the margin client-side (selling_price - purchase_price). The 'password protection' is therefore purely cosmetic - anyone can read selling price/margin from the network response without the profit password. Margin/selling_price should be masked server-side and served only after password verification."},
+      {"endpoint": "Two independent profit-password stores", "issue": "/api/settings/profit-password[-status]/verify-profit-password use tenant.profit_password, while /api/used-devices/{module}/stats/verify-profit uses tenant.settings.profit_password_hash. A password set in Settings does NOT unlock the module profit stats endpoint (and vice versa). Consolidate on one field."},
+      {"endpoint": "GET /api/settings/profit-password-status & verify-profit-password", "issue": "Both are admin-only (403 for staff/technician). On DeviceDetail the status call then fails silently (console error), hasPasswordSet stays true and the 'Unlock to see margin' button is shown to non-admins but can never succeed. Either hide the control for non-admins or allow status check for all roles."},
+      {"endpoint": "GET /api/used-devices/{module} & /detail", "issue": "days_in_stock is still (now - created_at) for sold/cancelled devices (all sold rows display '0 days'/keep ageing). Should freeze at sale/cancel date or show '-' for sold."},
+      {"endpoint": "POST /api/declined-intakes", "issue": "seller_id_masked is passed through mask_id_number() even though the UI only collects the last 4 digits, producing output like 'XXXX-XXXX-1234' for input '1234'. Double masking is confusing; store the 4 digits as-is or accept the full number."},
+      {"endpoint": "GET /api/tenants/modules", "issue": "Carried over from iteration 17: 'enabled' is not intersected with available_in_plan, and the seeded 'basic'/'starter'/'enterprise' plans still lack mobile_phone_trading / it_equipment_trading feature flags (Enterprise tenants are denied both modules)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "DeviceDetail.js - Condition block (line ~447)", "issue": "The 'Condition' heading + Separator always render even when physical_condition, working_status, cosmetic_issues and condition_notes are all empty, leaving a large blank area at the bottom of the Device Information card. Wrap in a conditional or render '-'.", "selector": "[data-testid=\"device-detail-page\"]", "priority": "LOW"},
+      {"component": "DeviceDetail.js handleSell", "issue": "toast uses response.data.margin.toLocaleString() with no null-guard. It works today because /sell returns a numeric margin, but if margin is ever masked server-side (recommended fix above) this will throw a TypeError after a successful sale.", "selector": "[data-testid=\"record-sale-btn\"]", "priority": "LOW"},
+      {"component": "ModuleSettings.jsx handleToggle", "issue": "Uses setTimeout(() => window.location.reload(), 500) to refresh the sidebar. Works but is a hard reload (loses scroll/state); prefer refreshing the tenant from AuthContext.", "selector": "[data-testid=\"toggle-it_equipment_trading\"]", "priority": "LOW"},
+      {"component": "DeclinedIntakes.js", "issue": "No client-side phone/ID validation and no field-level error messages - only a generic 'Please fill all required fields' toast. Also the search input and Search button have no data-testid.", "selector": "[data-testid=\"declined-intakes-page\"]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Device Detail (sold device)", "issues": ["Sold devices show 'Days in Stock: 0 days' (should be frozen/hidden after sale).", "Empty 'Condition' section leaves ~250px of dead space in the left card while the right column is much taller - uneven two-column layout.", "No 'Declaration PDF' link for sold devices; only pending devices expose Generate Declaration."]},
+      {"screen": "Mobile Trading / IT Equipment list", "issues": ["All 5 stat cards, filters, table and status badges render correctly with good contrast at 1920x1080.", "Stat cards still have no data-testid (values must be scraped by text)."]},
+      {"screen": "Settings", "issues": ["Module Settings card is placed at the very bottom of a long page; consider moving it above 'Shop Information' or adding an anchor since it is the entry point for enabling trading modules."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_device_detail_declined.py",
+    "/app/backend/tests/test_used_devices_modules.py",
+    "/app/test_reports/pytest/iter18_detail.xml"
+  ],
+  "action_items": [
+    "Mask selling_price/margin server-side (or expose them only via a verified-profit endpoint) - today the lock is cosmetic because detail API returns selling_price and the UI recomputes margin locally.",
+    "Unify the profit-password storage (tenant.profit_password vs tenant.settings.profit_password_hash) so Settings-set passwords also unlock /used-devices/{module}/stats/verify-profit.",
+    "Hide the 'Unlock to see margin' button for non-admins (profit-password-status/verify are admin-only and 403 for staff).",
+    "Freeze days_in_stock at sale/cancel date instead of ageing sold devices.",
+    "Do not render the 'Condition' heading/separator when no condition data exists (empty block on Device Detail).",
+    "Add mobile_phone_trading / it_equipment_trading feature flags to the basic/starter/enterprise seeded plans and intersect 'enabled' with 'available_in_plan' in GET /api/tenants/modules.",
+    "Add data-testid to the stats cards and to DeclinedIntakes search controls."
+  ],
+  "critical_code_review_comments": [
+    "Margin password protection is client-side only: GET /api/used-devices/detail returns selling_price and DeviceDetail computes margin as selling_price - purchase_price, so masking is bypassable via devtools/network. Enforce in the API.",
+    "Duplicate profit-password implementations in server.py (bcrypt on tenant.profit_password vs verify_password on tenant.settings.profit_password_hash) - a real functional split-brain, not just duplication.",
+    "server.py is 8506 lines; the used-devices/declined-intakes/module-settings block (~800 lines) should move to its own APIRouter module.",
+    "MobileTrading.js and ITEquipment.js remain ~90% duplicated (stats cards, filters, table, row menu); DeviceDetail/DeclinedIntakes already infer the module from location.pathname, so a shared parameterised component is straightforward."
+  ],
+  "updated_files": [
+    "/app/frontend/src/pages/DeviceDetail.js (added missing data-testid: generate-declaration-btn, sign-declaration-btn, sell-device-btn, selling-price-input, buyer-name-input, buyer-phone-input, record-sale-btn, margin-block, margin-value)",
+    "/app/frontend/src/pages/DeclinedIntakes.js (added data-testid: declined-category-select, declined-seller-name-input, declined-seller-phone-input, declined-reason-select, submit-declined-btn, declined-row-{id}; also removed 4 stray trailing lines ('/div>' + duplicate </Layout>) that broke the webpack build during editing)",
+    "/app/backend/tests/test_device_detail_declined.py (new, 17 tests)",
+    "/app/backend/tests/cleanup_iter18.py (new, test-data cleanup helper)",
+    "/app/test_reports/iteration_18.json"
+  ],
+  "success_rate": {"backend": "100% (43/43: 17 new + 26 existing)", "frontend": "100% of tested flows passed (device list, detail navigation, sell flow, margin lock/unlock, declined log create, module toggles, IT module) - only minor design/security-of-masking issues"},
+  "seed_data_creation": "Created and then cleaned up: TEST_ mobile/IT devices (MPT/ITE) and TEST_ declined intakes. Cleanup deleted 24 TEST_ used_devices and 2 TEST_ declined_intakes; demo tenant now has 1 real device (MPT-0010 Apple iPhone 13, pending signature). A profit password 'TESTprofit123' was set temporarily to test the margin lock and has been UNSET again (demo tenant has no profit password now, so margin is visible by default).",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "demo / admin@demo.com / demo123 (subdomain 'demo'); login testids: login-subdomain-input, login-email-input, login-password-input, login-submit-btn. Sidebar testids contain spaces: 'nav-mobile trading', 'nav-it equipment', 'nav-settings'.",
+  "context_for_next_testing_agent": "Routes are now /mobile-trading/device/:id, /mobile-trading/declined and the /it-equipment equivalents - all verified working (iteration 17's routing CRITICAL is fixed). Module gating works: TenantResponse exposes enabled_modules and Layout hides the sidebar link when toggled off in Settings (ModuleSettings reloads the page). To retest the margin lock you must POST /api/settings/profit-password first (demo currently has none) and remember to unset it afterwards via mongo ($unset profit_password on tenant subdomain 'demo'). Backend suites: tests/test_used_devices_modules.py (26) and tests/test_device_detail_declined.py (17), both green; the latter toggles the IT module off and back on. Note test_used_devices_modules depends on demo tenant subscription_plan='pro'.",
+  "rca_of_the_issue": "No functional blockers this iteration. The remaining defect of substance is that margin/profit protection is enforced only in the React layer: GET /api/used-devices/detail/{id} nulls 'margin' but still returns 'selling_price', and DeviceDetail.js recomputes margin as selling_price - purchase_price gated on a client-side isMarginUnlocked flag set by /api/settings/verify-profit-password. Any user with API access (or devtools) can read the profit data without the password. Additionally two different tenant fields store the profit password hash (tenant.profit_password used by the Settings endpoints vs tenant.settings.profit_password_hash used by /used-devices/{module}/stats/verify-profit), so a password set through the UI cannot unlock the module profit-stats endpoint."
+}

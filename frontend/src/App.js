@@ -33,6 +33,8 @@ import LegalPage from "./pages/LegalPage";
 import MobileTrading from "./pages/MobileTrading";
 import ITEquipment from "./pages/ITEquipment";
 import BuyDevice from "./pages/BuyDevice";
+import DeviceDetail from "./pages/DeviceDetail";
+import DeclinedIntakes from "./pages/DeclinedIntakes";
 
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
@@ -240,6 +242,22 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/mobile-trading/device/:id"
+        element={
+          <ProtectedRoute>
+            <DeviceDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mobile-trading/declined"
+        element={
+          <ProtectedRoute>
+            <DeclinedIntakes />
+          </ProtectedRoute>
+        }
+      />
 
       {/* IT Equipment Trading Module */}
       <Route
@@ -255,6 +273,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <BuyDevice />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/it-equipment/device/:id"
+        element={
+          <ProtectedRoute>
+            <DeviceDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/it-equipment/declined"
+        element={
+          <ProtectedRoute>
+            <DeclinedIntakes />
           </ProtectedRoute>
         }
       />
