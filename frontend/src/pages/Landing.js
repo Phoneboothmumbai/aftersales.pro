@@ -113,32 +113,34 @@ export default function Landing() {
   };
 
   const getPlanFeatures = (plan) => {
-    const features = [];
-    
-    // For Free plan - show limits
+    // For Free plan
     if (plan.price === 0) {
-      features.push(`${plan.max_users || 2} Team members`);
-      features.push(`${plan.max_branches || 1} Branch`);
-      features.push(`${plan.max_jobs_per_month || 30} Jobs/month`);
-      features.push("WhatsApp notifications");
-      features.push("PDF Job sheets");
-      features.push("QR Code tracking");
-      features.push("Basic reports");
+      return [
+        "2 Team members",
+        "1 Branch",
+        "30 Jobs/month",
+        "50 Customers",
+        "WhatsApp notifications",
+        "PDF Job sheets",
+        "QR Code tracking",
+        "Basic reports",
+      ];
     } else {
-      // For Pro plan - show unlimited features
-      features.push("Unlimited Team members");
-      features.push("Unlimited Branches");
-      features.push("Unlimited Jobs");
-      features.push("Inventory management");
-      features.push("Advanced analytics");
-      features.push("Profit reports");
-      features.push("Custom roles & permissions");
-      features.push("Multi-branch support");
-      features.push("Data export (CSV/Excel)");
-      features.push("Priority WhatsApp support");
+      // For Pro plan - highlight the value
+      return [
+        "Unlimited Team members",
+        "Unlimited Branches",
+        "Unlimited Jobs",
+        "Unlimited Customers",
+        "Inventory management",
+        "Advanced analytics",
+        "Profit & revenue reports",
+        "Custom roles & permissions",
+        "Multi-branch support",
+        "Data export (CSV/Excel)",
+        "Priority WhatsApp support",
+      ];
     }
-    
-    return features;
   };
 
   const getCta = (plan) => {
@@ -399,29 +401,22 @@ export default function Landing() {
             </div>
           ) : (
             <div className="flex justify-center">
-              <div className={`grid gap-8 ${plans.length === 2 ? 'md:grid-cols-2 max-w-4xl' : plans.length > 2 ? 'md:grid-cols-3 max-w-6xl' : 'max-w-md'} mx-auto`}>
+              <div className={`grid gap-8 ${plans.length === 2 ? 'md:grid-cols-2 max-w-3xl' : plans.length > 2 ? 'md:grid-cols-3 max-w-6xl' : 'max-w-md'} mx-auto`}>
               {plans.map((plan, index) => (
                 <Card
                   key={plan.id || index}
-                  className={`relative ${plan.is_featured || plan.badge ? 'border-primary border-2 shadow-xl scale-105' : 'border-border'}`}
+                  className={`relative ${plan.is_featured || plan.badge || plan.price > 0 ? 'border-primary border-2 shadow-xl' : 'border-border shadow-md'}`}
                 >
-                  {plan.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-semibold px-4 py-1 rounded-full shadow-lg">
-                        {plan.badge}
+                  {(plan.badge || plan.is_featured || plan.price > 0) && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                      <span className="bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
+                        {plan.badge || "Most Popular"}
                       </span>
                     </div>
                   )}
-                  {!plan.badge && plan.price === 0 && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-green-500 text-white text-sm font-semibold px-4 py-1 rounded-full">
-                        Forever Free
-                      </span>
-                    </div>
-                  )}
-                  <CardContent className="p-8">
-                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-4">{plan.description}</p>
+                  <CardContent className="p-8 pt-10">
+                    <h3 className="text-2xl font-bold mb-1">{plan.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4">{plan.description || (plan.price === 0 ? "Perfect for getting started" : "Everything unlimited")}</p>
                     <div className="mb-6">
                       {plan.original_price && plan.original_price > plan.price && (
                         <div className="flex items-center gap-2 mb-1">
@@ -432,13 +427,13 @@ export default function Landing() {
                         </div>
                       )}
                       <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-bold">{plan.price === 0 ? '₹0' : `₹${plan.price}`}</span>
+                        <span className="text-4xl font-bold">{plan.price === 0 ? 'Free' : `₹${plan.price}`}</span>
                         <span className="text-muted-foreground">
-                          {plan.price === 0 ? '/forever' : '/year'}
+                          {plan.price === 0 ? 'forever' : '/year'}
                         </span>
                       </div>
                       {plan.price > 0 && (
-                        <p className="text-xs text-muted-foreground mt-1">+ 18% GST • ~₹{Math.round(plan.price/12)}/month</p>
+                        <p className="text-xs text-muted-foreground mt-1">+ 18% GST • Just ₹{Math.round(plan.price/12)}/month</p>
                       )}
                     </div>
                     <ul className="space-y-3 mb-6">
@@ -451,7 +446,7 @@ export default function Landing() {
                     </ul>
                     <Button
                       className="w-full"
-                      variant={plan.is_featured || plan.badge ? "default" : "outline"}
+                      variant={plan.price > 0 ? "default" : "outline"}
                       size="lg"
                       onClick={() => navigate("/signup")}
                       data-testid={`pricing-${plan.name?.toLowerCase().replace(/\s+/g, '-')}-btn`}
