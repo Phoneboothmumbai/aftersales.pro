@@ -34,12 +34,13 @@ export default function Landing() {
         const response = await axios.get(`${API}/public/plans`);
         // Plans are already filtered by show_on_pricing in the API
         // Sort by sort_order first, then by price
+        // Filter out test plans (those with 'test' in the id)
         const displayPlans = response.data
+          .filter(p => !p.id?.toLowerCase().includes('test'))
           .sort((a, b) => {
             if (a.sort_order !== b.sort_order) return (a.sort_order || 99) - (b.sort_order || 99);
             return (a.price || 0) - (b.price || 0);
-          })
-          .slice(0, 4); // Show max 4 plans
+          });
         
         if (displayPlans.length > 0) {
           setPlans(displayPlans);
@@ -113,45 +114,56 @@ export default function Landing() {
   };
 
   const getPlanFeatures = (plan) => {
-    // For Free plan
-    if (plan.price === 0) {
-      return [
-        "2 Team members",
-        "1 Branch",
-        "30 Jobs/month",
-        "50 Customers",
-        "WhatsApp notifications",
-        "PDF Job sheets",
-        "QR Code tracking",
-        "Basic reports",
-      ];
-    } else {
-      // For Pro plan - highlight the value
-      return [
-        "Unlimited Team members",
-        "Unlimited Branches",
-        "Unlimited Jobs",
-        "Unlimited Customers",
-        "Inventory management",
-        "Advanced analytics",
-        "Profit & revenue reports",
-        "Custom roles & permissions",
-        "Multi-branch support",
-        "Data export (CSV/Excel)",
-        "Priority WhatsApp support",
-      ];
+    const features = [];
+    
+    // Add limits from API
+    if (plan.max_users === -1) {
+      features.push("Unlimited Team members");
+    } else if (plan.max_users) {
+      features.push(`${plan.max_users} Team member${plan.max_users > 1 ? 's' : ''}`);
     }
+    
+    if (plan.max_branches === -1) {
+      features.push("Unlimited Branches");
+    } else if (plan.max_branches) {
+      features.push(`${plan.max_branches} Branch${plan.max_branches > 1 ? 'es' : ''}`);
+    }
+    
+    if (plan.max_jobs_per_month === -1) {
+      features.push("Unlimited Jobs/month");
+    } else if (plan.max_jobs_per_month) {
+      features.push(`${plan.max_jobs_per_month} Jobs/month`);
+    }
+    
+    // Add feature flags from API
+    if (plan.features?.whatsapp_messages) features.push("WhatsApp notifications");
+    if (plan.features?.pdf_job_sheet) features.push("PDF Job sheets");
+    if (plan.features?.qr_tracking) features.push("QR Code tracking");
+    if (plan.features?.inventory_management) features.push("Inventory management");
+    if (plan.features?.advanced_analytics) features.push("Advanced analytics");
+    if (plan.features?.technician_metrics) features.push("Technician metrics");
+    if (plan.features?.customer_management) features.push("Customer management");
+    if (plan.features?.multi_branch) features.push("Multi-branch support");
+    if (plan.features?.custom_branding) features.push("Custom branding");
+    if (plan.features?.data_export) features.push("Data export (CSV/Excel)");
+    if (plan.features?.priority_support) features.push("Priority support");
+    if (plan.features?.api_access) features.push("API access");
+    if (plan.features?.mobile_phone_trading) features.push("Mobile phone trading");
+    if (plan.features?.it_equipment_trading) features.push("IT equipment trading");
+    
+    // Limit to 8 features max for display
+    return features.slice(0, 8);
   };
 
   const getCta = (plan) => {
     if (plan.price === 0) return "Start Free";
     if (plan.price === -1 || plan.price === null) return "Contact Sales";
-    return "Get Started";
+    return `Get ${plan.name}`;
   };
 
-  const isPopular = (plan, index) => {
-    // Mark the second plan (index 1) or "Pro" plan as popular
-    return index === 1 || plan.name?.toLowerCase().includes("pro");
+  const isPopular = (plan) => {
+    // Only mark as popular if explicitly set, or if it's the Pro plan
+    return plan.is_featured || plan.badge || plan.name?.toLowerCase() === "pro";
   };
 
   const features = [
@@ -401,22 +413,22 @@ export default function Landing() {
             </div>
           ) : (
             <div className="flex justify-center">
-              <div className={`grid gap-8 ${plans.length === 2 ? 'md:grid-cols-2 max-w-3xl' : plans.length > 2 ? 'md:grid-cols-3 max-w-6xl' : 'max-w-md'} mx-auto`}>
+              <div className={`grid gap-6 ${plans.length <= 2 ? 'md:grid-cols-2 max-w-3xl' : plans.length === 3 ? 'md:grid-cols-3 max-w-5xl' : plans.length === 4 ? 'md:grid-cols-2 lg:grid-cols-4 max-w-6xl' : 'md:grid-cols-2 lg:grid-cols-3 max-w-6xl'} mx-auto`}>
               {plans.map((plan, index) => (
                 <Card
                   key={plan.id || index}
-                  className={`relative ${plan.is_featured || plan.badge || plan.price > 0 ? 'border-primary border-2 shadow-xl' : 'border-border shadow-md'}`}
+                  className={`relative h-full flex flex-col ${isPopular(plan) ? 'border-primary border-2 shadow-xl' : 'border-border shadow-md'}`}
                 >
-                  {(plan.badge || plan.is_featured || plan.price > 0) && (
+                  {isPopular(plan) && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                       <span className="bg-primary text-primary-foreground text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap">
                         {plan.badge || "Most Popular"}
                       </span>
                     </div>
                   )}
-                  <CardContent className="p-8 pt-10">
-                    <h3 className="text-2xl font-bold mb-1">{plan.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-4">{plan.description || (plan.price === 0 ? "Perfect for getting started" : "Everything unlimited")}</p>
+                  <CardContent className="p-6 pt-8 flex flex-col flex-1">
+                    <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4">{plan.description || (plan.price === 0 ? "Perfect for getting started" : "For growing businesses")}</p>
                     <div className="mb-6">
                       {plan.original_price && plan.original_price > plan.price && (
                         <div className="flex items-center gap-2 mb-1">
@@ -427,8 +439,8 @@ export default function Landing() {
                         </div>
                       )}
                       <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-bold">{plan.price === 0 ? 'Free' : `₹${plan.price}`}</span>
-                        <span className="text-muted-foreground">
+                        <span className="text-3xl font-bold">{plan.price === 0 ? 'Free' : `₹${plan.price}`}</span>
+                        <span className="text-muted-foreground text-sm">
                           {plan.price === 0 ? 'forever' : plan.billing_cycle === 'yearly' ? '/year' : plan.billing_cycle === 'monthly' ? '/month' : `/${plan.billing_cycle}`}
                         </span>
                       </div>
@@ -439,22 +451,22 @@ export default function Landing() {
                         <p className="text-xs text-muted-foreground mt-1">+ 18% GST</p>
                       )}
                     </div>
-                    <ul className="space-y-3 mb-6">
+                    <ul className="space-y-2 mb-6 flex-1">
                       {getPlanFeatures(plan).map((feature, i) => (
-                        <li key={i} className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <li key={i} className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                           <span className="text-sm">{feature}</span>
                         </li>
                       ))}
                     </ul>
                     <Button
-                      className="w-full"
+                      className="w-full mt-auto"
                       variant={plan.price > 0 ? "default" : "outline"}
                       size="lg"
                       onClick={() => navigate("/signup")}
                       data-testid={`pricing-${plan.name?.toLowerCase().replace(/\s+/g, '-')}-btn`}
                     >
-                      {plan.price === 0 ? 'Start Free' : 'Get Pro'}
+                      {getCta(plan)}
                     </Button>
                   </CardContent>
                 </Card>
