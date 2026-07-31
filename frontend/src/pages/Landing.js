@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Loader2,
+  Smartphone,
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -148,8 +149,10 @@ export default function Landing() {
     if (plan.features?.data_export) features.push("Data export (CSV/Excel)");
     if (plan.features?.priority_support) features.push("Priority support");
     if (plan.features?.api_access) features.push("API access");
-    if (plan.features?.mobile_phone_trading) features.push("Mobile phone trading");
-    if (plan.features?.it_equipment_trading) features.push("IT equipment trading");
+    // Used device trading - friendly labels
+    if (plan.features?.mobile_phone_trading || plan.features?.it_equipment_trading) {
+      features.push("Used device buy/sell tracking");
+    }
     
     // Limit to 8 features max for display
     return features.slice(0, 8);
@@ -181,6 +184,11 @@ export default function Landing() {
       icon: BarChart3,
       title: t("landing.features.analytics.title"),
       description: t("landing.features.analytics.description"),
+    },
+    {
+      icon: Smartphone,
+      title: "Buy & Sell Used Devices",
+      description: "Keep complete records of old phones and laptops you buy and sell. Track seller details, stock value, and profit on each device.",
     },
     {
       icon: Shield,
