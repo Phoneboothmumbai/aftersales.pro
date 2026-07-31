@@ -125,6 +125,8 @@ const FEATURE_LABELS = {
   dedicated_account_manager: "Dedicated Account Manager",
   data_export: "Data Export",
   multi_branch: "Multi-Branch",
+  mobile_phone_trading: "Mobile Phone Trading",
+  it_equipment_trading: "IT Equipment Trading",
 };
 
 const DEFAULT_FEATURES = {
@@ -146,6 +148,8 @@ const DEFAULT_FEATURES = {
   dedicated_account_manager: false,
   data_export: false,
   multi_branch: false,
+  mobile_phone_trading: false,
+  it_equipment_trading: false,
 };
 
 export default function SuperAdminDashboard() {
@@ -997,6 +1001,7 @@ export default function SuperAdminDashboard() {
                 <Button
                   variant={activeTab === "plans" ? "default" : "ghost"}
                   size="sm"
+                  data-testid="super-admin-tab-plans"
                   onClick={() => setActiveTab("plans")}
                   className={activeTab === "plans" ? "bg-slate-600" : "text-slate-400"}
                 >
@@ -1378,6 +1383,7 @@ export default function SuperAdminDashboard() {
                         <Button
                           size="sm"
                           variant="ghost"
+                          data-testid={`edit-plan-${plan.id}`}
                           onClick={() => openEditPlan(plan)}
                           className="text-slate-400 hover:text-white"
                         >
@@ -2519,9 +2525,10 @@ export default function SuperAdminDashboard() {
               <p className="text-sm text-slate-400 mb-3">Toggle features available in this plan</p>
               <div className="grid grid-cols-2 gap-3">
                 {Object.entries(FEATURE_LABELS).map(([key, label]) => (
-                  <div key={key} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
+                  <div key={key} data-testid={`plan-feature-row-${key}`} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
                     <Label className="cursor-pointer">{label}</Label>
                     <Switch
+                      data-testid={`plan-feature-switch-${key}`}
                       checked={planForm.features[key] || false}
                       onCheckedChange={(checked) => setPlanForm({
                         ...planForm,

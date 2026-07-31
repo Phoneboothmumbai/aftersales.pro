@@ -1,0 +1,30 @@
+{
+  "summary": "Frontend-only verification of the new plan feature toggles in Super Admin (SuperAdminDashboard.js). Logged in at /super-admin with superadmin@aftersales.pro, opened Plans tab (10 plans/edit buttons). VERIFIED: (1) Create Plan modal renders 20 feature toggles including 'Mobile Phone Trading' and 'IT Equipment Trading', both defaulting to OFF per DEFAULT_FEATURES. (2) Edit Plan modal (plan 'free') shows both toggles with correct current state. (3) Toggled both ON, clicked Save Changes, reopened the modal -> both persisted as checked (PUT /api/super-admin/plans/{id} saves the features dict), then reverted to OFF and re-verified persistence of the revert (both unchecked). (4) Existing features (Job Management, WhatsApp Messages, Multi-Branch, and all 18 legacy keys) still render and are unaffected. No console errors, no error elements on the page. Also spot-checked plan 'pro' (mobile_phone_trading already enabled) - state read/write consistent, no data changed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Super Admin > Plans > plan cards", "issues": ["The 'Default' badge uses <Badge variant=\"outline\"> which inherits the light-theme dark foreground colour, so on the dark slate card it renders as an empty/invisible chip next to Free/Basic/Pro/Enterprise (see screenshot). Add an explicit text-slate-300 border-slate-600 class.", "Plan cards truncate the feature list to 6 chips + '+N more', so newly enabled Mobile Phone / IT Equipment Trading are not visible on the card without opening the edit modal - acceptable but worth a tooltip/expand."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "No functional fix needed for the reported bug - both toggles render, switch and persist correctly.",
+    "Optional: fix invisible 'Default' badge contrast on Plans cards (Badge variant=outline on dark background)."
+  ],
+  "critical_code_review_comments": [
+    "openEditPlan merges plan.features over DEFAULT_FEATURES ({...DEFAULT_FEATURES, ...plan.features}) which correctly back-fills the two new keys for legacy plans - good.",
+    "The two new feature keys match backend usage at server.py ~4188-4217 (plan_features.get('mobile_phone_trading'/'it_equipment_trading')), so plan-level gating for the trading modules will now be controllable from the UI.",
+    "SuperAdminDashboard.js is ~3800 lines - well over the 700-line guideline. Split Plans/Tenants/Settings/Analytics tabs into separate components.",
+    "Feature switches previously had no data-testid; I added data-testid=\"plan-feature-switch-{key}\" / \"plan-feature-row-{key}\", plus \"edit-plan-{id}\" and \"super-admin-tab-plans\"."
+  ],
+  "updated_files": ["/app/frontend/src/pages/SuperAdminDashboard.js (test-ids only: plan-feature-row-*, plan-feature-switch-*, edit-plan-*, super-admin-tab-plans)"],
+  "success_rate": {"backend": "N/A (frontend-only request)", "frontend": "100% (4/4 requested behaviours pass)"},
+  "seed_data_creation": "None. Temporarily toggled the two new features on the 'free' plan and reverted them to their original OFF state (verified).",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "superadmin@aftersales.pro / SuperAdmin@123 at /super-admin - works.",
+  "context_for_next_testing_agent": "Plan feature toggles fully verified. Use [data-testid='super-admin-tab-plans'] -> [data-testid='edit-plan-{planId}'] -> [data-testid='plan-feature-switch-{feature_key}'] (data-state attribute = checked/unchecked) for future plan-feature tests. Not tested (out of scope): whether a tenant's Mobile Phone / IT Equipment Trading modules actually unlock on the tenant side after enabling the plan feature (tenant-details toggles toggle-mobile-trading / toggle-it-equipment exist at SuperAdminDashboard.js ~2991/3017) - worth an e2e pass.",
+  "rca_of_the_issue": "Original bug was purely a missing entry in FEATURE_LABELS/DEFAULT_FEATURES; the plan modal renders toggles by iterating FEATURE_LABELS, so adding the two keys made them appear and persist automatically. Confirmed fixed."
+}
