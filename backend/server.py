@@ -5368,6 +5368,46 @@ async def test_email_config(admin: dict = Depends(get_super_admin)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to send test email: {str(e)}")
 
+# ==================== SUPER ADMIN - TENANT MODULE CONTROL ====================
+
+class TenantModulesUpdate(BaseModel):
+    mobile_device_trading: Optional[bool] = None
+    it_equipment_trading: Optional[bool] = None
+
+@api_router.put("/super-admin/tenants/{tenant_id}/modules")
+async def update_tenant_modules(
+    tenant_id: str,
+    data: TenantModulesUpdate,
+    admin: dict = Depends(get_super_admin)
+):
+    """Super Admin: Enable/disable trading modules for a specific tenant"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+    
+    update_data = {}
+    if data.mobile_device_trading is not None:
+        update_data["enabled_modules.mobile_device_trading"] = data.mobile_device_trading
+    if data.it_equipment_trading is not None:
+        update_data["enabled_modules.it_equipment_trading"] = data.it_equipment_trading
+    
+    if update_data:
+        await db.tenants.update_one(
+            {"id": tenant_id},
+            {"$set": update_data}
+        )
+        
+        # Log the action
+        await db.admin_action_logs.insert_one({
+            "admin_email": admin["email"],
+            "action": "update_tenant_modules",
+            "tenant_id": tenant_id,
+            "details": f"Updated modules: {data.dict(exclude_none=True)}",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+    
+    return {"message": "Tenant modules updated successfully"}
+
 # ==================== SUPPORT TICKETS ====================
 
 class TicketCreate(BaseModel):

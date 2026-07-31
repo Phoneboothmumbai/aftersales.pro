@@ -2947,9 +2947,75 @@ export default function SuperAdminDashboard() {
                     })()}
                   </CardContent>
                 </Card>
-              </TabsContent>
 
-              {/* Team Tab - NEW */}
+                {/* Trading Modules Control */}
+                <Card className="bg-slate-700/30 border-slate-600">
+                  <CardHeader>
+                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                      <Package className="w-4 h-4" />
+                      Trading Modules
+                    </CardTitle>
+                    <p className="text-xs text-slate-400">
+                      Control which trading modules this tenant can access
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-slate-600/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                            <Phone className="w-5 h-5 text-blue-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-white">Mobile Phone Trading</p>
+                            <p className="text-xs text-slate-400">Buy/sell smartphones, tablets, smartwatches</p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={tenantDetails.tenant.enabled_modules?.mobile_device_trading ?? false}
+                          onCheckedChange={async (checked) => {
+                            try {
+                              await axios.put(`${API}/super-admin/tenants/${tenantDetails.tenant.id}/modules`, {
+                                mobile_device_trading: checked
+                              });
+                              fetchTenantDetails(tenantDetails.tenant.id);
+                            } catch (error) {
+                              alert(error.response?.data?.detail || "Failed to update module");
+                            }
+                          }}
+                          data-testid="toggle-mobile-trading"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-slate-600/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                            <HardDrive className="w-5 h-5 text-purple-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-white">IT Equipment Trading</p>
+                            <p className="text-xs text-slate-400">Buy/sell laptops, desktops, monitors, printers</p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={tenantDetails.tenant.enabled_modules?.it_equipment_trading ?? false}
+                          onCheckedChange={async (checked) => {
+                            try {
+                              await axios.put(`${API}/super-admin/tenants/${tenantDetails.tenant.id}/modules`, {
+                                it_equipment_trading: checked
+                              });
+                              fetchTenantDetails(tenantDetails.tenant.id);
+                            } catch (error) {
+                              alert(error.response?.data?.detail || "Failed to update module");
+                            }
+                          }}
+                          data-testid="toggle-it-equipment"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
               <TabsContent value="team" className="space-y-6 mt-4">
                 <div className="flex items-center justify-between">
                   <div>
