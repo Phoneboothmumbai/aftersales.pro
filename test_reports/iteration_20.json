@@ -1,0 +1,44 @@
+{
+  "summary": "Frontend-only testing of the 6 clickable Dashboard stat cards (Dashboard.js) and the Jobs page URL-param filtering (Jobs.js). Logged in as demo/admin@demo.com. Demo tenant had 0 jobs, so I seeded 4 jobs (one per status: received/waiting_for_approval/repaired/closed, 2 of them backdated 3 days) to verify filtering with real data, then deleted them. Result: 6/6 cards are clickable, hover effect (transform+box-shadow) changes on hover, and 5/6 cards apply the correct filter end-to-end (URL + status dropdown + row counts match card values). The 'Today' card navigates to /jobs?filter=today but Jobs.js never reads the 'filter' param, so NO filtering is applied (card showed 2, list showed all 4 jobs including 28-Jul ones). Also found a stale-filter bug: Jobs.js reads search params only in useState initializers, so navigating from /jobs?status=closed to /jobs via the sidebar keeps the 'Closed' filter applied. Mobile (390x844) cards clickable and layout fine.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/jobs", "issue": "No 'today'/relative-date filter supported; only date_from/date_to. Frontend 'Today' card needs either date_from=today or a today flag."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Jobs.js", "issue": "'Today' stat card navigates to /jobs?filter=today but Jobs.js does not read the 'filter' search param at all (only status/branch/search). No filtering happens - verified: card value 2, Jobs list showed all 4 jobs including jobs created 3 days earlier. Feature requirement 'Jobs page correctly applies the filter from URL parameter' FAILS for this card.", "selector": "[data-testid='stat-card-today'] -> [data-testid='jobs-page']", "priority": "HIGH"},
+      {"component": "Jobs.js", "issue": "Search params are only read in useState initializers (lines 52-54) with no useEffect sync on searchParams change. Repro: click 'Completed Today' card -> /jobs?status=closed (filter=Closed), then click sidebar 'Jobs' -> URL becomes /jobs but status dropdown stays 'Closed' and the list stays filtered to 1 job. Same-route param changes are ignored.", "selector": "[data-testid='status-filter']", "priority": "MEDIUM"},
+      {"component": "Dashboard.js line 134", "issue": "data-testid is generated from the i18n-translated card title (stat.title.toLowerCase()...), so test ids change/break when the UI language is Arabic/Tamil/Vietnamese/Indonesian (e.g. stat-card-\u0625\u062c\u0645\u0627\u0644\u064a-\u0627\u0644\u0623\u0639\u0645\u0627\u0644). Use stable keys instead.", "selector": "[data-testid^='stat-card-']", "priority": "MEDIUM"},
+      {"component": "Dashboard.js stat cards", "issue": "Cards are clickable divs (Card + onClick) with no role='button', tabIndex or keyboard (Enter/Space) handler - not keyboard accessible and not focusable.", "selector": "[data-testid^='stat-card-total-jobs']", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "Dashboard 'Today' card -> Jobs filtered view", "issue": "URL param filter=today is silently ignored; unfiltered job list is shown, so the count on the card does not match the list (2 vs 4).", "affected_selectors": ["[data-testid='stat-card-today']", "[data-testid='jobs-page']"]}
+    ],
+    "design_issues": [
+      {"screen": "Jobs page arriving from a card click", "issues": ["No visible chip/indicator that a filter came from the dashboard (status dropdown does reflect status, but for filter=today there is zero visual feedback - date range pickers stay empty)."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/seed_dashboard_jobs.py"],
+  "action_items": [
+    "Jobs.js: handle the 'filter=today' search param - set dateFrom/dateTo to today (or pass date_from=YYYY-MM-DD) so the Today card shows only today's jobs.",
+    "Jobs.js: add a useEffect that syncs statusFilter/branchFilter/search from searchParams whenever the URL changes, so same-route navigation (sidebar Jobs, back/forward) does not leave a stale filter.",
+    "Dashboard.js: use a stable `key`/`testId` property per stat card instead of deriving data-testid from the translated title.",
+    "Dashboard.js: make stat cards keyboard accessible (role='button', tabIndex=0, onKeyDown Enter/Space).",
+    "Update /app/memory/test_credentials.md: the neostore tenant credentials (ck@motta.in / NewPassword@123) return 401 'Invalid credentials'."
+  ],
+  "critical_code_review_comments": [
+    "Dashboard.js statCards link values are correct for all 6 cards; navigation works. Only the consumer side (Jobs.js) is missing 'filter' handling - fix belongs in Jobs.js.",
+    "Jobs.js duplicates the dashboard's quick-action navigation targets; consider a single shared constant for status query values to avoid drift.",
+    "Jobs.js fetchJobs is not debounced and `search` is excluded from the effect deps intentionally - fine, but the stale-param bug above stems from the same pattern of not treating the URL as the source of truth."
+  ],
+  "updated_files": ["/app/backend/tests/seed_dashboard_jobs.py"],
+  "success_rate": {"backend": "N/A (frontend-only request)", "frontend": "83% (5/6 stat cards fully correct; hover effect 6/6; Today card filter fails)"},
+  "seed_data_creation": "Created 4 jobs in the demo tenant (customer names prefixed TEST_QA_, statuses received/waiting_for_approval/repaired/closed, 2 backdated by 3 days) via /api/jobs + a direct Mongo status/created_at patch. All 4 deleted after testing (verified deleted_count=4). Reusable script: /app/backend/tests/seed_dashboard_jobs.py (run with 'cleanup' arg to remove).",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "demo / admin@demo.com / demo123 (works). neostore / ck@motta.in / NewPassword@123 -> 401 Invalid credentials (stale entry in /app/memory/test_credentials.md).",
+  "context_for_next_testing_agent": "Dashboard stat card clickability + hover + status filters verified working for Total Jobs, Pending Jobs, Waiting Approval, Ready for Delivery, Completed Today. Only remaining failures: (1) /jobs?filter=today is ignored by Jobs.js, (2) stale filter when navigating to /jobs from an already-filtered /jobs URL. To retest with data, run `python /app/backend/tests/seed_dashboard_jobs.py` (creates 4 jobs, 2 backdated so the today filter is verifiable) and `python /app/backend/tests/seed_dashboard_jobs.py cleanup` afterwards. Expected after fix: Today card value == row count on /jobs?filter=today.",
+  "rca_of_the_issue": "Dashboard.js builds correct links for all 6 cards. Jobs.js initialises its filter state only from searchParams.get('status'|'branch'|'search') inside useState initialisers and has no branch for a 'filter' param, so 'filter=today' produces no request parameter (fetchJobs only sends status_filter/branch_id/search/date_from/date_to) and the full job list is returned. The same useState-only pattern also causes stale filters when the URL changes while the Jobs component stays mounted."
+}

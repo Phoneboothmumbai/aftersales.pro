@@ -56,6 +56,7 @@ export default function Dashboard() {
       icon: ClipboardList,
       color: "text-primary",
       bgColor: "bg-primary/10",
+      link: "/jobs",
     },
     {
       title: t("dashboard.stats.pending_jobs"),
@@ -63,6 +64,7 @@ export default function Dashboard() {
       icon: Clock,
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
+      link: "/jobs?status=received",
     },
     {
       title: "Waiting Approval",
@@ -70,6 +72,7 @@ export default function Dashboard() {
       icon: AlertCircle,
       color: "text-orange-500",
       bgColor: "bg-orange-500/10",
+      link: "/jobs?status=waiting_for_approval",
     },
     {
       title: t("dashboard.stats.ready_delivery"),
@@ -77,6 +80,7 @@ export default function Dashboard() {
       icon: CheckCircle,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
+      link: "/jobs?status=repaired",
     },
     {
       title: t("dashboard.stats.completed_today"),
@@ -84,6 +88,7 @@ export default function Dashboard() {
       icon: Package,
       color: "text-gray-500",
       bgColor: "bg-gray-500/10",
+      link: "/jobs?status=closed",
     },
     {
       title: t("dashboard.today"),
@@ -91,6 +96,7 @@ export default function Dashboard() {
       icon: Wrench,
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
+      link: "/jobs?filter=today",
     },
   ];
 
@@ -122,7 +128,12 @@ export default function Dashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {statCards.map((stat, index) => (
-            <Card key={index} className="card-shadow" data-testid={`stat-card-${stat.title.toLowerCase().replace(/\s+/g, '-')}`}>
+            <Card 
+              key={index} 
+              className="card-shadow cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all duration-200" 
+              data-testid={`stat-card-${stat.title.toLowerCase().replace(/\s+/g, '-')}`}
+              onClick={() => navigate(stat.link)}
+            >
               <CardContent className="p-4">
                 <div className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-3`}>
                   <stat.icon className={`w-5 h-5 ${stat.color}`} />
