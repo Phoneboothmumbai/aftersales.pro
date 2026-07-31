@@ -55,13 +55,50 @@ export default function Jobs() {
   const [dateFrom, setDateFrom] = useState(null);
   const [dateTo, setDateTo] = useState(null);
 
+  // Sync filters from URL when searchParams change (handles navigation from dashboard cards)
+  useEffect(() => {
+    const urlStatus = searchParams.get("status");
+    const urlBranch = searchParams.get("branch");
+    const urlSearch = searchParams.get("search");
+    const urlFilter = searchParams.get("filter");
+    
+    // Update status filter from URL
+    if (urlStatus) {
+      setStatusFilter(urlStatus);
+    } else if (!urlFilter) {
+      // Only reset to "all" if there's no special filter
+      setStatusFilter("all");
+    }
+    
+    // Update branch filter from URL
+    if (urlBranch) {
+      setBranchFilter(urlBranch);
+    } else {
+      setBranchFilter("all");
+    }
+    
+    // Update search from URL
+    setSearch(urlSearch || "");
+    
+    // Handle special "today" filter
+    if (urlFilter === "today") {
+      const today = new Date();
+      setDateFrom(today);
+      setDateTo(today);
+      setStatusFilter("all"); // Show all statuses for today
+    } else if (!urlFilter && !searchParams.get("date_from")) {
+      // Reset date filters if no filter param and no explicit date
+      setDateFrom(null);
+      setDateTo(null);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     fetchBranches();
   }, []);
 
   useEffect(() => {
     fetchJobs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, branchFilter, dateFrom, dateTo]);
 
   const fetchBranches = async () => {
