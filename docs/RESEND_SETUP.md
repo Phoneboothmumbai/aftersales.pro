@@ -51,7 +51,7 @@ After verification, test by triggering a forgot password email:
 ## Current Configuration
 
 ```
-API Key: re_FuKNR2b1_BUCJ6kfmt4euBEcHVvbgyBFd
+API Key: [Set in backend/.env as RESEND_API_KEY]
 Current Sender: AfterSales.pro <onboarding@resend.dev> (test mode)
 Admin Email: admin@aftersales.pro
 ```

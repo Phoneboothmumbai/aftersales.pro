@@ -33,10 +33,10 @@ echo ""
 # Step 4: Update backend .env (add Resend config if not present)
 echo "STEP 4: Checking backend .env for Resend config..."
 if ! grep -q "RESEND_API_KEY" /var/www/aftersales/backend/.env; then
-    echo 'RESEND_API_KEY="re_FuKNR2b1_BUCJ6kfmt4euBEcHVvbgyBFd"' >> /var/www/aftersales/backend/.env
+    echo 'RESEND_API_KEY="your_resend_api_key_here"' >> /var/www/aftersales/backend/.env
     echo 'SENDER_EMAIL="AfterSales.pro <onboarding@resend.dev>"' >> /var/www/aftersales/backend/.env
     echo 'ADMIN_EMAIL="admin@aftersales.pro"' >> /var/www/aftersales/backend/.env
-    echo "✅ Resend config added to .env"
+    echo "⚠️  Resend config added - UPDATE RESEND_API_KEY with your actual key!"
 else
     echo "✅ Resend config already present"
 fi

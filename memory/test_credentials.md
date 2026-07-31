@@ -15,7 +15,7 @@
 - **Password:** demo123
 
 ## Email Service (Resend)
-- **API Key:** re_FuKNR2b1_BUCJ6kfmt4euBEcHVvbgyBFd
+- **API Key:** [Stored in backend/.env - do not commit]
 - **Sender:** AfterSales.pro <onboarding@resend.dev>
 - **Admin Email:** admin@aftersales.pro
 
