@@ -238,6 +238,22 @@ export default function SuperAdminDashboard() {
   const [tickets, setTickets] = useState([]);
   const [ticketFilter, setTicketFilter] = useState("all");
   const [selectedTicket, setSelectedTicket] = useState(null);
+  
+  // Email/Platform Settings state
+  const [emailSettings, setEmailSettings] = useState({
+    resend_api_key_masked: "",
+    sender_email: "AfterSales.pro <onboarding@resend.dev>",
+    admin_email: "admin@aftersales.pro",
+    resend_configured: false
+  });
+  const [emailSettingsForm, setEmailSettingsForm] = useState({
+    resend_api_key: "",
+    sender_email: "",
+    admin_email: ""
+  });
+  const [emailSettingsLoading, setEmailSettingsLoading] = useState(false);
+  const [testEmailLoading, setTestEmailLoading] = useState(false);
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const [ticketReply, setTicketReply] = useState("");
   
   // Expiring subscriptions state
@@ -338,6 +354,10 @@ export default function SuperAdminDashboard() {
     if (activeTab === "tickets" && tickets.length === 0) {
       fetchTickets();
     }
+    if (activeTab === "settings") {
+      fetchLegalPages();
+      fetchEmailSettings();
+    }
   }, [activeTab]);
 
   const fetchLegalPages = async () => {
@@ -406,6 +426,57 @@ export default function SuperAdminDashboard() {
       setTickets(response.data);
     } catch (error) {
       console.error("Failed to fetch tickets:", error);
+    }
+  };
+
+  // Email/Platform Settings
+  const fetchEmailSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/super-admin/platform-settings`);
+      setEmailSettings(response.data);
+      setEmailSettingsForm({
+        resend_api_key: "",
+        sender_email: response.data.sender_email || "",
+        admin_email: response.data.admin_email || ""
+      });
+    } catch (error) {
+      console.error("Failed to fetch email settings:", error);
+    }
+  };
+
+  const handleSaveEmailSettings = async () => {
+    setEmailSettingsLoading(true);
+    try {
+      const payload = {};
+      if (emailSettingsForm.resend_api_key) {
+        payload.resend_api_key = emailSettingsForm.resend_api_key;
+      }
+      if (emailSettingsForm.sender_email) {
+        payload.sender_email = emailSettingsForm.sender_email;
+      }
+      if (emailSettingsForm.admin_email) {
+        payload.admin_email = emailSettingsForm.admin_email;
+      }
+      await axios.put(`${API}/super-admin/platform-settings`, payload);
+      await fetchEmailSettings();
+      setShowApiKeyInput(false);
+      alert("Email settings saved successfully!");
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to save email settings");
+    } finally {
+      setEmailSettingsLoading(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    setTestEmailLoading(true);
+    try {
+      const response = await axios.post(`${API}/super-admin/test-email`);
+      alert(response.data.message);
+    } catch (error) {
+      alert(error.response?.data?.detail || "Failed to send test email");
+    } finally {
+      setTestEmailLoading(false);
     }
   };
 
@@ -1974,6 +2045,134 @@ export default function SuperAdminDashboard() {
                       </a>
                     ))}
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Email Service Settings */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Mail className="w-5 h-5" />
+                  Email Service (Resend)
+                </CardTitle>
+                <p className="text-sm text-slate-400">
+                  Configure Resend API for sending transactional emails (welcome, password reset, invoices)
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Status Badge */}
+                <div className="flex items-center gap-3">
+                  <Badge className={emailSettings.resend_configured 
+                    ? "bg-green-600/20 text-green-400 border-green-600/30" 
+                    : "bg-yellow-600/20 text-yellow-400 border-yellow-600/30"
+                  }>
+                    {emailSettings.resend_configured ? (
+                      <><CheckCircle className="w-3 h-3 mr-1" /> Configured</>
+                    ) : (
+                      <><AlertTriangle className="w-3 h-3 mr-1" /> Not Configured</>
+                    )}
+                  </Badge>
+                  {emailSettings.resend_configured && (
+                    <span className="text-sm text-slate-400">
+                      API Key: {emailSettings.resend_api_key_masked}
+                    </span>
+                  )}
+                </div>
+
+                {/* API Key Input */}
+                <div className="space-y-2">
+                  <Label>Resend API Key</Label>
+                  {showApiKeyInput ? (
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        value={emailSettingsForm.resend_api_key}
+                        onChange={(e) => setEmailSettingsForm({ ...emailSettingsForm, resend_api_key: e.target.value })}
+                        placeholder="re_xxxxxxxx_xxxxxxxxxxxxxxxxxxxx"
+                        className="bg-slate-700 border-slate-600 font-mono"
+                        data-testid="resend-api-key-input"
+                      />
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => {
+                          setShowApiKeyInput(false);
+                          setEmailSettingsForm({ ...emailSettingsForm, resend_api_key: "" });
+                        }}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowApiKeyInput(true)}
+                      className="border-slate-600"
+                      data-testid="change-api-key-btn"
+                    >
+                      {emailSettings.resend_configured ? "Change API Key" : "Add API Key"}
+                    </Button>
+                  )}
+                  <p className="text-xs text-slate-500">
+                    Get your API key from <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">resend.com/api-keys</a>
+                  </p>
+                </div>
+
+                {/* Sender & Admin Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Sender Email</Label>
+                    <Input
+                      type="text"
+                      value={emailSettingsForm.sender_email}
+                      onChange={(e) => setEmailSettingsForm({ ...emailSettingsForm, sender_email: e.target.value })}
+                      placeholder="AfterSales.pro <noreply@yourdomain.com>"
+                      className="bg-slate-700 border-slate-600"
+                    />
+                    <p className="text-xs text-slate-500">Format: Display Name &lt;email@domain.com&gt;</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Admin Notification Email</Label>
+                    <Input
+                      type="email"
+                      value={emailSettingsForm.admin_email}
+                      onChange={(e) => setEmailSettingsForm({ ...emailSettingsForm, admin_email: e.target.value })}
+                      placeholder="admin@aftersales.pro"
+                      className="bg-slate-700 border-slate-600"
+                    />
+                    <p className="text-xs text-slate-500">Receives platform alerts</p>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <Button 
+                    onClick={handleSaveEmailSettings}
+                    disabled={emailSettingsLoading}
+                    data-testid="save-email-settings-btn"
+                  >
+                    {emailSettingsLoading ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+                    ) : (
+                      <><Check className="w-4 h-4 mr-2" /> Save Settings</>
+                    )}
+                  </Button>
+                  {emailSettings.resend_configured && (
+                    <Button 
+                      variant="outline"
+                      onClick={handleTestEmail}
+                      disabled={testEmailLoading}
+                      className="border-slate-600"
+                      data-testid="test-email-btn"
+                    >
+                      {testEmailLoading ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending...</>
+                      ) : (
+                        <><Send className="w-4 h-4 mr-2" /> Send Test Email</>
+                      )}
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

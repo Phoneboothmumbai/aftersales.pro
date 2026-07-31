@@ -10,15 +10,42 @@ from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 import resend
 from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
 
 load_dotenv()
 
-# Configure Resend
+# Configure Resend - will be updated from DB
 resend.api_key = os.environ.get("RESEND_API_KEY")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "AfterSales.pro <onboarding@resend.dev>")
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@aftersales.pro")
 
+# Database connection for reading settings
+MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
+DB_NAME = os.environ.get("DB_NAME", "aftersales")
+
 logger = logging.getLogger(__name__)
+
+async def get_email_config() -> Dict[str, str]:
+    """Get email configuration from database, fallback to env vars"""
+    try:
+        client = AsyncIOMotorClient(MONGO_URL)
+        db = client[DB_NAME]
+        settings = await db.platform_settings.find_one({"type": "email_config"})
+        if settings and settings.get("resend_api_key"):
+            return {
+                "resend_api_key": settings.get("resend_api_key"),
+                "sender_email": settings.get("sender_email", SENDER_EMAIL),
+                "admin_email": settings.get("admin_email", ADMIN_EMAIL)
+            }
+    except Exception as e:
+        logger.warning(f"Failed to get email config from DB: {e}")
+    
+    # Fallback to environment variables
+    return {
+        "resend_api_key": os.environ.get("RESEND_API_KEY", ""),
+        "sender_email": SENDER_EMAIL,
+        "admin_email": ADMIN_EMAIL
+    }
 
 # ==================== EMAIL TEMPLATES ====================
 
@@ -541,26 +568,34 @@ def weekly_summary_template(stats: Dict[str, Any]) -> Dict[str, str]:
 
 # ==================== EMAIL SENDING FUNCTIONS ====================
 
-async def send_email(to_email: str, subject: str, html_content: str) -> Dict[str, Any]:
-    """Send an email using Resend"""
-    if not resend.api_key:
+async def send_email(to: str, subject: str, html: str) -> Dict[str, Any]:
+    """Send an email using Resend - reads config from DB"""
+    config = await get_email_config()
+    
+    api_key = config.get("resend_api_key")
+    sender = config.get("sender_email", SENDER_EMAIL)
+    
+    if not api_key:
         logger.error("RESEND_API_KEY not configured")
         return {"success": False, "error": "Email service not configured"}
     
+    # Update resend module with current key
+    resend.api_key = api_key
+    
     params = {
-        "from": SENDER_EMAIL,
-        "to": [to_email],
+        "from": sender,
+        "to": [to],
         "subject": subject,
-        "html": html_content
+        "html": html
     }
     
     try:
         # Run sync SDK in thread to keep FastAPI non-blocking
         email = await asyncio.to_thread(resend.Emails.send, params)
-        logger.info(f"Email sent to {to_email}: {subject}")
+        logger.info(f"Email sent to {to}: {subject}")
         return {"success": True, "email_id": email.get("id")}
     except Exception as e:
-        logger.error(f"Failed to send email to {to_email}: {str(e)}")
+        logger.error(f"Failed to send email to {to}: {str(e)}")
         return {"success": False, "error": str(e)}
 
 # ==================== CONVENIENCE FUNCTIONS ====================

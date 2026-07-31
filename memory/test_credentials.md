@@ -22,4 +22,5 @@
 ## Notes
 - Use "demo" subdomain for testing regular shop flows
 - Use "neostore" subdomain for testing existing tenant data
-- Super Admin portal is at /super-admin/login
+- Super Admin portal is at /super-admin (not /super-admin/login)
+- Email settings can be configured in Super Admin → Settings → Email Service (Resend)

@@ -5278,6 +5278,96 @@ async def get_tenant_announcements(user: dict = Depends(get_current_user)):
     announcements = await db.announcements.find(query, {"_id": 0}).sort("created_at", -1).to_list(10)
     return announcements
 
+# ==================== PLATFORM SETTINGS ====================
+
+class PlatformSettingsUpdate(BaseModel):
+    resend_api_key: Optional[str] = None
+    sender_email: Optional[str] = None
+    admin_email: Optional[str] = None
+
+@api_router.get("/super-admin/platform-settings")
+async def get_platform_settings(admin: dict = Depends(get_super_admin)):
+    """Get platform-wide settings (email config, etc.)"""
+    settings = await db.platform_settings.find_one({"type": "email_config"}, {"_id": 0})
+    if not settings:
+        settings = {
+            "type": "email_config",
+            "resend_api_key": "",
+            "sender_email": "AfterSales.pro <onboarding@resend.dev>",
+            "admin_email": "admin@aftersales.pro",
+            "resend_configured": False
+        }
+    # Mask the API key for display
+    if settings.get("resend_api_key"):
+        key = settings["resend_api_key"]
+        settings["resend_api_key_masked"] = f"{key[:8]}...{key[-4:]}" if len(key) > 12 else "****"
+        settings["resend_configured"] = True
+    else:
+        settings["resend_api_key_masked"] = ""
+        settings["resend_configured"] = False
+    # Don't send the actual key to frontend
+    settings.pop("resend_api_key", None)
+    return settings
+
+@api_router.put("/super-admin/platform-settings")
+async def update_platform_settings(
+    data: PlatformSettingsUpdate,
+    admin: dict = Depends(get_super_admin)
+):
+    """Update platform-wide settings"""
+    import resend as resend_module
+    
+    update_data = {"type": "email_config", "updated_at": datetime.now(timezone.utc).isoformat()}
+    
+    if data.resend_api_key is not None:
+        update_data["resend_api_key"] = data.resend_api_key
+        # Update the resend module's API key immediately
+        resend_module.api_key = data.resend_api_key
+    if data.sender_email is not None:
+        update_data["sender_email"] = data.sender_email
+    if data.admin_email is not None:
+        update_data["admin_email"] = data.admin_email
+    
+    await db.platform_settings.update_one(
+        {"type": "email_config"},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    # Log the action
+    await db.admin_action_logs.insert_one({
+        "admin_email": admin["email"],
+        "action": "update_platform_settings",
+        "details": f"Updated email settings",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {"message": "Platform settings updated successfully"}
+
+@api_router.post("/super-admin/test-email")
+async def test_email_config(admin: dict = Depends(get_super_admin)):
+    """Send a test email to verify Resend configuration"""
+    from email_service import send_email, get_email_config
+    
+    config = await get_email_config()
+    if not config.get("resend_api_key"):
+        raise HTTPException(status_code=400, detail="Resend API key not configured")
+    
+    try:
+        result = await send_email(
+            to=admin["email"],
+            subject="AfterSales.pro - Test Email",
+            html=f"""
+            <h2>Test Email</h2>
+            <p>This is a test email from AfterSales.pro platform.</p>
+            <p>If you received this, your Resend configuration is working correctly!</p>
+            <p>Sent at: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
+            """
+        )
+        return {"message": f"Test email sent to {admin['email']}", "success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send test email: {str(e)}")
+
 # ==================== SUPPORT TICKETS ====================
 
 class TicketCreate(BaseModel):
