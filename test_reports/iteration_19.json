@@ -1,0 +1,46 @@
+{
+  "summary": "Frontend-only verification of the homepage pricing billing-cycle bug fix (Landing.js). Verified /api/public/plans data vs rendered homepage pricing cards. Bug fix CONFIRMED WORKING: monthly plans render '/month', Free plan renders 'Free forever'. Also flipped 'starter' plan to billing_cycle='yearly' via super-admin API and confirmed homepage renders '/year' + 'Just Rs.25/month' note, then reverted it back to 'monthly'. Found several secondary issues (plans truncated to 4, hardcoded feature lists, misleading 'Sync to Pricing Page' button, leftover test plan in DB).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "PUT /api/super-admin/plans/{id}", "issue": "Updating billing_cycle to 'yearly' does not update duration_days (stays 30) - plan data becomes inconsistent (yearly plan expiring in 30 days)."},
+      {"endpoint": "GET /api/public/plans", "issue": "Leftover QA seed plan 'UI Test Plan' (id ui_test_1768484191, Rs.199/monthly) is still returned by the public endpoint - would be visible to users if plan count/order changes. Should be cleaned up."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Landing.js pricing", "issue": "API returns 6 visible plans but code does .slice(0,4) - 'Enterprise' (Rs.2499) and 'UI Test Plan' are silently dropped from the homepage. Enterprise plan is never shown to users.", "selector": "[data-testid='pricing-enterprise-btn'] (missing)", "priority": "HIGH"},
+      {"component": "Landing.js pricing", "issue": "getPlanFeatures() ignores API data and returns hardcoded lists: Free card shows '2 Team members / 30 Jobs/month / 50 Customers' while API says max_users=1, max_jobs_per_month=50; Starter/Basic/Pro all show identical 'Unlimited everything' feature list despite different API limits.", "selector": "pricing card feature list", "priority": "HIGH"},
+      {"component": "Landing.js pricing", "issue": "Every paid plan gets the 'Most Popular' badge (condition includes plan.price > 0) - 3 of 4 cards are badged 'Most Popular'.", "selector": ".bg-primary badge in pricing card", "priority": "MEDIUM"},
+      {"component": "Landing.js pricing", "issue": "CTA on all paid plans is hardcoded 'Get Pro' (even on Starter/Basic/Enterprise). An unused getCta() helper exists but is not wired.", "selector": "[data-testid='pricing-basic-btn']", "priority": "MEDIUM"},
+      {"component": "SuperAdminDashboard.js", "issue": "'Sync to Pricing Page' button only calls fetchPlans() (refetches super-admin list) and shows a native alert('Plans synced!'). It performs no sync toward the public pricing page - misleading no-op; also uses window.alert instead of a toast.", "selector": "[data-testid='sync-plans-btn']", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Homepage pricing section", "issues": ["With 4 plans and md:grid-cols-3, the 4th card (Pro) wraps to a second row left-aligned, leaving a large empty gap on the right - unbalanced layout.", "Free plan card is visually much shorter than paid cards (unequal card heights, no h-full)."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Show all visible plans (or make the limit configurable) - Enterprise plan is currently hidden by .slice(0,4) and the 4-card grid wraps badly.",
+    "Derive pricing card features/limits from API plan data instead of hardcoded getPlanFeatures() - current Free/Starter/Basic/Pro feature lists are factually wrong vs API.",
+    "Fix 'Most Popular' badge logic to use is_featured/badge only (not price > 0).",
+    "Use per-plan CTA text instead of hardcoded 'Get Pro'.",
+    "Make 'Sync to Pricing Page' either do a real action or remove it; replace window.alert with toast.",
+    "Sync duration_days when billing_cycle changes in PUT /api/super-admin/plans/{id}.",
+    "Delete leftover QA plan 'ui_test_1768484191' from subscription_plans."
+  ],
+  "critical_code_review_comments": [
+    "Landing.js: billing-cycle rendering fix is correct (yearly -> /year, monthly -> /month, price 0 -> 'forever'), with a sane fallback `/${plan.billing_cycle}` for unknown cycles.",
+    "Landing.js has dead code: getCta() and isPopular() are defined but never used, while inline logic duplicates them - remove or wire them.",
+    "Landing.js hardcodes feature copy, so plan changes made in Super Admin will never fully reflect on the homepage - the root class of the original reported bug."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only request; 2 super-admin/public plan endpoints exercised manually, both 200)", "frontend": "100% on the requested billing-cycle scenarios (6/6), with 5 secondary UI defects found"},
+  "seed_data_creation": "Temporarily set plan 'starter' billing_cycle to 'yearly' to verify /year rendering, then reverted to 'monthly' (verified via /api/public/plans). No new records created.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "superadmin@aftersales.pro / SuperAdmin@123 (from /app/memory/test_credentials.md)",
+  "context_for_next_testing_agent": "Homepage pricing billing-cycle fix is verified working for forever/monthly/yearly. Remaining open items are plan truncation (slice(0,4)), hardcoded feature lists, badge/CTA logic, and the no-op 'Sync to Pricing Page' button. To test yearly rendering: POST /api/super-admin/login then PUT /api/super-admin/plans/starter with {\"billing_cycle\":\"yearly\"}, reload homepage, then revert.",
+  "rca_of_the_issue": "Original bug was a hardcoded '/year' suffix in Landing.js pricing card. Fix now reads plan.billing_cycle from /api/public/plans and maps monthly//month, yearly//year, price 0/'forever'. Verified end-to-end against live API data. However the same file still hardcodes plan feature bullets and limits, so Super Admin plan edits still won't fully reflect on the homepage."
+}

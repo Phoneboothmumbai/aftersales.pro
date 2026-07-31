@@ -429,11 +429,14 @@ export default function Landing() {
                       <div className="flex items-baseline gap-1">
                         <span className="text-4xl font-bold">{plan.price === 0 ? 'Free' : `₹${plan.price}`}</span>
                         <span className="text-muted-foreground">
-                          {plan.price === 0 ? 'forever' : '/year'}
+                          {plan.price === 0 ? 'forever' : plan.billing_cycle === 'yearly' ? '/year' : plan.billing_cycle === 'monthly' ? '/month' : `/${plan.billing_cycle}`}
                         </span>
                       </div>
-                      {plan.price > 0 && (
+                      {plan.price > 0 && plan.billing_cycle === 'yearly' && (
                         <p className="text-xs text-muted-foreground mt-1">+ 18% GST • Just ₹{Math.round(plan.price/12)}/month</p>
+                      )}
+                      {plan.price > 0 && plan.billing_cycle === 'monthly' && (
+                        <p className="text-xs text-muted-foreground mt-1">+ 18% GST</p>
                       )}
                     </div>
                     <ul className="space-y-3 mb-6">
