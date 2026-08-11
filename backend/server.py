@@ -5375,7 +5375,7 @@ class TenantModulesUpdate(BaseModel):
     it_equipment_trading: Optional[bool] = None
 
 @api_router.put("/super-admin/tenants/{tenant_id}/modules")
-async def update_tenant_modules(
+async def super_admin_update_tenant_modules(
     tenant_id: str,
     data: TenantModulesUpdate,
     admin: dict = Depends(get_super_admin)
@@ -6257,6 +6257,54 @@ async def get_customers(
         customer["total_received"] += total_direct_payments
         customer["outstanding_balance"] = max(0, customer["total_billed"] - customer["total_received"])
     
+    return {"customers": customers}
+
+@api_router.get("/customers/autocomplete")
+async def autocomplete_customers(
+    q: str = "",
+    user: dict = Depends(get_current_user)
+):
+    """Fast autocomplete search for customers - returns top 10 matches by name or mobile"""
+    if not q or len(q) < 2:
+        return {"customers": []}
+    
+    tenant_id = user["tenant_id"]
+    
+    # Escape regex special characters to prevent ReDoS/invalid regex errors
+    import re
+    escaped_q = re.escape(q)
+    
+    # Search by name or mobile (case insensitive)
+    pipeline = [
+        {"$match": {
+            "tenant_id": tenant_id,
+            "$or": [
+                {"customer.name": {"$regex": escaped_q, "$options": "i"}},
+                {"customer.mobile": {"$regex": escaped_q, "$options": "i"}}
+            ]
+        }},
+        {"$sort": {"created_at": -1}},
+        {"$group": {
+            "_id": "$customer.mobile",
+            "name": {"$first": "$customer.name"},
+            "mobile": {"$first": "$customer.mobile"},
+            "email": {"$first": "$customer.email"},
+            "total_jobs": {"$sum": 1},
+            "last_visit": {"$first": "$created_at"}
+        }},
+        {"$project": {
+            "_id": 0,
+            "name": 1,
+            "mobile": 1,
+            "email": 1,
+            "total_jobs": 1,
+            "last_visit": 1
+        }},
+        {"$sort": {"last_visit": -1}},
+        {"$limit": 10}
+    ]
+    
+    customers = await db.jobs.aggregate(pipeline).to_list(10)
     return {"customers": customers}
 
 @api_router.get("/customers/{mobile}/devices")

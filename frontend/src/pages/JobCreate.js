@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Layout from "../components/Layout";
@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
-import { ArrowLeft, Save, Loader2, MessageSquare, CheckCircle, ExternalLink, FileText, Users, Send } from "lucide-react";
+import { ArrowLeft, Save, Loader2, MessageSquare, CheckCircle, ExternalLink, FileText, Users, Send, User, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { DEVICE_TYPES, DEVICE_CONDITIONS, DEFAULT_ACCESSORIES } from "../lib/utils";
 
@@ -41,6 +41,16 @@ export default function JobCreate() {
   const [technicians, setTechnicians] = useState([]);
   const [selectedTechnician, setSelectedTechnician] = useState(null);
   const [loadingTechnicians, setLoadingTechnicians] = useState(false);
+  
+  // Customer autocomplete state
+  const [customerSuggestions, setCustomerSuggestions] = useState([]);
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+  const [showMobileSuggestions, setShowMobileSuggestions] = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const nameInputRef = useRef(null);
+  const mobileInputRef = useRef(null);
+  const nameSuggestionsRef = useRef(null);
+  const mobileSuggestionsRef = useRef(null);
   
   const [formData, setFormData] = useState({
     customer: {
@@ -69,6 +79,57 @@ export default function JobCreate() {
     fetchBranches();
   }, []);
 
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const clickedOutsideName = nameInputRef.current && !nameInputRef.current.contains(event.target) &&
+                                  (!nameSuggestionsRef.current || !nameSuggestionsRef.current.contains(event.target));
+      const clickedOutsideMobile = mobileInputRef.current && !mobileInputRef.current.contains(event.target) &&
+                                    (!mobileSuggestionsRef.current || !mobileSuggestionsRef.current.contains(event.target));
+      
+      if (clickedOutsideName) {
+        setShowNameSuggestions(false);
+      }
+      if (clickedOutsideMobile) {
+        setShowMobileSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const fetchCustomerSuggestions = async (query) => {
+    if (!query || query.length < 2) {
+      setCustomerSuggestions([]);
+      return;
+    }
+    setLoadingSuggestions(true);
+    try {
+      const response = await axios.get(`${API}/customers/autocomplete?q=${encodeURIComponent(query)}`);
+      setCustomerSuggestions(response.data.customers || []);
+    } catch (error) {
+      console.error("Failed to fetch customer suggestions:", error);
+      setCustomerSuggestions([]);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
+
+  const selectCustomer = (customer) => {
+    setFormData((prev) => ({
+      ...prev,
+      customer: {
+        name: customer.name || "",
+        mobile: customer.mobile || "",
+        email: customer.email || "",
+      },
+    }));
+    setShowNameSuggestions(false);
+    setShowMobileSuggestions(false);
+    setCustomerSuggestions([]);
+    toast.success(`Selected existing customer: ${customer.name}`);
+  };
+
   const fetchBranches = async () => {
     try {
       const response = await axios.get(`${API}/branches`);
@@ -87,6 +148,21 @@ export default function JobCreate() {
       ...prev,
       customer: { ...prev.customer, [name]: value },
     }));
+    
+    // Trigger autocomplete search
+    if (name === "name" && value.length >= 2) {
+      fetchCustomerSuggestions(value);
+      setShowNameSuggestions(true);
+      setShowMobileSuggestions(false);
+    } else if (name === "mobile" && value.length >= 3) {
+      fetchCustomerSuggestions(value);
+      setShowMobileSuggestions(true);
+      setShowNameSuggestions(false);
+    } else {
+      setCustomerSuggestions([]);
+      setShowNameSuggestions(false);
+      setShowMobileSuggestions(false);
+    }
   };
 
   const handleDeviceChange = (e) => {
@@ -272,33 +348,121 @@ Please check and update the status once diagnosed.`;
           {/* Customer Information */}
           <Card className="card-shadow">
             <CardHeader>
-              <CardTitle>Customer Information</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Customer Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                {/* Customer Name with Autocomplete */}
+                <div className="space-y-2 relative">
                   <Label htmlFor="customer-name">Customer Name *</Label>
-                  <Input
-                    id="customer-name"
-                    name="name"
-                    value={formData.customer.name}
-                    onChange={handleCustomerChange}
-                    placeholder="John Doe"
-                    required
-                    data-testid="customer-name-input"
-                  />
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      ref={nameInputRef}
+                      id="customer-name"
+                      name="name"
+                      value={formData.customer.name}
+                      onChange={handleCustomerChange}
+                      onFocus={() => formData.customer.name.length >= 2 && customerSuggestions.length > 0 && setShowNameSuggestions(true)}
+                      placeholder="Start typing to search..."
+                      required
+                      className="pl-9"
+                      autoComplete="off"
+                      data-testid="customer-name-input"
+                    />
+                  </div>
+                  {/* Name Suggestions Dropdown */}
+                  {showNameSuggestions && customerSuggestions.length > 0 && (
+                    <div 
+                      ref={nameSuggestionsRef}
+                      className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto"
+                    >
+                      {loadingSuggestions ? (
+                        <div className="p-3 text-center text-muted-foreground">
+                          <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
+                          Searching...
+                        </div>
+                      ) : (
+                        customerSuggestions.map((customer, index) => (
+                          <div
+                            key={index}
+                            onClick={() => selectCustomer(customer)}
+                            className="px-3 py-2 hover:bg-accent cursor-pointer border-b last:border-b-0"
+                            data-testid={`customer-suggestion-${index}`}
+                          >
+                            <div className="font-medium">{customer.name}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-2">
+                              <Phone className="w-3 h-3" />
+                              {customer.mobile}
+                              {customer.total_jobs && (
+                                <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                                  {customer.total_jobs} job{customer.total_jobs > 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-2">
+                
+                {/* Customer Mobile with Autocomplete */}
+                <div className="space-y-2 relative">
                   <Label htmlFor="customer-mobile">Mobile Number *</Label>
-                  <Input
-                    id="customer-mobile"
-                    name="mobile"
-                    value={formData.customer.mobile}
-                    onChange={handleCustomerChange}
-                    placeholder="+91 98765 43210"
-                    required
-                    data-testid="customer-mobile-input"
-                  />
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      ref={mobileInputRef}
+                      id="customer-mobile"
+                      name="mobile"
+                      value={formData.customer.mobile}
+                      onChange={handleCustomerChange}
+                      onFocus={() => formData.customer.mobile.length >= 3 && customerSuggestions.length > 0 && setShowMobileSuggestions(true)}
+                      placeholder="Enter mobile to search..."
+                      required
+                      className="pl-9"
+                      autoComplete="off"
+                      data-testid="customer-mobile-input"
+                    />
+                  </div>
+                  {/* Mobile Suggestions Dropdown */}
+                  {showMobileSuggestions && customerSuggestions.length > 0 && (
+                    <div 
+                      ref={mobileSuggestionsRef}
+                      className="absolute z-50 w-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-auto"
+                    >
+                      {loadingSuggestions ? (
+                        <div className="p-3 text-center text-muted-foreground">
+                          <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
+                          Searching...
+                        </div>
+                      ) : (
+                        customerSuggestions.map((customer, index) => (
+                          <div
+                            key={index}
+                            onClick={() => selectCustomer(customer)}
+                            className="px-3 py-2 hover:bg-accent cursor-pointer border-b last:border-b-0"
+                            data-testid={`mobile-suggestion-${index}`}
+                          >
+                            <div className="font-medium">{customer.mobile}</div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-2">
+                              <User className="w-3 h-3" />
+                              {customer.name}
+                              {customer.total_jobs && (
+                                <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                                  {customer.total_jobs} job{customer.total_jobs > 1 ? 's' : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">

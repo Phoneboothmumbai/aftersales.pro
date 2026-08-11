@@ -1,0 +1,51 @@
+{
+  "summary": "Tested new customer autocomplete feature (GET /api/customers/autocomplete + JobCreate.js dropdowns). Demo tenant had ZERO customers/jobs, so I seeded 5 TEST_ jobs (4 unique customers) to make the feature testable. Backend: 8/9 pytest tests pass. Frontend: name dropdown, mobile dropdown, autofill on selection (both name-first and mobile-first), suggestion content (name/mobile/job count), manual new-customer entry + job submission all work. One confirmed bug: clicking outside does NOT close the MOBILE suggestions dropdown (name dropdown closes correctly). One backend bug: unescaped regex causes 500.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "GET /api/customers/autocomplete", "issue": "500 Internal Server Error when q contains regex metacharacters (e.g. q='((' -> pymongo OperationFailure 'Regular expression is invalid: missing closing parenthesis'). User typing '(' in name/mobile field breaks autocomplete. Fix: re.escape(q) before building $regex.", "priority": "HIGH"}
+    ],
+    "minor": [
+      {"endpoint": "GET /api/customers/autocomplete", "issue": "Result ordering is non-deterministic: pipeline sorts by created_at BEFORE $group and applies $limit 10 AFTER $group, so $sort order is not preserved. With >10 matches the 10 returned customers are arbitrary (not most-recent). Add {$sort:{last_visit:-1}} after $group, before $limit."},
+      {"endpoint": "GET /api/customers/autocomplete", "issue": "Sources customers from the jobs collection only, not a customer master. Customers created without a job (if that path exists) will never appear in autocomplete."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "JobCreate.js mobile suggestions dropdown", "issue": "Click-outside does not close the mobile dropdown. RCA: the mobile dropdown div (line ~428) is missing ref={suggestionsRef}; the handleClickOutside guard starts with 'suggestionsRef.current && ...', which is null when only the mobile dropdown is rendered, so both setShow*(false) calls are skipped. The open dropdown also overlays the Email field, blocking input. Fix: attach a ref to the mobile dropdown (or restructure the guard to not depend on a single ref).", "selector": "[data-testid^=\"mobile-suggestion-\"]", "priority": "HIGH"},
+      {"component": "JobCreate.js autocomplete", "issue": "No debounce on fetchCustomerSuggestions - one API request fired per keystroke (verified in backend access log). Add ~300ms debounce.", "selector": "[data-testid=\"customer-name-input\"]", "priority": "MEDIUM"},
+      {"component": "JobCreate.js suggestion row", "issue": "Job count badge uses truthy check `customer.total_jobs && ...`, so a 0 count would render nothing (falsy leak risk); also no keyboard navigation (ArrowUp/Down/Enter/Escape) on the dropdown - mouse only.", "selector": "[data-testid=\"customer-suggestion-0\"]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "New Job Sheet - Customer Information", "issues": ["Mobile suggestion dropdown overlaps the Email (Optional) input; because it does not close on outside click the email field can become unreachable until a suggestion is picked or the field is cleared."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_customer_autocomplete.py",
+    "/app/backend/tests/seed_autocomplete_customers.py",
+    "/app/test_reports/pytest/autocomplete_results.xml"
+  ],
+  "action_items": [
+    "re.escape() the q param in /api/customers/autocomplete to stop 500s on regex metacharacters",
+    "Add ref={suggestionsRef} to the mobile suggestions dropdown so click-outside closes it (or fix the guard logic)",
+    "Move $sort after $group (before $limit) so the top-10 are the most recent matches",
+    "Debounce the autocomplete request (~300ms)",
+    "Consider Escape-key + keyboard arrow navigation for accessibility"
+  ],
+  "critical_code_review_comments": [
+    "server.py:6262 autocomplete builds a MongoDB $regex directly from user input -> ReDoS/invalid-regex 500; always escape.",
+    "JobCreate.js click-outside effect depends on a single suggestionsRef that only the name dropdown sets, so the guard silently no-ops for the mobile dropdown.",
+    "server.py is very large (>6600 lines) and should be split into routers/modules."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_customer_autocomplete.py",
+    "/app/backend/tests/seed_autocomplete_customers.py"
+  ],
+  "success_rate": {"backend": "89% (8/9)", "frontend": "83% (5/6 feature checks)"},
+  "seed_data_creation": "Demo tenant had no jobs/customers. Seeded 5 jobs via POST /api/jobs (JOB-2026-000001..000005) for customers TEST_Rajesh Kumar (9876543210, 2 jobs), TEST_Rajesh Sharma (9876511111), TEST_Priya Verma (9812345678), TEST_Amit Patel (9700000001). One extra job JOB-2026-000006 created via UI for TEST_Brand New Cust (9000000123). Re-run /app/backend/tests/seed_autocomplete_customers.py if DB is reset.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "test_credentials": "demo / admin@demo.com / demo123 (login requires subdomain field)",
+  "context_for_next_testing_agent": "Verified: name dropdown (2+ chars), mobile dropdown (3+ digits), selection autofills name/mobile/email, mobile-first selection fills name, suggestion rows show name+mobile+'N jobs', manual new-customer entry + submit works (JOB-2026-000006), sub-threshold input clears dropdown, name dropdown closes on outside click. Remaining failures: mobile dropdown outside-click close, and 500 on regex metachars. Use test_customer_autocomplete.py as regression suite; seed script needed if demo DB is empty.",
+  "rca_of_the_issue": "Mobile dropdown stays open: handleClickOutside in JobCreate.js short-circuits on `suggestionsRef.current &&` and only the name dropdown assigns suggestionsRef, so with mobile-only dropdown open the ref is null and no state is reset. Backend 500: q is interpolated into $regex without re.escape, so invalid regex input raises pymongo OperationFailure (code 51091) which is not handled."
+}
