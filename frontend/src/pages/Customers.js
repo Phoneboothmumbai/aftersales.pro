@@ -62,6 +62,8 @@ import {
   Clock,
   FileText,
   Plus,
+  Edit,
+  Save,
 } from "lucide-react";
 import { formatDate, formatCurrency, getStatusColor, getStatusLabel, PAYMENT_MODES } from "../lib/utils";
 import { toast } from "sonner";
@@ -108,6 +110,16 @@ export default function Customers() {
     job_id: "",
   });
   const [paymentLoading, setPaymentLoading] = useState(false);
+
+  // Edit customer modal
+  const [editModal, setEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    mobile: "",
+    email: "",
+    original_mobile: "", // To track original mobile for updates
+  });
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     fetchCustomers();
@@ -249,6 +261,41 @@ export default function Customers() {
       toast.error(error.response?.data?.detail || "Failed to record payment");
     } finally {
       setPaymentLoading(false);
+    }
+  };
+
+  // Edit customer functions
+  const openEditModal = (customer) => {
+    setEditForm({
+      name: customer.name || "",
+      mobile: customer.mobile || "",
+      email: customer.email || "",
+      original_mobile: customer.mobile,
+    });
+    setSelectedCustomer(customer);
+    setEditModal(true);
+  };
+
+  const handleEditCustomer = async () => {
+    if (!editForm.name || !editForm.mobile) {
+      toast.error("Name and mobile are required");
+      return;
+    }
+
+    setEditLoading(true);
+    try {
+      await axios.put(`${API}/customers/${encodeURIComponent(editForm.original_mobile)}`, {
+        name: editForm.name,
+        mobile: editForm.mobile,
+        email: editForm.email || null,
+      });
+      toast.success("Customer updated across all jobs");
+      setEditModal(false);
+      fetchCustomers();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update customer");
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -465,16 +512,20 @@ export default function Customers() {
                         <TableCell onClick={(e) => e.stopPropagation()}>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button variant="ghost" size="icon" className="h-8 w-8" data-testid={`customer-actions-${customer.mobile}`}>
                                 <MoreVertical className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openLedger(customer)}>
+                              <DropdownMenuItem onClick={() => openEditModal(customer)} data-testid={`edit-customer-${customer.mobile}`}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit Customer
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openLedger(customer)} data-testid={`view-statement-${customer.mobile}`}>
                                 <Receipt className="w-4 h-4 mr-2" />
                                 View Statement
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => openPaymentModal(customer)}>
+                              <DropdownMenuItem onClick={() => openPaymentModal(customer)} data-testid={`record-payment-${customer.mobile}`}>
                                 <CreditCard className="w-4 h-4 mr-2" />
                                 Record Payment
                               </DropdownMenuItem>
@@ -884,6 +935,77 @@ export default function Customers() {
                 <>
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Record Payment
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Customer Modal */}
+      <Dialog open={editModal} onOpenChange={setEditModal}>
+        <DialogContent className="max-w-md" data-testid="edit-customer-modal">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Edit className="w-5 h-5" />
+              Edit Customer
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              Changes will apply to all jobs for this customer.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Customer Name *</Label>
+              <Input
+                id="edit-name"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                placeholder="Customer name"
+                data-testid="edit-customer-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-mobile">Mobile Number *</Label>
+              <Input
+                id="edit-mobile"
+                value={editForm.mobile}
+                onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })}
+                placeholder="Mobile number"
+                data-testid="edit-customer-mobile"
+              />
+              {editForm.mobile !== editForm.original_mobile && (
+                <p className="text-xs text-orange-500" data-testid="edit-customer-mobile-warning">
+                  ⚠️ Changing mobile will update all associated jobs and ledger entries
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email (Optional)</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                placeholder="customer@example.com"
+                data-testid="edit-customer-email"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditModal(false)} data-testid="edit-customer-cancel">
+              Cancel
+            </Button>
+            <Button onClick={handleEditCustomer} disabled={editLoading} data-testid="edit-customer-save">
+              {editLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
                 </>
               )}
             </Button>

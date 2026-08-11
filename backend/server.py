@@ -6364,6 +6364,52 @@ async def get_customer_devices(
         "devices": devices
     }
 
+class CustomerUpdate(BaseModel):
+    name: str
+    mobile: str
+    email: Optional[str] = None
+
+@api_router.put("/customers/{mobile}")
+async def update_customer(
+    mobile: str,
+    data: CustomerUpdate,
+    user: dict = Depends(get_current_user)
+):
+    """Update customer details across all jobs and ledger entries"""
+    tenant_id = user["tenant_id"]
+    
+    # Check if customer exists
+    existing = await db.jobs.find_one(
+        {"tenant_id": tenant_id, "customer.mobile": mobile}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    # Update all jobs with this customer's mobile
+    job_update_result = await db.jobs.update_many(
+        {"tenant_id": tenant_id, "customer.mobile": mobile},
+        {"$set": {
+            "customer.name": data.name,
+            "customer.mobile": data.mobile,
+            "customer.email": data.email
+        }}
+    )
+    
+    # Update customer_ledger entries if mobile number changed
+    ledger_update_result = await db.customer_ledger.update_many(
+        {"tenant_id": tenant_id, "customer_mobile": mobile},
+        {"$set": {
+            "customer_mobile": data.mobile,
+            "customer_name": data.name
+        }}
+    )
+    
+    return {
+        "message": "Customer updated successfully",
+        "jobs_updated": job_update_result.modified_count,
+        "ledger_entries_updated": ledger_update_result.modified_count
+    }
+
 @api_router.get("/customers/{mobile}/devices/{serial_imei}/history")
 async def get_device_history(
     mobile: str,

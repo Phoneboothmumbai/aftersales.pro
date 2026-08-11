@@ -6,7 +6,8 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
+from dotenv import dotenv_values as _dv
+BASE_URL = (os.environ.get('REACT_APP_BACKEND_URL') or _dv('/app/frontend/.env').get('REACT_APP_BACKEND_URL') or '').rstrip('/')
 
 # Test credentials from previous iterations
 TEST_SUBDOMAIN = "demo"

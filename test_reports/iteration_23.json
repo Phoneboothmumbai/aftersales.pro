@@ -1,0 +1,48 @@
+{
+  "summary": "Tested the new Edit Customer feature end-to-end (backend PUT /api/customers/{mobile} + Customers page UI). Created /app/backend/tests/test_customer_update.py (7 pytest cases, all passing) covering auth, 404, 422 validation, name/email propagation to jobs + customers list, mobile-change propagation (jobs, customers list, ledger lookup), email clearing, and tenant isolation. Playwright UI runs verified the 3-item dropdown (Edit Customer / View Statement / Record Payment), pre-filled modal, mobile-change warning appearing/disappearing, successful save with success toast + list refresh, cancel, client-side required-field validation, and an end-to-end mobile change reflected on the Jobs page and Customer Statement modal (then reverted). Full backend suite: 109 passed, 2 skipped (fixed pre-existing BASE_URL harness bug in test_roles.py and test_inventory_parts.py that made 33 old tests error out).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "PUT /api/customers/{mobile}", "issue": "No input validation: empty name (\"\") and empty/whitespace mobile (\"\") are accepted with 200 and written to every job. Blanking the mobile makes the customer permanently unreachable via the API (later PUT/GET by mobile return 404) i.e. silent data corruption. Add Pydantic constraints (min_length after strip, digit/length check for mobile) or explicit 400s."},
+      {"endpoint": "PUT /api/customers/{mobile}", "issue": "No duplicate-mobile check: changing a customer's mobile to a mobile already used by another customer silently merges the two customers' jobs/ledger with no warning or 409. Recommend detecting collision and returning 409 (or requiring an explicit merge flag)."},
+      {"endpoint": "PUT /api/customers/{mobile}", "issue": "Invalid email format (e.g. 'not-an-email') is stored as-is; CustomerUpdate.email is a plain str. Use EmailStr/Optional[EmailStr] for consistency with notification flows."},
+      {"endpoint": "PUT /api/customers/{mobile}", "issue": "No audit trail/updated_at written on affected jobs; the bulk $set does not touch updated_at so job timelines do not record the customer edit."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Edit Customer modal", "issues": ["Client-side validation uses falsy check only, so whitespace-only name/mobile (e.g. '   ') passes and is sent to the API; trim before validating.", "No inline field-level error styling - only a toast is shown for missing required fields."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_customer_update.py",
+    "/app/backend/tests/probe_customer_update_edge.py",
+    "/app/test_reports/pytest/pytest_results_iter23.xml"
+  ],
+  "action_items": [
+    "Add server-side validation to CustomerUpdate (non-empty trimmed name, valid mobile format/length, EmailStr) to prevent blanking customer identity across all jobs.",
+    "Handle mobile-number collision with an existing customer (409 or explicit merge confirmation) instead of silent merge.",
+    "Trim inputs in handleEditCustomer before the required-field check."
+  ],
+  "critical_code_review_comments": [
+    "PUT /api/customers/{mobile}: the update_many bulk write executes before any validation of name/mobile - a blank payload wipes customer identity on every job for that tenant. Validate first, then write.",
+    "server.py is 8730 lines; consider splitting into routers (customers, jobs, billing, super-admin) for maintainability.",
+    "Update propagation covers db.jobs and db.customer_ledger only; verified no other collection stores customer mobile/name, so coverage is complete today - add a comment/test to guard this if new collections denormalize customer data."
+  ],
+  "updated_files": [
+    "/app/frontend/src/pages/Customers.js (added data-testid: customer-actions-{mobile}, edit-customer-{mobile}, view-statement-{mobile}, record-payment-{mobile}, edit-customer-modal, edit-customer-mobile-warning, edit-customer-save, edit-customer-cancel)",
+    "/app/backend/tests/test_customer_update.py (new)",
+    "/app/backend/tests/probe_customer_update_edge.py (new)",
+    "/app/backend/tests/test_roles.py (BASE_URL fallback to /app/frontend/.env)",
+    "/app/backend/tests/test_inventory_parts.py (BASE_URL fallback to /app/frontend/.env)"
+  ],
+  "success_rate": {"backend": "100% (7/7 new tests; 109 passed suite-wide)", "frontend": "100% of tested Edit Customer flows"},
+  "seed_data_creation": "Temporary job/customer TEST_EditCust (random 9xxxxxxxxx mobile) created and deleted in test teardown. Demo tenant customer TEST_Brand New Cust (9000000123) was edited during UI tests and fully reverted to original name/mobile.",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "demo / admin@demo.com / demo123",
+  "context_for_next_testing_agent": "Edit Customer feature works end-to-end (backend + UI). New regression suite: /app/backend/tests/test_customer_update.py. All existing backend tests now run (BASE_URL fallback fixed). Remaining open items are validation gaps only: blank name/mobile accepted by PUT /api/customers/{mobile}, and silent merge on duplicate mobile.",
+  "rca_of_the_issue": "N/A - feature functioned as specified. Validation gaps stem from CustomerUpdate using bare str fields with no constraints and update_customer performing update_many without checking whether the target mobile already belongs to another customer."
+}

@@ -7,7 +7,8 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
+from dotenv import dotenv_values as _dv
+BASE_URL = (os.environ.get('REACT_APP_BACKEND_URL') or _dv('/app/frontend/.env').get('REACT_APP_BACKEND_URL') or '').rstrip('/')
 
 # Test credentials from the review request
 TEST_SHOP = {
