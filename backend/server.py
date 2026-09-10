@@ -5882,11 +5882,13 @@ async def assign_plan_to_tenant(
     now = datetime.now(timezone.utc)
     
     # Calculate subscription end date based on plan duration
-    if plan_info["price"] == 0:
+    if plan_info.get("price", 0) == 0:
         subscription_ends_at = None
         subscription_status = "free"
     else:
-        duration_days = plan_info["duration_days"] * data.duration_months
+        # Default to 30 days per month if duration_days not set
+        days_per_month = plan_info.get("duration_days", 30)
+        duration_days = days_per_month * data.duration_months
         subscription_ends_at = (now + timedelta(days=duration_days)).isoformat()
         subscription_status = "paid"
     
