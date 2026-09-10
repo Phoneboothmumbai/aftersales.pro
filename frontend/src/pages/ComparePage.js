@@ -64,7 +64,6 @@ const competitors = {
     cons: ["Limited automation", "Basic WhatsApp", "No used device trading", "Limited customer ledger", "Older UI design"],
     keywords: "servicecircle alternative, servicecircle vs, servicecircle pricing, service circle repair software, servicecircle competitor",
   },
-  // Global Competitors
   fixably: {
     name: "Fixably",
     tagline: "Fixably Alternative for Growing Repair Shops",
@@ -181,10 +180,10 @@ export default function ComparePage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Comparison not found</h1>
-          <p className="text-slate-400 mb-6">Looking for a specific comparison? Check our alternatives:</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Comparison not found</h1>
+          <p className="text-gray-600 mb-6">Looking for a specific comparison? Check our alternatives:</p>
           <div className="flex flex-wrap gap-2 justify-center mb-8">
             {Object.keys(competitors).map(key => (
               <Button 
@@ -192,7 +191,6 @@ export default function ComparePage() {
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate(`/compare/${key}`)}
-                className="border-slate-600 text-slate-300 hover:bg-slate-800"
               >
                 vs {competitors[key].name}
               </Button>
@@ -226,18 +224,18 @@ export default function ComparePage() {
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Header */}
-        <header className="border-b border-slate-700 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+        <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">AfterSales.pro</span>
+              <span className="text-xl font-bold text-gray-900">AfterSales.pro</span>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={() => navigate("/")} className="text-slate-300 hover:text-white">
+              <Button variant="ghost" onClick={() => navigate("/")} className="text-gray-600 hover:text-gray-900">
                 Home
               </Button>
               <Button onClick={() => navigate("/signup")} className="bg-blue-600 hover:bg-blue-700">
@@ -250,27 +248,27 @@ export default function ComparePage() {
         {/* Hero */}
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-2 mb-6">
-              <Globe className="w-4 h-4 text-blue-400" />
-              <span className="text-blue-400 text-sm font-medium">Comparison Guide 2024</span>
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2 mb-6">
+              <Globe className="w-4 h-4 text-blue-600" />
+              <span className="text-blue-700 text-sm font-medium">Comparison Guide 2024</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               AfterSales.pro vs {data.name}
             </h1>
-            <p className="text-xl text-slate-300 mb-4">{data.tagline}</p>
-            <p className="text-slate-400 max-w-3xl mx-auto mb-8">{data.description}</p>
+            <p className="text-xl text-gray-700 mb-4">{data.tagline}</p>
+            <p className="text-gray-600 max-w-3xl mx-auto mb-8">{data.description}</p>
             
             {/* Pricing Comparison */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Card className="bg-slate-800/50 border-slate-700 px-6 py-4">
-                <p className="text-slate-400 text-sm">{data.name} Pricing</p>
-                <p className="text-xl font-bold text-red-400">{data.pricing}</p>
-                <p className="text-xs text-slate-500">{data.location}</p>
+              <Card className="bg-gray-100 border-gray-200 px-6 py-4">
+                <p className="text-gray-600 text-sm">{data.name} Pricing</p>
+                <p className="text-xl font-bold text-red-600">{data.pricing}</p>
+                <p className="text-xs text-gray-500">{data.location}</p>
               </Card>
-              <Card className="bg-green-500/10 border-green-500/30 px-6 py-4">
-                <p className="text-green-400 text-sm">AfterSales.pro Pricing</p>
-                <p className="text-xl font-bold text-green-400">{data.ourPricing}</p>
-                <p className="text-xs text-green-500">India-based, Global Support</p>
+              <Card className="bg-green-50 border-green-200 px-6 py-4">
+                <p className="text-green-700 text-sm">AfterSales.pro Pricing</p>
+                <p className="text-xl font-bold text-green-600">{data.ourPricing}</p>
+                <p className="text-xs text-green-600">India-based, Global Support</p>
               </Card>
             </div>
 
@@ -281,23 +279,23 @@ export default function ComparePage() {
         </section>
 
         {/* Feature Comparison Table */}
-        <section className="py-16 px-4 bg-slate-800/30">
+        <section className="py-16 px-4 bg-gray-50">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white text-center mb-8">Feature Comparison</h2>
-            <Card className="bg-slate-800/50 border-slate-700 overflow-hidden">
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Feature Comparison</h2>
+            <Card className="bg-white border-gray-200 overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="text-left p-4 text-slate-300 font-medium">Feature</th>
-                      <th className="text-center p-4 text-green-400 font-medium">AfterSales.pro</th>
-                      <th className="text-center p-4 text-slate-400 font-medium">{data.name}</th>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left p-4 text-gray-700 font-medium">Feature</th>
+                      <th className="text-center p-4 text-green-600 font-medium">AfterSales.pro</th>
+                      <th className="text-center p-4 text-gray-500 font-medium">{data.name}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {features.map((feature, index) => (
-                      <tr key={index} className="border-b border-slate-700/50 hover:bg-slate-700/20">
-                        <td className="p-4 text-white">{feature.name}</td>
+                      <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="p-4 text-gray-800">{feature.name}</td>
                         <td className="p-4 text-center">
                           {feature.us ? (
                             <Check className="w-5 h-5 text-green-500 mx-auto" />
@@ -309,7 +307,7 @@ export default function ComparePage() {
                           {feature.them === true ? (
                             <Check className="w-5 h-5 text-green-500 mx-auto" />
                           ) : feature.them === "partial" ? (
-                            <span className="text-yellow-500 text-sm">Partial</span>
+                            <span className="text-yellow-600 text-sm">Partial</span>
                           ) : (
                             <X className="w-5 h-5 text-red-500 mx-auto" />
                           )}
@@ -326,14 +324,14 @@ export default function ComparePage() {
         {/* Why Switch */}
         <section className="py-16 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white text-center mb-8">Why Switch to AfterSales.pro?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Why Switch to AfterSales.pro?</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">{data.name} Limitations</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{data.name} Limitations</h3>
                   <ul className="space-y-3">
                     {data.cons.map((con, index) => (
-                      <li key={index} className="flex items-center gap-2 text-slate-300">
+                      <li key={index} className="flex items-center gap-2 text-gray-700">
                         <X className="w-4 h-4 text-red-500 flex-shrink-0" />
                         {con}
                       </li>
@@ -341,32 +339,32 @@ export default function ComparePage() {
                   </ul>
                 </CardContent>
               </Card>
-              <Card className="bg-green-500/5 border-green-500/30">
+              <Card className="bg-green-50 border-green-200">
                 <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">AfterSales.pro Benefits</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">AfterSales.pro Benefits</h3>
                   <ul className="space-y-3">
-                    <li className="flex items-center gap-2 text-slate-300">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                       Built for repair shops worldwide
                     </li>
-                    <li className="flex items-center gap-2 text-slate-300">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                       WhatsApp integration included
                     </li>
-                    <li className="flex items-center gap-2 text-slate-300">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                       Affordable INR & global pricing
                     </li>
-                    <li className="flex items-center gap-2 text-slate-300">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                       Free plan to get started
                     </li>
-                    <li className="flex items-center gap-2 text-slate-300">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                       Customer ledger & credit management
                     </li>
-                    <li className="flex items-center gap-2 text-slate-300">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                    <li className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                       Multi-currency support
                     </li>
                   </ul>
@@ -377,22 +375,22 @@ export default function ComparePage() {
         </section>
 
         {/* Testimonial */}
-        <section className="py-16 px-4 bg-slate-800/30">
+        <section className="py-16 px-4 bg-blue-50">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex justify-center mb-4">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-6 h-6 text-yellow-500 fill-yellow-500" />)}
             </div>
-            <blockquote className="text-xl text-slate-300 italic mb-4">
+            <blockquote className="text-xl text-gray-700 italic mb-4">
               "We switched from {data.name} to AfterSales.pro and saved 60% on monthly costs. The WhatsApp integration alone has improved our customer satisfaction significantly."
             </blockquote>
-            <p className="text-slate-400">— Repair Shop Owner, Mumbai</p>
+            <p className="text-gray-600">— Repair Shop Owner, Mumbai</p>
           </div>
         </section>
 
         {/* Other Comparisons */}
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-white text-center mb-8">Compare with Other Alternatives</h2>
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Compare with Other Alternatives</h2>
             <div className="flex flex-wrap gap-2 justify-center">
               {Object.keys(competitors).filter(k => k !== competitor).slice(0, 8).map(key => (
                 <Button 
@@ -400,7 +398,6 @@ export default function ComparePage() {
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate(`/compare/${key}`)}
-                  className="border-slate-600 text-slate-300 hover:bg-slate-800"
                 >
                   vs {competitors[key].name}
                 </Button>
@@ -410,17 +407,17 @@ export default function ComparePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 px-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+        <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-white mb-4">Ready to Make the Switch?</h2>
-            <p className="text-slate-300 mb-8">
+            <p className="text-blue-100 mb-8">
               Join 500+ repair shops who made the switch to AfterSales.pro. Start your free trial today - no credit card required.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={() => navigate("/signup")} size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => navigate("/signup")} size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
                 Start Free Trial <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button onClick={() => navigate("/")} size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
+              <Button onClick={() => navigate("/")} size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 Learn More
               </Button>
             </div>
@@ -428,8 +425,8 @@ export default function ComparePage() {
         </section>
 
         {/* Footer */}
-        <footer className="py-8 px-4 border-t border-slate-700">
-          <div className="max-w-7xl mx-auto text-center text-slate-400 text-sm">
+        <footer className="py-8 px-4 border-t border-gray-200 bg-white">
+          <div className="max-w-7xl mx-auto text-center text-gray-600 text-sm">
             <p>© 2024 AfterSales.pro. All rights reserved.</p>
             <p className="mt-2">
               {data.name} is a trademark of its respective owner. This page is for comparison purposes only.

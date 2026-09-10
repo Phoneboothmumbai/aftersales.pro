@@ -104,22 +104,22 @@ export default function LegalPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-red-500" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Card className="bg-slate-800 border-slate-700 max-w-md">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="bg-white border-gray-200 shadow-sm max-w-md">
           <CardContent className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-white mb-2">Page Not Found</h2>
-            <p className="text-slate-400 mb-4">{error}</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Page Not Found</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
             <Link to="/">
-              <Button className="bg-red-600 hover:bg-red-700">
+              <Button className="bg-blue-600 hover:bg-blue-700">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Go Home
               </Button>
@@ -131,22 +131,22 @@ export default function LegalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700">
+      <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <Link to="/" className="inline-flex items-center text-slate-400 hover:text-white mb-4">
+          <Link to="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Link>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-red-600/20 rounded-lg flex items-center justify-center">
-              <Icon className="w-6 h-6 text-red-500" />
+            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+              <Icon className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">{config.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{config.title}</h1>
               {companyName && (
-                <p className="text-slate-400">{companyName}</p>
+                <p className="text-gray-600">{companyName}</p>
               )}
             </div>
           </div>
@@ -155,15 +155,15 @@ export default function LegalPage() {
 
       {/* Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-white border-gray-200 shadow-sm">
           <CardContent className="p-6 md:p-8">
-            <div className="prose prose-invert prose-slate max-w-none
-              prose-headings:text-white prose-headings:font-bold
-              prose-h1:text-2xl prose-h1:mb-6 prose-h1:pb-4 prose-h1:border-b prose-h1:border-slate-700
+            <div className="prose prose-gray max-w-none
+              prose-headings:text-gray-900 prose-headings:font-bold
+              prose-h1:text-2xl prose-h1:mb-6 prose-h1:pb-4 prose-h1:border-b prose-h1:border-gray-200
               prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4
-              prose-p:text-slate-300 prose-p:leading-relaxed
-              prose-li:text-slate-300
-              prose-strong:text-white
+              prose-p:text-gray-700 prose-p:leading-relaxed
+              prose-li:text-gray-700
+              prose-strong:text-gray-900
               prose-ul:list-disc prose-ul:pl-6
               prose-ol:list-decimal prose-ol:pl-6
             ">
@@ -174,12 +174,12 @@ export default function LegalPage() {
 
         {/* Footer Links */}
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm">
-          {Object.entries(PAGE_CONFIG).map(([key, cfg]) => (
+          {Object.entries(PAGE_CONFIG).filter(([key]) => !key.includes('_')).map(([key, cfg]) => (
             <Link
               key={key}
               to={`/legal/${key}`}
-              className={`text-slate-400 hover:text-white transition-colors ${
-                key === pageType ? "text-red-500" : ""
+              className={`text-gray-600 hover:text-gray-900 transition-colors ${
+                key === pageType ? "text-blue-600 font-medium" : ""
               }`}
             >
               {cfg.title}

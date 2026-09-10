@@ -41,25 +41,25 @@ export default function SuperAdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center">
-            <Shield className="w-7 h-7 text-white" />
+            <Shield className="w-7 h-7 text-gray-900" />
           </div>
           <div className="text-center">
-            <span className="text-2xl font-bold text-white tracking-tight">
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">
               Super Admin
             </span>
-            <p className="text-slate-400 text-sm">aftersales.pro</p>
+            <p className="text-gray-600 text-sm">aftersales.pro</p>
           </div>
         </div>
 
-        <Card className="bg-slate-800 border-slate-700">
+        <Card className="bg-white border-gray-200">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-white">Admin Access</CardTitle>
-            <CardDescription className="text-slate-400">
+            <CardTitle className="text-2xl text-gray-900">Admin Access</CardTitle>
+            <CardDescription className="text-gray-600">
               Platform management console
             </CardDescription>
           </CardHeader>
@@ -81,7 +81,7 @@ export default function SuperAdminLogin() {
                   placeholder="superadmin@aftersales.pro"
                   value={formData.email}
                   onChange={handleChange}
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+                  className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500"
                   required
                   data-testid="super-admin-email-input"
                 />
@@ -97,13 +97,13 @@ export default function SuperAdminLogin() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
-                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+                    className="bg-gray-100 border-gray-300 text-gray-900 placeholder:text-gray-500"
                     required
                     data-testid="super-admin-password-input"
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -133,7 +133,7 @@ export default function SuperAdminLogin() {
           </CardContent>
         </Card>
 
-        <p className="mt-6 text-center text-slate-500 text-sm">
+        <p className="mt-6 text-center text-gray-500 text-sm">
           This is a restricted area. Unauthorized access is prohibited.
         </p>
       </div>

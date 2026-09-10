@@ -17,7 +17,6 @@ import {
   Users,
   BarChart3,
   Shield,
-  Clock,
   IndianRupee,
   Star,
 } from "lucide-react";
@@ -29,7 +28,6 @@ const featurePages = {
     description: "Manage your mobile phone repair shop efficiently with AfterSales.pro. Track IMEI numbers, manage repairs, send WhatsApp updates, and grow your business.",
     icon: Smartphone,
     keywords: "mobile repair software, phone repair shop software, smartphone repair management, cell phone repair software, mobile service center software, iphone repair software, android repair management",
-    heroImage: "mobile-repair",
     benefits: [
       "IMEI & Serial Number Tracking",
       "WhatsApp Customer Updates",
@@ -55,7 +53,6 @@ const featurePages = {
     description: "Streamline your laptop and computer repair business with AfterSales.pro. Handle complex repairs, track parts, manage warranties, and keep customers informed.",
     icon: Laptop,
     keywords: "laptop repair software, computer repair management, pc repair shop software, laptop service center software, computer technician software, IT repair management",
-    heroImage: "laptop-repair",
     benefits: [
       "Detailed Diagnostic Tracking",
       "Component-Level Repair Records",
@@ -81,7 +78,6 @@ const featurePages = {
     description: "Manage multiple repair shop branches from a single dashboard. Track inventory, staff, and jobs across all locations with AfterSales.pro's multi-branch solution.",
     icon: Building2,
     keywords: "multi-branch repair software, repair chain management, multiple location repair shop, franchise repair software, repair business scaling, multi-store repair management",
-    heroImage: "multi-branch",
     benefits: [
       "Centralized Dashboard",
       "Branch-Wise Reporting",
@@ -107,7 +103,6 @@ const featurePages = {
     description: "AfterSales.pro is built specifically for Indian repair shops. INR pricing, GST compliance, WhatsApp integration, Hindi support, and Razorpay payments.",
     icon: IndianRupee,
     keywords: "repair shop software india, mobile repair software india, laptop repair india, service center software india, repair management india, gst billing repair shop",
-    heroImage: "india-repair",
     benefits: [
       "INR Pricing - No Forex Charges",
       "GST Compliant Invoicing",
@@ -133,7 +128,6 @@ const featurePages = {
     description: "Get premium repair shop management features at a fraction of the cost. AfterSales.pro offers everything US repair shops need without the premium price tag.",
     icon: Globe,
     keywords: "repair shop software usa, cell phone repair software usa, computer repair software america, affordable repair software, repairdesk alternative usa",
-    heroImage: "usa-repair",
     benefits: [
       "Competitive USD Pricing",
       "All Premium Features Included",
@@ -159,7 +153,6 @@ const featurePages = {
     description: "AfterSales.pro offers UK repair shops an affordable, feature-rich alternative to expensive European software. WhatsApp updates, cloud access, and great support.",
     icon: Globe,
     keywords: "repair shop software uk, mobile repair software uk, computer repair uk, repair management united kingdom, phone repair software britain",
-    heroImage: "uk-repair",
     benefits: [
       "Affordable GBP Pricing",
       "WhatsApp Integration",
@@ -185,7 +178,6 @@ const featurePages = {
     description: "Manage your repair business in UAE, Saudi Arabia, and the Middle East with AfterSales.pro. Multi-currency support, WhatsApp integration, and Arabic-friendly interface.",
     icon: Globe,
     keywords: "repair shop software uae, mobile repair dubai, repair management middle east, service center software gulf, phone repair software saudi arabia",
-    heroImage: "uae-repair",
     benefits: [
       "Multi-Currency Support (AED, SAR)",
       "WhatsApp Business Integration",
@@ -211,7 +203,6 @@ const featurePages = {
     description: "Send automated WhatsApp updates to customers at every stage of repair. Job received, diagnosis, approval needed, ready for pickup - all automated.",
     icon: MessageSquare,
     keywords: "whatsapp repair software, whatsapp job updates, automated customer notifications, repair shop whatsapp, service center whatsapp integration",
-    heroImage: "whatsapp-repair",
     benefits: [
       "Automated Status Updates",
       "One-Click WhatsApp Messages",
@@ -240,10 +231,10 @@ export default function FeaturePage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Page not found</h1>
-          <p className="text-slate-400 mb-6">Explore our feature pages:</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Page not found</h1>
+          <p className="text-gray-600 mb-6">Explore our feature pages:</p>
           <div className="flex flex-wrap gap-2 justify-center mb-8 max-w-2xl">
             {Object.keys(featurePages).map(key => (
               <Button 
@@ -251,7 +242,6 @@ export default function FeaturePage() {
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate(`/features/${key}`)}
-                className="border-slate-600 text-slate-300 hover:bg-slate-800"
               >
                 {featurePages[key].title}
               </Button>
@@ -292,18 +282,18 @@ export default function FeaturePage() {
         </script>
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Header */}
-        <header className="border-b border-slate-700 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
+        <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">AfterSales.pro</span>
+              <span className="text-xl font-bold text-gray-900">AfterSales.pro</span>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={() => navigate("/")} className="text-slate-300 hover:text-white hidden sm:inline-flex">
+              <Button variant="ghost" onClick={() => navigate("/")} className="text-gray-600 hover:text-gray-900 hidden sm:inline-flex">
                 Home
               </Button>
               <Button onClick={() => navigate("/signup")} className="bg-blue-600 hover:bg-blue-700">
@@ -316,21 +306,21 @@ export default function FeaturePage() {
         {/* Hero */}
         <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/30 mb-6">
-              <IconComponent className="w-8 h-8 text-blue-400" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 mb-6">
+              <IconComponent className="w-8 h-8 text-blue-600" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               {data.title}
             </h1>
-            <p className="text-xl text-slate-300 mb-4">{data.subtitle}</p>
-            <p className="text-slate-400 max-w-3xl mx-auto mb-8">{data.description}</p>
+            <p className="text-xl text-gray-700 mb-4">{data.subtitle}</p>
+            <p className="text-gray-600 max-w-3xl mx-auto mb-8">{data.description}</p>
             
             {/* Stats */}
             <div className="flex flex-wrap justify-center gap-8 mb-8">
               {Object.entries(data.stats).map(([key, value]) => (
                 <div key={key} className="text-center">
-                  <p className="text-3xl font-bold text-blue-400">{value}</p>
-                  <p className="text-slate-400 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                  <p className="text-3xl font-bold text-blue-600">{value}</p>
+                  <p className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
                 </div>
               ))}
             </div>
@@ -339,7 +329,7 @@ export default function FeaturePage() {
               <Button onClick={() => navigate("/signup")} size="lg" className="bg-blue-600 hover:bg-blue-700">
                 Start Free Trial <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button onClick={() => navigate("/contact")} size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
+              <Button onClick={() => navigate("/contact")} size="lg" variant="outline">
                 Contact Sales
               </Button>
             </div>
@@ -347,15 +337,15 @@ export default function FeaturePage() {
         </section>
 
         {/* Benefits */}
-        <section className="py-16 px-4 bg-slate-800/30">
+        <section className="py-16 px-4 bg-gray-50">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-white text-center mb-12">Key Features & Benefits</h2>
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Key Features & Benefits</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {data.benefits.map((benefit, index) => (
-                <Card key={index} className="bg-slate-800/50 border-slate-700">
+                <Card key={index} className="bg-white border-gray-200 shadow-sm">
                   <CardContent className="p-4 flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span className="text-slate-200">{benefit}</span>
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-gray-800">{benefit}</span>
                   </CardContent>
                 </Card>
               ))}
@@ -366,15 +356,15 @@ export default function FeaturePage() {
         {/* Use Cases */}
         <section className="py-16 px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white text-center mb-8">Perfect For</h2>
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">Perfect For</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {data.useCases.map((useCase, index) => (
-                <Card key={index} className="bg-slate-800/50 border-slate-700 hover:border-blue-500/50 transition-colors">
+                <Card key={index} className="bg-white border-gray-200 hover:border-blue-300 transition-colors shadow-sm">
                   <CardContent className="p-4 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-4 h-4 text-blue-400" />
+                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="text-slate-200">{useCase}</span>
+                    <span className="text-gray-800">{useCase}</span>
                   </CardContent>
                 </Card>
               ))}
@@ -383,51 +373,51 @@ export default function FeaturePage() {
         </section>
 
         {/* All Features Overview */}
-        <section className="py-16 px-4 bg-slate-800/30">
+        <section className="py-16 px-4 bg-gray-50">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-white text-center mb-4">Complete Repair Management</h2>
-            <p className="text-slate-400 text-center mb-12">Everything you need to run your repair business efficiently</p>
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">Complete Repair Management</h2>
+            <p className="text-gray-600 text-center mb-12">Everything you need to run your repair business efficiently</p>
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6 text-center">
-                  <FileText className="w-10 h-10 text-blue-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">Job Management</h3>
-                  <p className="text-slate-400 text-sm">Track every repair from intake to delivery with detailed status updates</p>
+                  <FileText className="w-10 h-10 text-blue-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Job Management</h3>
+                  <p className="text-gray-600 text-sm">Track every repair from intake to delivery with detailed status updates</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6 text-center">
-                  <MessageSquare className="w-10 h-10 text-green-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">WhatsApp Updates</h3>
-                  <p className="text-slate-400 text-sm">Automated customer notifications at every stage of repair</p>
+                  <MessageSquare className="w-10 h-10 text-green-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">WhatsApp Updates</h3>
+                  <p className="text-gray-600 text-sm">Automated customer notifications at every stage of repair</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6 text-center">
-                  <Package className="w-10 h-10 text-orange-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">Inventory Control</h3>
-                  <p className="text-slate-400 text-sm">Track parts, set reorder alerts, and manage stock efficiently</p>
+                  <Package className="w-10 h-10 text-orange-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Inventory Control</h3>
+                  <p className="text-gray-600 text-sm">Track parts, set reorder alerts, and manage stock efficiently</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6 text-center">
-                  <Users className="w-10 h-10 text-purple-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">Customer CRM</h3>
-                  <p className="text-slate-400 text-sm">Complete customer history, ledger, and credit management</p>
+                  <Users className="w-10 h-10 text-purple-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Customer CRM</h3>
+                  <p className="text-gray-600 text-sm">Complete customer history, ledger, and credit management</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6 text-center">
-                  <BarChart3 className="w-10 h-10 text-cyan-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">Reports & Analytics</h3>
-                  <p className="text-slate-400 text-sm">Profit tracking, performance metrics, and business insights</p>
+                  <BarChart3 className="w-10 h-10 text-cyan-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Reports & Analytics</h3>
+                  <p className="text-gray-600 text-sm">Profit tracking, performance metrics, and business insights</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardContent className="p-6 text-center">
-                  <Shield className="w-10 h-10 text-red-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-white mb-2">Secure & Reliable</h3>
-                  <p className="text-slate-400 text-sm">Your data is encrypted and backed up automatically</p>
+                  <Shield className="w-10 h-10 text-red-600 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Secure & Reliable</h3>
+                  <p className="text-gray-600 text-sm">Your data is encrypted and backed up automatically</p>
                 </CardContent>
               </Card>
             </div>
@@ -435,22 +425,22 @@ export default function FeaturePage() {
         </section>
 
         {/* Testimonial */}
-        <section className="py-16 px-4">
+        <section className="py-16 px-4 bg-blue-50">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex justify-center mb-4">
               {[1,2,3,4,5].map(i => <Star key={i} className="w-6 h-6 text-yellow-500 fill-yellow-500" />)}
             </div>
-            <blockquote className="text-xl text-slate-300 italic mb-4">
+            <blockquote className="text-xl text-gray-700 italic mb-4">
               "AfterSales.pro transformed how we run our repair shop. Customer satisfaction is up 40% thanks to WhatsApp updates, and we've saved hours on paperwork every week."
             </blockquote>
-            <p className="text-slate-400">— Verified Customer</p>
+            <p className="text-gray-600">— Verified Customer</p>
           </div>
         </section>
 
         {/* Other Features */}
-        <section className="py-16 px-4 bg-slate-800/30">
+        <section className="py-16 px-4">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold text-white text-center mb-8">Explore More Solutions</h2>
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Explore More Solutions</h2>
             <div className="flex flex-wrap gap-2 justify-center">
               {Object.keys(featurePages).filter(k => k !== feature).map(key => (
                 <Button 
@@ -458,7 +448,6 @@ export default function FeaturePage() {
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate(`/features/${key}`)}
-                  className="border-slate-600 text-slate-300 hover:bg-slate-800"
                 >
                   {featurePages[key].title}
                 </Button>
@@ -468,17 +457,17 @@ export default function FeaturePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-16 px-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
+        <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-white mb-4">Ready to Transform Your Repair Shop?</h2>
-            <p className="text-slate-300 mb-8">
+            <p className="text-blue-100 mb-8">
               Join 500+ repair shops using AfterSales.pro. Start your free trial today - no credit card required.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button onClick={() => navigate("/signup")} size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => navigate("/signup")} size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
                 Start Free Trial <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button onClick={() => navigate("/")} size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800">
+              <Button onClick={() => navigate("/")} size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 View All Features
               </Button>
             </div>
@@ -486,8 +475,8 @@ export default function FeaturePage() {
         </section>
 
         {/* Footer */}
-        <footer className="py-8 px-4 border-t border-slate-700">
-          <div className="max-w-7xl mx-auto text-center text-slate-400 text-sm">
+        <footer className="py-8 px-4 border-t border-gray-200 bg-white">
+          <div className="max-w-7xl mx-auto text-center text-gray-600 text-sm">
             <p>© 2024 AfterSales.pro. All rights reserved.</p>
           </div>
         </footer>

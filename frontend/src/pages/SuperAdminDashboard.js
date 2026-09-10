@@ -100,7 +100,7 @@ const PLAN_ICONS = {
 };
 
 const PLAN_COLORS = {
-  free: "bg-slate-600/20 text-slate-400 border-slate-600/30",
+  free: "bg-slate-600/20 text-gray-600 border-gray-300/30",
   starter: "bg-green-600/20 text-green-400 border-green-600/30",
   basic: "bg-blue-600/20 text-blue-400 border-blue-600/30",
   pro: "bg-purple-600/20 text-purple-400 border-purple-600/30",
@@ -1001,29 +1001,29 @@ export default function SuperAdminDashboard() {
   };
 
   const getPlanIcon = (planId) => PLAN_ICONS[planId] || <Package className="w-4 h-4" />;
-  const getPlanColor = (planId) => PLAN_COLORS[planId] || "bg-slate-600/20 text-slate-400 border-slate-600/30";
+  const getPlanColor = (planId) => PLAN_COLORS[planId] || "bg-slate-600/20 text-gray-600 border-gray-300/30";
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-red-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+                <Shield className="w-6 h-6 text-gray-900" />
               </div>
               <div>
-                <span className="text-xl font-bold text-white">Super Admin</span>
-                <p className="text-xs text-slate-400">aftersales.pro</p>
+                <span className="text-xl font-bold text-gray-900">Super Admin</span>
+                <p className="text-xs text-gray-600">aftersales.pro</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -1032,7 +1032,7 @@ export default function SuperAdminDashboard() {
                   variant={activeTab === "tenants" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("tenants")}
-                  className={activeTab === "tenants" ? "bg-slate-600" : "text-slate-400"}
+                  className={activeTab === "tenants" ? "bg-slate-600" : "text-gray-600"}
                 >
                   <Building2 className="w-4 h-4 mr-2" />
                   Shops
@@ -1042,7 +1042,7 @@ export default function SuperAdminDashboard() {
                   size="sm"
                   data-testid="super-admin-tab-plans"
                   onClick={() => setActiveTab("plans")}
-                  className={activeTab === "plans" ? "bg-slate-600" : "text-slate-400"}
+                  className={activeTab === "plans" ? "bg-slate-600" : "text-gray-600"}
                 >
                   <Crown className="w-4 h-4 mr-2" />
                   Plans
@@ -1051,7 +1051,7 @@ export default function SuperAdminDashboard() {
                   variant={activeTab === "analytics" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("analytics")}
-                  className={activeTab === "analytics" ? "bg-slate-600" : "text-slate-400"}
+                  className={activeTab === "analytics" ? "bg-slate-600" : "text-gray-600"}
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Analytics
@@ -1060,7 +1060,7 @@ export default function SuperAdminDashboard() {
                   variant={activeTab === "announcements" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("announcements")}
-                  className={activeTab === "announcements" ? "bg-slate-600" : "text-slate-400"}
+                  className={activeTab === "announcements" ? "bg-slate-600" : "text-gray-600"}
                 >
                   <Megaphone className="w-4 h-4 mr-2" />
                   Broadcast
@@ -1069,7 +1069,7 @@ export default function SuperAdminDashboard() {
                   variant={activeTab === "tickets" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("tickets")}
-                  className={activeTab === "tickets" ? "bg-slate-600" : "text-slate-400"}
+                  className={activeTab === "tickets" ? "bg-slate-600" : "text-gray-600"}
                 >
                   <Ticket className="w-4 h-4 mr-2" />
                   Tickets
@@ -1078,7 +1078,7 @@ export default function SuperAdminDashboard() {
                   variant={activeTab === "settings" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setActiveTab("settings")}
-                  className={activeTab === "settings" ? "bg-slate-600" : "text-slate-400"}
+                  className={activeTab === "settings" ? "bg-slate-600" : "text-gray-600"}
                 >
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
@@ -1086,7 +1086,7 @@ export default function SuperAdminDashboard() {
               </div>
               <Button
                 variant="ghost"
-                className="text-slate-400 hover:text-white hover:bg-slate-700"
+                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 onClick={handleLogout}
                 data-testid="super-admin-logout-btn"
               >
@@ -1103,57 +1103,57 @@ export default function SuperAdminDashboard() {
         {activeTab === "tenants" && (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <Card className="bg-slate-800 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
                       <Building2 className="w-5 h-5 text-blue-400" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-white">{stats?.total_tenants || 0}</p>
-                      <p className="text-sm text-slate-400">Total Shops</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats?.total_tenants || 0}</p>
+                      <p className="text-sm text-gray-600">Total Shops</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
                       <CheckCircle className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-white">{stats?.active_tenants || 0}</p>
-                      <p className="text-sm text-slate-400">Active</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats?.active_tenants || 0}</p>
+                      <p className="text-sm text-gray-600">Active</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
                       <Users className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-white">{stats?.total_users || 0}</p>
-                      <p className="text-sm text-slate-400">Total Users</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats?.total_users || 0}</p>
+                      <p className="text-sm text-gray-600">Total Users</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
                       <ClipboardList className="w-5 h-5 text-orange-400" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-white">{stats?.total_jobs || 0}</p>
-                      <p className="text-sm text-slate-400">Total Jobs</p>
+                      <p className="text-2xl font-bold text-gray-900">{stats?.total_jobs || 0}</p>
+                      <p className="text-sm text-gray-600">Total Jobs</p>
                     </div>
                   </div>
                 </CardContent>
@@ -1161,28 +1161,28 @@ export default function SuperAdminDashboard() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4 text-center">
                   <p className="text-xl font-bold text-yellow-400">{stats?.trial_tenants || 0}</p>
-                  <p className="text-sm text-slate-400">On Trial</p>
+                  <p className="text-sm text-gray-600">On Trial</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4 text-center">
                   <p className="text-xl font-bold text-green-400">{stats?.paid_tenants || 0}</p>
-                  <p className="text-sm text-slate-400">Paid</p>
+                  <p className="text-sm text-gray-600">Paid</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4 text-center">
                   <p className="text-xl font-bold text-red-400">{stats?.inactive_tenants || 0}</p>
-                  <p className="text-sm text-slate-400">Inactive</p>
+                  <p className="text-sm text-gray-600">Inactive</p>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-800/50 border-slate-700">
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-4 text-center">
                   <p className="text-xl font-bold text-blue-400">{stats?.recent_signups || 0}</p>
-                  <p className="text-sm text-slate-400">This Week</p>
+                  <p className="text-sm text-gray-600">This Week</p>
                 </CardContent>
               </Card>
             </div>
@@ -1191,10 +1191,10 @@ export default function SuperAdminDashboard() {
 
         {/* Tenants Tab */}
         {activeTab === "tenants" && (
-          <Card className="bg-slate-800 border-slate-700">
-            <CardHeader className="border-b border-slate-700">
+          <Card className="bg-white border-gray-200">
+            <CardHeader className="border-b border-gray-200">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="text-white">All Shops</CardTitle>
+                <CardTitle className="text-gray-900">All Shops</CardTitle>
                 <div className="flex gap-2 w-full sm:w-auto">
                   <Button
                     onClick={() => setShowCreateShop(true)}
@@ -1210,12 +1210,12 @@ export default function SuperAdminDashboard() {
                       placeholder="Search shops..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 w-full sm:w-64"
+                      className="pl-10 bg-slate-700 border-gray-300 text-gray-900 placeholder:text-slate-500 w-full sm:w-64"
                       data-testid="search-tenants-input"
                     />
                   </div>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-32 bg-slate-700 border-slate-600 text-white">
+                    <SelectTrigger className="w-32 bg-slate-700 border-gray-300 text-gray-900">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1233,30 +1233,30 @@ export default function SuperAdminDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Shop</th>
-                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Admin</th>
-                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Status</th>
-                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Plan</th>
-                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Jobs</th>
-                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Validity</th>
-                      <th className="text-left text-sm font-medium text-slate-400 px-4 py-3">Actions</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left text-sm font-medium text-gray-600 px-4 py-3">Shop</th>
+                      <th className="text-left text-sm font-medium text-gray-600 px-4 py-3">Admin</th>
+                      <th className="text-left text-sm font-medium text-gray-600 px-4 py-3">Status</th>
+                      <th className="text-left text-sm font-medium text-gray-600 px-4 py-3">Plan</th>
+                      <th className="text-left text-sm font-medium text-gray-600 px-4 py-3">Jobs</th>
+                      <th className="text-left text-sm font-medium text-gray-600 px-4 py-3">Validity</th>
+                      <th className="text-left text-sm font-medium text-gray-600 px-4 py-3">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredTenants.map((tenant) => (
-                      <tr key={tenant.id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                      <tr key={tenant.id} className="border-b border-gray-200/50 hover:bg-gray-100/30">
                         <td className="px-4 py-3">
                           <div 
                             className="cursor-pointer hover:opacity-80"
                             onClick={() => handleViewTenant(tenant)}
                           >
-                            <p className="font-medium text-white hover:text-blue-400">{tenant.company_name}</p>
-                            <p className="text-sm text-slate-400">{tenant.subdomain}.aftersales.pro</p>
+                            <p className="font-medium text-gray-900 hover:text-blue-400">{tenant.company_name}</p>
+                            <p className="text-sm text-gray-600">{tenant.subdomain}.aftersales.pro</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="text-sm text-slate-300">{tenant.admin_email || "N/A"}</p>
+                          <p className="text-sm text-gray-700">{tenant.admin_email || "N/A"}</p>
                         </td>
                         <td className="px-4 py-3">
                           {tenant.is_active ? (
@@ -1276,10 +1276,10 @@ export default function SuperAdminDashboard() {
                           </Badge>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="text-slate-300">{tenant.total_jobs}</p>
+                          <p className="text-gray-700">{tenant.total_jobs}</p>
                         </td>
                         <td className="px-4 py-3">
-                          <p className="text-sm text-slate-400">
+                          <p className="text-sm text-gray-600">
                             {tenant.subscription_status === "paid" 
                               ? formatDate(tenant.subscription_ends_at) 
                               : formatDate(tenant.trial_ends_at)}
@@ -1290,7 +1290,7 @@ export default function SuperAdminDashboard() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="text-slate-400 hover:text-white hover:bg-slate-700"
+                              className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                               onClick={() => handleViewTenant(tenant)}
                               data-testid={`view-tenant-${tenant.subdomain}`}
                               title="View Details"
@@ -1338,7 +1338,7 @@ export default function SuperAdminDashboard() {
                 </table>
                 {filteredTenants.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-slate-400">No shops found</p>
+                    <p className="text-gray-600">No shops found</p>
                   </div>
                 )}
               </div>
@@ -1351,8 +1351,8 @@ export default function SuperAdminDashboard() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold text-white">Subscription Plans</h2>
-                <p className="text-slate-400">Manage subscription plans and their features</p>
+                <h2 className="text-2xl font-bold text-gray-900">Subscription Plans</h2>
+                <p className="text-gray-600">Manage subscription plans and their features</p>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -1379,12 +1379,12 @@ export default function SuperAdminDashboard() {
             </div>
 
             {/* Visibility Info */}
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-slate-300 text-sm">
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-gray-700 text-sm">
                 <Eye className="w-4 h-4 text-green-400" />
                 <span>Plans marked as &quot;Show on Pricing&quot; will appear on the public pricing page.</span>
                 <span className="text-slate-500">•</span>
-                <span className="text-slate-400">
+                <span className="text-gray-600">
                   Currently showing: {plans.filter(p => p.show_on_pricing !== false && p.is_active !== false).length} plans
                 </span>
               </div>
@@ -1392,7 +1392,7 @@ export default function SuperAdminDashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {plans.map((plan) => (
-                <Card key={plan.id} className={`bg-slate-800 border-slate-700 ${!plan.is_active ? 'opacity-50' : ''}`}>
+                <Card key={plan.id} className={`bg-white border-gray-200 ${!plan.is_active ? 'opacity-50' : ''}`}>
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
                       <div>
@@ -1412,7 +1412,7 @@ export default function SuperAdminDashboard() {
                             Visible
                           </Badge>
                         ) : (
-                          <Badge className="ml-2 bg-slate-600/20 text-slate-400 text-xs">
+                          <Badge className="ml-2 bg-slate-600/20 text-gray-600 text-xs">
                             <EyeOff className="w-3 h-3 mr-1" />
                             Hidden
                           </Badge>
@@ -1424,7 +1424,7 @@ export default function SuperAdminDashboard() {
                           variant="ghost"
                           data-testid={`edit-plan-${plan.id}`}
                           onClick={() => openEditPlan(plan)}
-                          className="text-slate-400 hover:text-white"
+                          className="text-gray-600 hover:text-gray-900"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -1441,58 +1441,58 @@ export default function SuperAdminDashboard() {
                       </div>
                     </div>
                     <div className="mt-2">
-                      <span className="text-3xl font-bold text-white">
+                      <span className="text-3xl font-bold text-gray-900">
                         {plan.price === 0 ? "Free" : formatCurrency(plan.price)}
                       </span>
                       {plan.price > 0 && (
-                        <span className="text-slate-400 text-sm">/{plan.billing_cycle}</span>
+                        <span className="text-gray-600 text-sm">/{plan.billing_cycle}</span>
                       )}
                     </div>
                     {plan.description && (
-                      <p className="text-sm text-slate-400 mt-1">{plan.description}</p>
+                      <p className="text-sm text-gray-600 mt-1">{plan.description}</p>
                     )}
                   </CardHeader>
                   <CardContent className="pt-2">
                     <div className="space-y-3">
                       {/* Limits */}
                       <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="flex items-center gap-2 text-slate-300">
+                        <div className="flex items-center gap-2 text-gray-700">
                           <Users className="w-4 h-4 text-slate-500" />
                           <span>{formatLimit(plan.max_users)} users</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-300">
+                        <div className="flex items-center gap-2 text-gray-700">
                           <Building2 className="w-4 h-4 text-slate-500" />
                           <span>{formatLimit(plan.max_branches)} branches</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-300">
+                        <div className="flex items-center gap-2 text-gray-700">
                           <ClipboardList className="w-4 h-4 text-slate-500" />
                           <span>{formatLimit(plan.max_jobs_per_month)} jobs/mo</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-300">
+                        <div className="flex items-center gap-2 text-gray-700">
                           <Package className="w-4 h-4 text-slate-500" />
                           <span>{formatLimit(plan.max_inventory_items)} items</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-300">
+                        <div className="flex items-center gap-2 text-gray-700">
                           <Image className="w-4 h-4 text-slate-500" />
                           <span>{formatLimit(plan.max_photos_per_job)} photos/job</span>
                         </div>
-                        <div className="flex items-center gap-2 text-slate-300">
+                        <div className="flex items-center gap-2 text-gray-700">
                           <HardDrive className="w-4 h-4 text-slate-500" />
                           <span>{plan.max_storage_mb === -1 ? "Unlimited" : `${plan.max_storage_mb} MB`}</span>
                         </div>
                       </div>
                       
                       {/* Features */}
-                      <div className="border-t border-slate-700 pt-3">
+                      <div className="border-t border-gray-200 pt-3">
                         <p className="text-xs text-slate-500 mb-2">Features</p>
                         <div className="flex flex-wrap gap-1">
                           {Object.entries(plan.features || {}).filter(([_, v]) => v).slice(0, 6).map(([key]) => (
-                            <Badge key={key} variant="outline" className="text-xs text-slate-400">
+                            <Badge key={key} variant="outline" className="text-xs text-gray-600">
                               {FEATURE_LABELS[key] || key}
                             </Badge>
                           ))}
                           {Object.values(plan.features || {}).filter(v => v).length > 6 && (
-                            <Badge variant="outline" className="text-xs text-slate-400">
+                            <Badge variant="outline" className="text-xs text-gray-600">
                               +{Object.values(plan.features || {}).filter(v => v).length - 6} more
                             </Badge>
                           )}
@@ -1500,9 +1500,9 @@ export default function SuperAdminDashboard() {
                       </div>
 
                       {/* Tenant count */}
-                      <div className="border-t border-slate-700 pt-3 flex items-center justify-between">
-                        <span className="text-sm text-slate-400">Active tenants</span>
-                        <span className="text-white font-medium">{plan.tenant_count || 0}</span>
+                      <div className="border-t border-gray-200 pt-3 flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Active tenants</span>
+                        <span className="text-gray-900 font-medium">{plan.tenant_count || 0}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -1517,13 +1517,13 @@ export default function SuperAdminDashboard() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold text-white">Analytics & Billing</h2>
-                <p className="text-slate-400">Platform-wide revenue and performance metrics</p>
+                <h2 className="text-2xl font-bold text-gray-900">Analytics & Billing</h2>
+                <p className="text-gray-600">Platform-wide revenue and performance metrics</p>
               </div>
               <Button
                 onClick={fetchAnalytics}
                 variant="outline"
-                className="border-slate-600"
+                className="border-gray-300"
                 disabled={analyticsLoading}
               >
                 {analyticsLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RotateCcw className="w-4 h-4 mr-2" />}
@@ -1533,7 +1533,7 @@ export default function SuperAdminDashboard() {
 
             {analyticsLoading && !analytics ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+                <Loader2 className="w-8 h-8 animate-spin text-gray-600" />
               </div>
             ) : analytics ? (
               <>
@@ -1546,7 +1546,7 @@ export default function SuperAdminDashboard() {
                           <IndianRupee className="w-6 h-6 text-green-400" />
                         </div>
                         <div>
-                          <p className="text-3xl font-bold text-white">{formatCurrency(analytics.revenue?.total || 0)}</p>
+                          <p className="text-3xl font-bold text-gray-900">{formatCurrency(analytics.revenue?.total || 0)}</p>
                           <p className="text-sm text-green-400">Total Revenue</p>
                         </div>
                       </div>
@@ -1559,7 +1559,7 @@ export default function SuperAdminDashboard() {
                           <TrendingUp className="w-6 h-6 text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-3xl font-bold text-white">{formatCurrency(analytics.revenue?.monthly || 0)}</p>
+                          <p className="text-3xl font-bold text-gray-900">{formatCurrency(analytics.revenue?.monthly || 0)}</p>
                           <p className="text-sm text-blue-400">This Month</p>
                         </div>
                       </div>
@@ -1572,7 +1572,7 @@ export default function SuperAdminDashboard() {
                           <CreditCard className="w-6 h-6 text-purple-400" />
                         </div>
                         <div>
-                          <p className="text-3xl font-bold text-white">{analytics.recent_payments?.length || 0}</p>
+                          <p className="text-3xl font-bold text-gray-900">{analytics.recent_payments?.length || 0}</p>
                           <p className="text-sm text-purple-400">Recent Payments</p>
                         </div>
                       </div>
@@ -1581,9 +1581,9 @@ export default function SuperAdminDashboard() {
                 </div>
 
                 {/* Revenue by Month Chart */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-white border-gray-200">
                   <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-gray-900 flex items-center gap-2">
                       <BarChart3 className="w-5 h-5" />
                       Revenue by Month
                     </CardTitle>
@@ -1601,14 +1601,14 @@ export default function SuperAdminDashboard() {
                                 style={{ height: `${Math.max(height, 5)}%` }}
                                 title={`${month._id}: ${formatCurrency(month.revenue)}`}
                               />
-                              <span className="text-xs text-slate-400 transform -rotate-45 origin-center">
+                              <span className="text-xs text-gray-600 transform -rotate-45 origin-center">
                                 {month._id?.substring(5) || ''}
                               </span>
                             </div>
                           );
                         })
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <div className="w-full h-full flex items-center justify-center text-gray-600">
                           No revenue data available
                         </div>
                       )}
@@ -1618,9 +1618,9 @@ export default function SuperAdminDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Plan Distribution */}
-                  <Card className="bg-slate-800 border-slate-700">
+                  <Card className="bg-white border-gray-200">
                     <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
+                      <CardTitle className="text-gray-900 flex items-center gap-2">
                         <PieChart className="w-5 h-5" />
                         Plan Distribution
                       </CardTitle>
@@ -1642,8 +1642,8 @@ export default function SuperAdminDashboard() {
                                   style={{ width: `${percentage}%` }}
                                 />
                               </div>
-                              <span className="text-white font-medium w-12 text-right">{item.count}</span>
-                              <span className="text-slate-400 text-sm w-12 text-right">{percentage}%</span>
+                              <span className="text-gray-900 font-medium w-12 text-right">{item.count}</span>
+                              <span className="text-gray-600 text-sm w-12 text-right">{percentage}%</span>
                             </div>
                           );
                         })}
@@ -1652,9 +1652,9 @@ export default function SuperAdminDashboard() {
                   </Card>
 
                   {/* Payment Mode Distribution */}
-                  <Card className="bg-slate-800 border-slate-700">
+                  <Card className="bg-white border-gray-200">
                     <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
+                      <CardTitle className="text-gray-900 flex items-center gap-2">
                         <CreditCard className="w-5 h-5" />
                         Revenue by Payment Mode
                       </CardTitle>
@@ -1668,16 +1668,16 @@ export default function SuperAdminDashboard() {
                                 <div className="w-8 h-8 bg-slate-600/50 rounded-lg flex items-center justify-center">
                                   {item._id === 'upi' ? '📱' : item._id === 'cash' ? '💵' : item._id === 'card' ? '💳' : '🏦'}
                                 </div>
-                                <span className="text-white capitalize">{item._id || 'Other'}</span>
+                                <span className="text-gray-900 capitalize">{item._id || 'Other'}</span>
                               </div>
                               <div className="text-right">
-                                <p className="text-white font-medium">{formatCurrency(item.total)}</p>
-                                <p className="text-xs text-slate-400">{item.count} payments</p>
+                                <p className="text-gray-900 font-medium">{formatCurrency(item.total)}</p>
+                                <p className="text-xs text-gray-600">{item.count} payments</p>
                               </div>
                             </div>
                           ))
                         ) : (
-                          <p className="text-slate-400 text-center py-4">No payment data available</p>
+                          <p className="text-gray-600 text-center py-4">No payment data available</p>
                         )}
                       </div>
                     </CardContent>
@@ -1687,9 +1687,9 @@ export default function SuperAdminDashboard() {
                 {/* Recent Payments & Expiring Subscriptions */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Recent Payments */}
-                  <Card className="bg-slate-800 border-slate-700">
+                  <Card className="bg-white border-gray-200">
                     <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
+                      <CardTitle className="text-gray-900 flex items-center gap-2">
                         <History className="w-5 h-5" />
                         Recent Payments
                       </CardTitle>
@@ -1700,8 +1700,8 @@ export default function SuperAdminDashboard() {
                           analytics.recent_payments.map((payment, index) => (
                             <div key={index} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
                               <div>
-                                <p className="text-white font-medium">{payment.company_name}</p>
-                                <p className="text-xs text-slate-400">
+                                <p className="text-gray-900 font-medium">{payment.company_name}</p>
+                                <p className="text-xs text-gray-600">
                                   {payment.payment_mode?.charAt(0).toUpperCase() + payment.payment_mode?.slice(1)} • {formatDate(payment.created_at)}
                                 </p>
                               </div>
@@ -1709,16 +1709,16 @@ export default function SuperAdminDashboard() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-slate-400 text-center py-4">No recent payments</p>
+                          <p className="text-gray-600 text-center py-4">No recent payments</p>
                         )}
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Expiring Subscriptions */}
-                  <Card className="bg-slate-800 border-slate-700">
+                  <Card className="bg-white border-gray-200">
                     <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
+                      <CardTitle className="text-gray-900 flex items-center gap-2">
                         <AlertTriangle className="w-5 h-5 text-yellow-400" />
                         Expiring Soon (30 days)
                       </CardTitle>
@@ -1729,8 +1729,8 @@ export default function SuperAdminDashboard() {
                           analytics.tenants.expiring_soon.map((tenant, index) => (
                             <div key={index} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
                               <div>
-                                <p className="text-white font-medium">{tenant.company_name}</p>
-                                <p className="text-xs text-slate-400">{tenant.subdomain}.aftersales.pro</p>
+                                <p className="text-gray-900 font-medium">{tenant.company_name}</p>
+                                <p className="text-xs text-gray-600">{tenant.subdomain}.aftersales.pro</p>
                               </div>
                               <div className="text-right">
                                 <Badge className={getPlanColor(tenant.subscription_plan)}>
@@ -1741,7 +1741,7 @@ export default function SuperAdminDashboard() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-slate-400 text-center py-4">No subscriptions expiring soon</p>
+                          <p className="text-gray-600 text-center py-4">No subscriptions expiring soon</p>
                         )}
                       </div>
                     </CardContent>
@@ -1749,9 +1749,9 @@ export default function SuperAdminDashboard() {
                 </div>
 
                 {/* Top Tenants by Jobs */}
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-white border-gray-200">
                   <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
+                    <CardTitle className="text-gray-900 flex items-center gap-2">
                       <Store className="w-5 h-5" />
                       Top Shops by Jobs
                     </CardTitle>
@@ -1761,12 +1761,12 @@ export default function SuperAdminDashboard() {
                       {analytics.tenants?.top_by_jobs?.slice(0, 5).map((tenant, index) => (
                         <div key={index} className="bg-slate-700/50 rounded-lg p-4 text-center">
                           <div className="w-12 h-12 bg-slate-600/50 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <span className="text-xl font-bold text-white">#{index + 1}</span>
+                            <span className="text-xl font-bold text-gray-900">#{index + 1}</span>
                           </div>
-                          <p className="text-white font-medium truncate">{tenant.company_name}</p>
-                          <p className="text-xs text-slate-400 truncate">{tenant.subdomain}</p>
+                          <p className="text-gray-900 font-medium truncate">{tenant.company_name}</p>
+                          <p className="text-xs text-gray-600 truncate">{tenant.subdomain}</p>
                           <p className="text-2xl font-bold text-blue-400 mt-2">{tenant.job_count}</p>
-                          <p className="text-xs text-slate-400">jobs</p>
+                          <p className="text-xs text-gray-600">jobs</p>
                         </div>
                       ))}
                     </div>
@@ -1774,7 +1774,7 @@ export default function SuperAdminDashboard() {
                 </Card>
               </>
             ) : (
-              <div className="text-center py-12 text-slate-400">
+              <div className="text-center py-12 text-gray-600">
                 <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>Click Refresh to load analytics data</p>
               </div>
@@ -1787,8 +1787,8 @@ export default function SuperAdminDashboard() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold text-white">Broadcast Announcements</h2>
-                <p className="text-slate-400">Send announcements to all shops or specific groups</p>
+                <h2 className="text-2xl font-bold text-gray-900">Broadcast Announcements</h2>
+                <p className="text-gray-600">Send announcements to all shops or specific groups</p>
               </div>
               <Button
                 onClick={() => setShowCreateAnnouncement(true)}
@@ -1803,16 +1803,16 @@ export default function SuperAdminDashboard() {
             {/* Announcements List */}
             <div className="grid gap-4">
               {announcements.length === 0 ? (
-                <Card className="bg-slate-800 border-slate-700">
+                <Card className="bg-white border-gray-200">
                   <CardContent className="py-12 text-center">
                     <Megaphone className="w-12 h-12 mx-auto mb-4 text-slate-500" />
-                    <p className="text-slate-400">No announcements yet</p>
+                    <p className="text-gray-600">No announcements yet</p>
                     <p className="text-sm text-slate-500 mt-1">Create your first announcement to broadcast to shops</p>
                   </CardContent>
                 </Card>
               ) : (
                 announcements.map((announcement) => (
-                  <Card key={announcement.id} className="bg-slate-800 border-slate-700">
+                  <Card key={announcement.id} className="bg-white border-gray-200">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -1825,12 +1825,12 @@ export default function SuperAdminDashboard() {
                             }>
                               {announcement.type?.charAt(0).toUpperCase() + announcement.type?.slice(1)}
                             </Badge>
-                            <Badge variant="outline" className="text-slate-400">
+                            <Badge variant="outline" className="text-gray-600">
                               {announcement.target === "all" ? "All Shops" : announcement.target}
                             </Badge>
                           </div>
-                          <h3 className="text-lg font-medium text-white">{announcement.title}</h3>
-                          <p className="text-slate-400 mt-1">{announcement.content}</p>
+                          <h3 className="text-lg font-medium text-gray-900">{announcement.title}</h3>
+                          <p className="text-gray-600 mt-1">{announcement.content}</p>
                           <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
                             <span>Created: {formatDate(announcement.created_at)}</span>
                             {announcement.expires_at && (
@@ -1860,12 +1860,12 @@ export default function SuperAdminDashboard() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-bold text-white">Support Tickets</h2>
-                <p className="text-slate-400">Manage support requests from shops</p>
+                <h2 className="text-2xl font-bold text-gray-900">Support Tickets</h2>
+                <p className="text-gray-600">Manage support requests from shops</p>
               </div>
               <div className="flex gap-2">
                 <Select value={ticketFilter} onValueChange={(v) => { setTicketFilter(v); fetchTickets(); }}>
-                  <SelectTrigger className="w-32 bg-slate-700 border-slate-600 text-white">
+                  <SelectTrigger className="w-32 bg-slate-700 border-gray-300 text-gray-900">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1875,7 +1875,7 @@ export default function SuperAdminDashboard() {
                     <SelectItem value="closed">Closed</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button onClick={fetchTickets} variant="outline" className="border-slate-600">
+                <Button onClick={fetchTickets} variant="outline" className="border-gray-300">
                   <RotateCcw className="w-4 h-4" />
                 </Button>
               </div>
@@ -1885,10 +1885,10 @@ export default function SuperAdminDashboard() {
               {/* Tickets List */}
               <div className="space-y-3">
                 {tickets.length === 0 ? (
-                  <Card className="bg-slate-800 border-slate-700">
+                  <Card className="bg-white border-gray-200">
                     <CardContent className="py-12 text-center">
                       <Ticket className="w-12 h-12 mx-auto mb-4 text-slate-500" />
-                      <p className="text-slate-400">No support tickets</p>
+                      <p className="text-gray-600">No support tickets</p>
                       <p className="text-sm text-slate-500 mt-1">Tickets from shops will appear here</p>
                     </CardContent>
                   </Card>
@@ -1896,7 +1896,7 @@ export default function SuperAdminDashboard() {
                   tickets.map((ticket) => (
                     <Card 
                       key={ticket.id} 
-                      className={`bg-slate-800 border-slate-700 cursor-pointer transition-all hover:border-slate-500 ${selectedTicket?.id === ticket.id ? 'ring-2 ring-blue-500' : ''}`}
+                      className={`bg-white border-gray-200 cursor-pointer transition-all hover:border-slate-500 ${selectedTicket?.id === ticket.id ? 'ring-2 ring-blue-500' : ''}`}
                       onClick={() => setSelectedTicket(ticket)}
                     >
                       <CardContent className="p-4">
@@ -1904,7 +1904,7 @@ export default function SuperAdminDashboard() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <Badge className={
-                                ticket.status === "closed" ? "bg-slate-600/20 text-slate-400" :
+                                ticket.status === "closed" ? "bg-slate-600/20 text-gray-600" :
                                 ticket.status === "in_progress" ? "bg-yellow-600/20 text-yellow-400" :
                                 "bg-green-600/20 text-green-400"
                               }>
@@ -1912,8 +1912,8 @@ export default function SuperAdminDashboard() {
                               </Badge>
                               <span className="text-xs text-slate-500">{ticket.company_name}</span>
                             </div>
-                            <h4 className="font-medium text-white">{ticket.subject}</h4>
-                            <p className="text-sm text-slate-400 mt-1 line-clamp-2">{ticket.message}</p>
+                            <h4 className="font-medium text-gray-900">{ticket.subject}</h4>
+                            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{ticket.message}</p>
                             <p className="text-xs text-slate-500 mt-2">{formatDate(ticket.created_at)}</p>
                           </div>
                         </div>
@@ -1925,12 +1925,12 @@ export default function SuperAdminDashboard() {
 
               {/* Selected Ticket Detail */}
               {selectedTicket && (
-                <Card className="bg-slate-800 border-slate-700 h-fit sticky top-20">
-                  <CardHeader className="border-b border-slate-700">
+                <Card className="bg-white border-gray-200 h-fit sticky top-20">
+                  <CardHeader className="border-b border-gray-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle className="text-white">{selectedTicket.subject}</CardTitle>
-                        <p className="text-sm text-slate-400 mt-1">
+                        <CardTitle className="text-gray-900">{selectedTicket.subject}</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">
                           From: {selectedTicket.company_name} ({selectedTicket.subdomain}.aftersales.pro)
                         </p>
                       </div>
@@ -1938,7 +1938,7 @@ export default function SuperAdminDashboard() {
                         size="sm"
                         variant="ghost"
                         onClick={() => setSelectedTicket(null)}
-                        className="text-slate-400"
+                        className="text-gray-600"
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -1946,21 +1946,21 @@ export default function SuperAdminDashboard() {
                   </CardHeader>
                   <CardContent className="p-4 space-y-4">
                     {/* Original Message */}
-                    <div className="bg-slate-900/50 rounded-lg p-4">
-                      <p className="text-slate-300">{selectedTicket.message}</p>
+                    <div className="bg-gray-50/50 rounded-lg p-4">
+                      <p className="text-gray-700">{selectedTicket.message}</p>
                       <p className="text-xs text-slate-500 mt-2">{formatDate(selectedTicket.created_at)}</p>
                     </div>
 
                     {/* Replies */}
                     {selectedTicket.replies?.length > 0 && (
                       <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-slate-400">Replies</h4>
+                        <h4 className="text-sm font-medium text-gray-600">Replies</h4>
                         {selectedTicket.replies.map((reply, idx) => (
                           <div 
                             key={idx} 
                             className={`rounded-lg p-3 ${reply.from === "admin" ? "bg-blue-900/20 border border-blue-600/30 ml-4" : "bg-slate-700/50 mr-4"}`}
                           >
-                            <p className="text-sm text-slate-300">{reply.message}</p>
+                            <p className="text-sm text-gray-700">{reply.message}</p>
                             <p className="text-xs text-slate-500 mt-1">
                               {reply.from === "admin" ? "Super Admin" : "Shop"} • {formatDate(reply.created_at)}
                             </p>
@@ -1976,7 +1976,7 @@ export default function SuperAdminDashboard() {
                           value={ticketReply}
                           onChange={(e) => setTicketReply(e.target.value)}
                           placeholder="Type your reply..."
-                          className="bg-slate-700 border-slate-600 min-h-[100px]"
+                          className="bg-slate-700 border-gray-300 min-h-[100px]"
                         />
                         <div className="flex justify-between">
                           <Button
@@ -1999,7 +1999,7 @@ export default function SuperAdminDashboard() {
                     )}
 
                     {selectedTicket.status === "closed" && (
-                      <div className="text-center py-4 text-slate-400">
+                      <div className="text-center py-4 text-gray-600">
                         <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-500" />
                         <p>This ticket has been closed</p>
                       </div>
@@ -2015,18 +2015,18 @@ export default function SuperAdminDashboard() {
         {activeTab === "settings" && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-white">Platform Settings</h2>
-              <p className="text-slate-400">Manage global platform configuration</p>
+              <h2 className="text-2xl font-bold text-gray-900">Platform Settings</h2>
+              <p className="text-gray-600">Manage global platform configuration</p>
             </div>
 
             {/* Legal Pages Section */}
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-gray-900 flex items-center gap-2">
                   <FileText className="w-5 h-5" />
                   Legal & Compliance Pages
                 </CardTitle>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-gray-600">
                   Manage default legal pages for all tenants. Individual shops can customize these in their settings.
                 </p>
               </CardHeader>
@@ -2041,11 +2041,11 @@ export default function SuperAdminDashboard() {
                       >
                         <div className="flex items-start gap-3">
                           <div className="w-10 h-10 bg-slate-600/50 rounded-lg flex items-center justify-center">
-                            <Icon className="w-5 h-5 text-slate-300" />
+                            <Icon className="w-5 h-5 text-gray-700" />
                           </div>
                           <div>
-                            <h4 className="font-medium text-white">{page.title}</h4>
-                            <p className="text-xs text-slate-400 mt-1">
+                            <h4 className="font-medium text-gray-900">{page.title}</h4>
+                            <p className="text-xs text-gray-600 mt-1">
                               {legalPages[page.key] ? `${legalPages[page.key].length} characters` : "Not configured"}
                             </p>
                           </div>
@@ -2055,7 +2055,7 @@ export default function SuperAdminDashboard() {
                             size="sm"
                             variant="outline"
                             onClick={() => handleEditLegalPage(page)}
-                            className="border-slate-600"
+                            className="border-gray-300"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -2064,7 +2064,7 @@ export default function SuperAdminDashboard() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <Button size="sm" variant="ghost" className="text-slate-400">
+                            <Button size="sm" variant="ghost" className="text-gray-600">
                               <ExternalLink className="w-4 h-4" />
                             </Button>
                           </a>
@@ -2075,8 +2075,8 @@ export default function SuperAdminDashboard() {
                 </div>
                 
                 {/* Public URLs Info */}
-                <div className="mt-6 bg-slate-900/50 rounded-lg p-4">
-                  <p className="text-sm font-medium text-slate-400 mb-2">Public URLs:</p>
+                <div className="mt-6 bg-gray-50/50 rounded-lg p-4">
+                  <p className="text-sm font-medium text-gray-600 mb-2">Public URLs:</p>
                   <div className="flex flex-wrap gap-2">
                     {LEGAL_PAGES.map((page) => (
                       <a
@@ -2084,7 +2084,7 @@ export default function SuperAdminDashboard() {
                         href={`/legal/${page.key}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-1.5 rounded-full"
+                        className="text-xs bg-slate-700 hover:bg-slate-600 text-gray-700 px-3 py-1.5 rounded-full"
                       >
                         /legal/{page.key}
                       </a>
@@ -2095,13 +2095,13 @@ export default function SuperAdminDashboard() {
             </Card>
 
             {/* Email Service Settings */}
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-gray-900 flex items-center gap-2">
                   <Mail className="w-5 h-5" />
                   Email Service (Resend)
                 </CardTitle>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-gray-600">
                   Configure Resend API for sending transactional emails (welcome, password reset, invoices)
                 </p>
               </CardHeader>
@@ -2119,7 +2119,7 @@ export default function SuperAdminDashboard() {
                     )}
                   </Badge>
                   {emailSettings.resend_configured && (
-                    <span className="text-sm text-slate-400">
+                    <span className="text-sm text-gray-600">
                       API Key: {emailSettings.resend_api_key_masked}
                     </span>
                   )}
@@ -2135,7 +2135,7 @@ export default function SuperAdminDashboard() {
                         value={emailSettingsForm.resend_api_key}
                         onChange={(e) => setEmailSettingsForm({ ...emailSettingsForm, resend_api_key: e.target.value })}
                         placeholder="re_xxxxxxxx_xxxxxxxxxxxxxxxxxxxx"
-                        className="bg-slate-700 border-slate-600 font-mono"
+                        className="bg-slate-700 border-gray-300 font-mono"
                         data-testid="resend-api-key-input"
                       />
                       <Button 
@@ -2153,7 +2153,7 @@ export default function SuperAdminDashboard() {
                     <Button 
                       variant="outline" 
                       onClick={() => setShowApiKeyInput(true)}
-                      className="border-slate-600"
+                      className="border-gray-300"
                       data-testid="change-api-key-btn"
                     >
                       {emailSettings.resend_configured ? "Change API Key" : "Add API Key"}
@@ -2173,7 +2173,7 @@ export default function SuperAdminDashboard() {
                       value={emailSettingsForm.sender_email}
                       onChange={(e) => setEmailSettingsForm({ ...emailSettingsForm, sender_email: e.target.value })}
                       placeholder="AfterSales.pro <noreply@yourdomain.com>"
-                      className="bg-slate-700 border-slate-600"
+                      className="bg-slate-700 border-gray-300"
                     />
                     <p className="text-xs text-slate-500">Format: Display Name &lt;email@domain.com&gt;</p>
                   </div>
@@ -2184,7 +2184,7 @@ export default function SuperAdminDashboard() {
                       value={emailSettingsForm.admin_email}
                       onChange={(e) => setEmailSettingsForm({ ...emailSettingsForm, admin_email: e.target.value })}
                       placeholder="admin@aftersales.pro"
-                      className="bg-slate-700 border-slate-600"
+                      className="bg-slate-700 border-gray-300"
                     />
                     <p className="text-xs text-slate-500">Receives platform alerts</p>
                   </div>
@@ -2208,7 +2208,7 @@ export default function SuperAdminDashboard() {
                       variant="outline"
                       onClick={handleTestEmail}
                       disabled={testEmailLoading}
-                      className="border-slate-600"
+                      className="border-gray-300"
                       data-testid="test-email-btn"
                     >
                       {testEmailLoading ? (
@@ -2223,9 +2223,9 @@ export default function SuperAdminDashboard() {
             </Card>
 
             {/* Platform Info */}
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-gray-900 flex items-center gap-2">
                   <Shield className="w-5 h-5" />
                   Platform Information
                 </CardTitle>
@@ -2233,33 +2233,33 @@ export default function SuperAdminDashboard() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <p className="text-2xl font-bold text-white">{plans.length}</p>
-                    <p className="text-sm text-slate-400">Active Plans</p>
+                    <p className="text-2xl font-bold text-gray-900">{plans.length}</p>
+                    <p className="text-sm text-gray-600">Active Plans</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <p className="text-2xl font-bold text-white">{tenants.length}</p>
-                    <p className="text-sm text-slate-400">Total Tenants</p>
+                    <p className="text-2xl font-bold text-gray-900">{tenants.length}</p>
+                    <p className="text-sm text-gray-600">Total Tenants</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <p className="text-2xl font-bold text-white">{stats?.total_users || 0}</p>
-                    <p className="text-sm text-slate-400">Total Users</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats?.total_users || 0}</p>
+                    <p className="text-sm text-gray-600">Total Users</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <p className="text-2xl font-bold text-white">{stats?.total_jobs || 0}</p>
-                    <p className="text-sm text-slate-400">Total Jobs</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats?.total_jobs || 0}</p>
+                    <p className="text-sm text-gray-600">Total Jobs</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Change Admin Password */}
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-white border-gray-200">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-gray-900 flex items-center gap-2">
                   <Key className="w-5 h-5" />
                   Change Your Password
                 </CardTitle>
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-gray-600">
                   Update your Super Admin account password
                 </p>
               </CardHeader>
@@ -2273,12 +2273,12 @@ export default function SuperAdminDashboard() {
                         value={adminPasswordForm.currentPassword}
                         onChange={(e) => setAdminPasswordForm({ ...adminPasswordForm, currentPassword: e.target.value })}
                         placeholder="Enter current password"
-                        className="bg-slate-700 border-slate-600 pr-10"
+                        className="bg-slate-700 border-gray-300 pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowAdminPasswords({ ...showAdminPasswords, current: !showAdminPasswords.current })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
                       >
                         {showAdminPasswords.current ? <X className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -2292,12 +2292,12 @@ export default function SuperAdminDashboard() {
                         value={adminPasswordForm.newPassword}
                         onChange={(e) => setAdminPasswordForm({ ...adminPasswordForm, newPassword: e.target.value })}
                         placeholder="Min 6 characters"
-                        className="bg-slate-700 border-slate-600 pr-10"
+                        className="bg-slate-700 border-gray-300 pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowAdminPasswords({ ...showAdminPasswords, new: !showAdminPasswords.new })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
                       >
                         {showAdminPasswords.new ? <X className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -2311,12 +2311,12 @@ export default function SuperAdminDashboard() {
                         value={adminPasswordForm.confirmPassword}
                         onChange={(e) => setAdminPasswordForm({ ...adminPasswordForm, confirmPassword: e.target.value })}
                         placeholder="Confirm password"
-                        className="bg-slate-700 border-slate-600 pr-10"
+                        className="bg-slate-700 border-gray-300 pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowAdminPasswords({ ...showAdminPasswords, confirm: !showAdminPasswords.confirm })}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900"
                       >
                         {showAdminPasswords.confirm ? <X className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -2348,7 +2348,7 @@ export default function SuperAdminDashboard() {
 
       {/* Legal Page Edit Modal */}
       <Dialog open={!!editingLegalPage} onOpenChange={() => setEditingLegalPage(null)}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {editingLegalPage && <editingLegalPage.icon className="w-5 h-5 text-red-500" />}
@@ -2367,7 +2367,7 @@ export default function SuperAdminDashboard() {
                 <div className="flex items-center justify-between">
                   <Label>Content (Markdown supported)</Label>
                   <div className="flex items-center gap-2">
-                    <Label className="text-sm text-slate-400">Page Enabled</Label>
+                    <Label className="text-sm text-gray-600">Page Enabled</Label>
                     <Switch
                       checked={legalEditEnabled}
                       onCheckedChange={setLegalEditEnabled}
@@ -2377,20 +2377,20 @@ export default function SuperAdminDashboard() {
                 <Textarea
                   value={legalEditContent}
                   onChange={(e) => setLegalEditContent(e.target.value)}
-                  className="flex-1 min-h-[400px] bg-slate-900 border-slate-600 font-mono text-sm resize-none"
+                  className="flex-1 min-h-[400px] bg-gray-50 border-gray-300 font-mono text-sm resize-none"
                   placeholder="Enter page content in Markdown format..."
                 />
               </div>
             </TabsContent>
             
             <TabsContent value="preview" className="flex-1 overflow-auto mt-0">
-              <div className="bg-slate-900 rounded-lg p-6 min-h-[400px] prose prose-invert prose-slate max-w-none prose-headings:text-white prose-h1:text-xl prose-h2:text-lg prose-p:text-slate-300 prose-li:text-slate-300 prose-strong:text-white">
+              <div className="bg-gray-50 rounded-lg p-6 min-h-[400px] prose prose-invert prose-slate max-w-none prose-headings:text-gray-900 prose-h1:text-xl prose-h2:text-lg prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:text-gray-900">
                 <ReactMarkdown>{legalEditContent}</ReactMarkdown>
               </div>
             </TabsContent>
           </Tabs>
           
-          <div className="flex justify-end gap-2 pt-4 border-t border-slate-700">
+          <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
             <Button variant="ghost" onClick={() => setEditingLegalPage(null)}>
               Cancel
             </Button>
@@ -2408,7 +2408,7 @@ export default function SuperAdminDashboard() {
 
       {/* Create/Edit Plan Modal */}
       <Dialog open={showCreatePlan || showEditPlan} onOpenChange={() => { setShowCreatePlan(false); setShowEditPlan(false); setEditingPlan(null); }}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingPlan ? "Edit Plan" : "Create New Plan"}</DialogTitle>
           </DialogHeader>
@@ -2421,7 +2421,7 @@ export default function SuperAdminDashboard() {
                   value={planForm.id}
                   onChange={(e) => setPlanForm({ ...planForm, id: e.target.value.toLowerCase().replace(/\s+/g, '_') })}
                   placeholder="e.g., starter, growth"
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                   disabled={!!editingPlan}
                 />
               </div>
@@ -2431,7 +2431,7 @@ export default function SuperAdminDashboard() {
                   value={planForm.name}
                   onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
                   placeholder="e.g., Starter Plan"
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
             </div>
@@ -2442,7 +2442,7 @@ export default function SuperAdminDashboard() {
                 value={planForm.description}
                 onChange={(e) => setPlanForm({ ...planForm, description: e.target.value })}
                 placeholder="Brief description of this plan..."
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
 
@@ -2454,7 +2454,7 @@ export default function SuperAdminDashboard() {
                   type="number"
                   value={planForm.price}
                   onChange={(e) => setPlanForm({ ...planForm, price: parseFloat(e.target.value) || 0 })}
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
               <div className="space-y-2">
@@ -2463,7 +2463,7 @@ export default function SuperAdminDashboard() {
                   value={planForm.billing_cycle}
                   onValueChange={(value) => setPlanForm({ ...planForm, billing_cycle: value })}
                 >
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className="bg-slate-700 border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -2479,7 +2479,7 @@ export default function SuperAdminDashboard() {
                   type="number"
                   value={planForm.duration_days}
                   onChange={(e) => setPlanForm({ ...planForm, duration_days: parseInt(e.target.value) || 30 })}
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
             </div>
@@ -2487,7 +2487,7 @@ export default function SuperAdminDashboard() {
             {/* Limits */}
             <div>
               <Label className="text-lg">Limits</Label>
-              <p className="text-sm text-slate-400 mb-3">Set -1 for unlimited</p>
+              <p className="text-sm text-gray-600 mb-3">Set -1 for unlimited</p>
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
@@ -2497,7 +2497,7 @@ export default function SuperAdminDashboard() {
                     type="number"
                     value={planForm.max_users}
                     onChange={(e) => setPlanForm({ ...planForm, max_users: parseInt(e.target.value) })}
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-gray-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -2508,7 +2508,7 @@ export default function SuperAdminDashboard() {
                     type="number"
                     value={planForm.max_branches}
                     onChange={(e) => setPlanForm({ ...planForm, max_branches: parseInt(e.target.value) })}
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-gray-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -2519,7 +2519,7 @@ export default function SuperAdminDashboard() {
                     type="number"
                     value={planForm.max_jobs_per_month}
                     onChange={(e) => setPlanForm({ ...planForm, max_jobs_per_month: parseInt(e.target.value) })}
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-gray-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -2530,7 +2530,7 @@ export default function SuperAdminDashboard() {
                     type="number"
                     value={planForm.max_inventory_items}
                     onChange={(e) => setPlanForm({ ...planForm, max_inventory_items: parseInt(e.target.value) })}
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-gray-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -2541,7 +2541,7 @@ export default function SuperAdminDashboard() {
                     type="number"
                     value={planForm.max_photos_per_job}
                     onChange={(e) => setPlanForm({ ...planForm, max_photos_per_job: parseInt(e.target.value) })}
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-gray-300"
                   />
                 </div>
                 <div className="space-y-2">
@@ -2552,7 +2552,7 @@ export default function SuperAdminDashboard() {
                     type="number"
                     value={planForm.max_storage_mb}
                     onChange={(e) => setPlanForm({ ...planForm, max_storage_mb: parseInt(e.target.value) })}
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-gray-300"
                   />
                 </div>
               </div>
@@ -2561,7 +2561,7 @@ export default function SuperAdminDashboard() {
             {/* Features */}
             <div>
               <Label className="text-lg">Features</Label>
-              <p className="text-sm text-slate-400 mb-3">Toggle features available in this plan</p>
+              <p className="text-sm text-gray-600 mb-3">Toggle features available in this plan</p>
               <div className="grid grid-cols-2 gap-3">
                 {Object.entries(FEATURE_LABELS).map(([key, label]) => (
                   <div key={key} data-testid={`plan-feature-row-${key}`} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
@@ -2587,7 +2587,7 @@ export default function SuperAdminDashboard() {
                   type="number"
                   value={planForm.sort_order}
                   onChange={(e) => setPlanForm({ ...planForm, sort_order: parseInt(e.target.value) || 99 })}
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
               <div className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
@@ -2611,7 +2611,7 @@ export default function SuperAdminDashboard() {
                   onCheckedChange={(checked) => setPlanForm({ ...planForm, show_on_pricing: checked })}
                 />
               </div>
-              <div className="flex items-center text-sm text-slate-400 bg-slate-700/30 rounded-lg p-3">
+              <div className="flex items-center text-sm text-gray-600 bg-slate-700/30 rounded-lg p-3">
                 <span>When enabled, this plan will appear on the public pricing page for customers.</span>
               </div>
             </div>
@@ -2634,7 +2634,7 @@ export default function SuperAdminDashboard() {
 
       {/* Tenant Details Modal */}
       <Dialog open={!!selectedTenant} onOpenChange={() => setSelectedTenant(null)}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
               <Store className="w-5 h-5" />
@@ -2658,7 +2658,7 @@ export default function SuperAdminDashboard() {
 
           {detailsLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+              <Loader2 className="w-6 h-6 animate-spin text-gray-600" />
             </div>
           ) : tenantDetails ? (
             <Tabs defaultValue="overview" className="w-full">
@@ -2678,71 +2678,71 @@ export default function SuperAdminDashboard() {
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
                     <ClipboardList className="w-5 h-5 mx-auto mb-1 text-blue-400" />
                     <p className="text-2xl font-bold">{tenantDetails.stats.total_jobs}</p>
-                    <p className="text-xs text-slate-400">Total Jobs</p>
+                    <p className="text-xs text-gray-600">Total Jobs</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
                     <Users className="w-5 h-5 mx-auto mb-1 text-green-400" />
                     <p className="text-2xl font-bold">{tenantDetails.users.length}</p>
-                    <p className="text-xs text-slate-400">Team Members</p>
+                    <p className="text-xs text-gray-600">Team Members</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
                     <Building2 className="w-5 h-5 mx-auto mb-1 text-purple-400" />
                     <p className="text-2xl font-bold">{tenantDetails.branches.length}</p>
-                    <p className="text-xs text-slate-400">Branches</p>
+                    <p className="text-xs text-gray-600">Branches</p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-3 text-center">
                     <Package className="w-5 h-5 mx-auto mb-1 text-yellow-400" />
                     <p className="text-2xl font-bold">{tenantDetails.stats.total_inventory || 0}</p>
-                    <p className="text-xs text-slate-400">Inventory Items</p>
+                    <p className="text-xs text-gray-600">Inventory Items</p>
                   </div>
                 </div>
 
                 {/* Shop Info */}
                 <div className="grid grid-cols-2 gap-4">
-                  <Card className="bg-slate-700/30 border-slate-600">
+                  <Card className="bg-slate-700/30 border-gray-300">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-slate-400">Shop Details</CardTitle>
+                      <CardTitle className="text-sm text-gray-600">Shop Details</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Subdomain</span>
+                        <span className="text-gray-600">Subdomain</span>
                         <span className="font-medium">{tenantDetails.tenant.subdomain}.aftersales.pro</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Created</span>
+                        <span className="text-gray-600">Created</span>
                         <span className="font-medium">{formatDate(tenantDetails.tenant.created_at)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Email</span>
+                        <span className="text-gray-600">Email</span>
                         <span className="font-medium">{tenantDetails.tenant.settings?.email || "-"}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Phone</span>
+                        <span className="text-gray-600">Phone</span>
                         <span className="font-medium">{tenantDetails.tenant.settings?.phone || "-"}</span>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-slate-700/30 border-slate-600">
+                  <Card className="bg-slate-700/30 border-gray-300">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-slate-400">Subscription Info</CardTitle>
+                      <CardTitle className="text-sm text-gray-600">Subscription Info</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Plan</span>
+                        <span className="text-gray-600">Plan</span>
                         <Badge className={getPlanColor(tenantDetails.tenant.subscription_plan || "free")}>
                           {(tenantDetails.tenant.subscription_plan || "free").charAt(0).toUpperCase() + 
                            (tenantDetails.tenant.subscription_plan || "free").slice(1)}
                         </Badge>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Status</span>
+                        <span className="text-gray-600">Status</span>
                         <Badge className={tenantDetails.tenant.subscription_status === "paid" ? "bg-green-600/20 text-green-400" : "bg-yellow-600/20 text-yellow-400"}>
                           {tenantDetails.tenant.subscription_status === "paid" ? "Paid" : "Trial"}
                         </Badge>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">{tenantDetails.tenant.subscription_status === "paid" ? "Expires" : "Trial Ends"}</span>
+                        <span className="text-gray-600">{tenantDetails.tenant.subscription_status === "paid" ? "Expires" : "Trial Ends"}</span>
                         <span className="font-medium">
                           {tenantDetails.tenant.subscription_status === "paid"
                             ? formatDate(tenantDetails.tenant.subscription_ends_at)
@@ -2750,7 +2750,7 @@ export default function SuperAdminDashboard() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400">Total Payments</span>
+                        <span className="text-gray-600">Total Payments</span>
                         <span className="font-medium text-green-400">
                           {formatCurrency(tenantDetails.payments?.reduce((sum, p) => sum + p.amount, 0) || 0)}
                         </span>
@@ -2760,9 +2760,9 @@ export default function SuperAdminDashboard() {
                 </div>
 
                 {/* Branches List */}
-                <Card className="bg-slate-700/30 border-slate-600">
+                <Card className="bg-slate-700/30 border-gray-300">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-slate-400 flex items-center justify-between">
+                    <CardTitle className="text-sm text-gray-600 flex items-center justify-between">
                       <span>Branches</span>
                       <Badge variant="outline">{tenantDetails.branches.length}</Badge>
                     </CardTitle>
@@ -2771,10 +2771,10 @@ export default function SuperAdminDashboard() {
                     <div className="grid grid-cols-2 gap-2">
                       {tenantDetails.branches.map((branch) => (
                         <div key={branch.id} className="bg-slate-600/30 rounded-lg p-2 flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-slate-400" />
+                          <Building2 className="w-4 h-4 text-gray-600" />
                           <div>
                             <p className="font-medium text-sm">{branch.name}</p>
-                            {branch.address && <p className="text-xs text-slate-400">{branch.address}</p>}
+                            {branch.address && <p className="text-xs text-gray-600">{branch.address}</p>}
                           </div>
                         </div>
                       ))}
@@ -2783,7 +2783,7 @@ export default function SuperAdminDashboard() {
                 </Card>
 
                 {/* Quick Actions */}
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-700">
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
                   <Button
                     onClick={() => handleLoginAsShop(tenantDetails.tenant.id)}
                     disabled={actionLoading}
@@ -2796,11 +2796,11 @@ export default function SuperAdminDashboard() {
                     <Crown className="w-4 h-4 mr-2" />
                     Change Plan
                   </Button>
-                  <Button variant="outline" onClick={() => setShowExtendValidity(true)} className="border-slate-600">
+                  <Button variant="outline" onClick={() => setShowExtendValidity(true)} className="border-gray-300">
                     <Calendar className="w-4 h-4 mr-2" />
                     Extend Validity
                   </Button>
-                  <Button variant="outline" onClick={() => setShowRecordPayment(true)} className="border-slate-600">
+                  <Button variant="outline" onClick={() => setShowRecordPayment(true)} className="border-gray-300">
                     <CreditCard className="w-4 h-4 mr-2" />
                     Record Payment
                   </Button>
@@ -2837,9 +2837,9 @@ export default function SuperAdminDashboard() {
 
               {/* Settings Tab - NEW */}
               <TabsContent value="settings" className="space-y-6 mt-4">
-                <Card className="bg-slate-700/30 border-slate-600">
+                <Card className="bg-slate-700/30 border-gray-300">
                   <CardHeader>
-                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <CardTitle className="text-sm text-gray-900 flex items-center gap-2">
                       <Settings className="w-4 h-4" />
                       Shop Settings
                     </CardTitle>
@@ -2862,7 +2862,7 @@ export default function SuperAdminDashboard() {
                             disabled
                             className="bg-slate-600/50 border-slate-500"
                           />
-                          <span className="text-slate-400 text-sm">.aftersales.pro</span>
+                          <span className="text-gray-600 text-sm">.aftersales.pro</span>
                         </div>
                       </div>
                     </div>
@@ -2927,9 +2927,9 @@ export default function SuperAdminDashboard() {
                 </Card>
 
                 {/* Plan Limits & Usage */}
-                <Card className="bg-slate-700/30 border-slate-600">
+                <Card className="bg-slate-700/30 border-gray-300">
                   <CardHeader>
-                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <CardTitle className="text-sm text-gray-900 flex items-center gap-2">
                       <Database className="w-4 h-4" />
                       Plan Limits & Usage
                     </CardTitle>
@@ -2937,12 +2937,12 @@ export default function SuperAdminDashboard() {
                   <CardContent className="space-y-3">
                     {(() => {
                       const currentPlan = plans.find(p => p.id === (tenantDetails.tenant.subscription_plan || "free"));
-                      if (!currentPlan) return <p className="text-slate-400">No plan limits configured</p>;
+                      if (!currentPlan) return <p className="text-gray-600">No plan limits configured</p>;
                       return (
                         <div className="grid grid-cols-2 gap-3">
                           <div className="bg-slate-600/30 rounded-lg p-3">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm text-slate-400">Users</span>
+                              <span className="text-sm text-gray-600">Users</span>
                               <span className="text-sm">{tenantDetails.users.length} / {currentPlan.max_users}</span>
                             </div>
                             <div className="w-full bg-slate-600 rounded-full h-2">
@@ -2954,7 +2954,7 @@ export default function SuperAdminDashboard() {
                           </div>
                           <div className="bg-slate-600/30 rounded-lg p-3">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm text-slate-400">Branches</span>
+                              <span className="text-sm text-gray-600">Branches</span>
                               <span className="text-sm">{tenantDetails.branches.length} / {currentPlan.max_branches}</span>
                             </div>
                             <div className="w-full bg-slate-600 rounded-full h-2">
@@ -2966,7 +2966,7 @@ export default function SuperAdminDashboard() {
                           </div>
                           <div className="bg-slate-600/30 rounded-lg p-3">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm text-slate-400">Jobs/Month</span>
+                              <span className="text-sm text-gray-600">Jobs/Month</span>
                               <span className="text-sm">{tenantDetails.stats.this_month_jobs || 0} / {currentPlan.max_jobs_per_month}</span>
                             </div>
                             <div className="w-full bg-slate-600 rounded-full h-2">
@@ -2978,7 +2978,7 @@ export default function SuperAdminDashboard() {
                           </div>
                           <div className="bg-slate-600/30 rounded-lg p-3">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm text-slate-400">Inventory Items</span>
+                              <span className="text-sm text-gray-600">Inventory Items</span>
                               <span className="text-sm">{tenantDetails.stats.total_inventory || 0} / {currentPlan.max_inventory_items}</span>
                             </div>
                             <div className="w-full bg-slate-600 rounded-full h-2">
@@ -2995,13 +2995,13 @@ export default function SuperAdminDashboard() {
                 </Card>
 
                 {/* Trading Modules Control */}
-                <Card className="bg-slate-700/30 border-slate-600">
+                <Card className="bg-slate-700/30 border-gray-300">
                   <CardHeader>
-                    <CardTitle className="text-sm text-white flex items-center gap-2">
+                    <CardTitle className="text-sm text-gray-900 flex items-center gap-2">
                       <Package className="w-4 h-4" />
                       Trading Modules
                     </CardTitle>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-gray-600">
                       Control which trading modules this tenant can access
                     </p>
                   </CardHeader>
@@ -3013,8 +3013,8 @@ export default function SuperAdminDashboard() {
                             <Phone className="w-5 h-5 text-blue-400" />
                           </div>
                           <div>
-                            <p className="font-medium text-white">Mobile Phone Trading</p>
-                            <p className="text-xs text-slate-400">Buy/sell smartphones, tablets, smartwatches</p>
+                            <p className="font-medium text-gray-900">Mobile Phone Trading</p>
+                            <p className="text-xs text-gray-600">Buy/sell smartphones, tablets, smartwatches</p>
                           </div>
                         </div>
                         <Switch
@@ -3039,8 +3039,8 @@ export default function SuperAdminDashboard() {
                             <HardDrive className="w-5 h-5 text-purple-400" />
                           </div>
                           <div>
-                            <p className="font-medium text-white">IT Equipment Trading</p>
-                            <p className="text-xs text-slate-400">Buy/sell laptops, desktops, monitors, printers</p>
+                            <p className="font-medium text-gray-900">IT Equipment Trading</p>
+                            <p className="text-xs text-gray-600">Buy/sell laptops, desktops, monitors, printers</p>
                           </div>
                         </div>
                         <Switch
@@ -3066,13 +3066,13 @@ export default function SuperAdminDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium">Team Members</h3>
-                    <p className="text-sm text-slate-400">{tenantDetails.users.length} member(s) in this shop</p>
+                    <p className="text-sm text-gray-600">{tenantDetails.users.length} member(s) in this shop</p>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   {tenantDetails.users.map((user) => (
-                    <Card key={user.id} className="bg-slate-700/30 border-slate-600">
+                    <Card key={user.id} className="bg-slate-700/30 border-gray-300">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -3081,7 +3081,7 @@ export default function SuperAdminDashboard() {
                             </div>
                             <div>
                               <p className="font-medium">{user.name || "No name"}</p>
-                              <p className="text-sm text-slate-400">{user.email}</p>
+                              <p className="text-sm text-gray-600">{user.email}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -3105,17 +3105,17 @@ export default function SuperAdminDashboard() {
                             </Button>
                           </div>
                         </div>
-                        <div className="mt-3 pt-3 border-t border-slate-600 grid grid-cols-3 gap-4 text-sm">
+                        <div className="mt-3 pt-3 border-t border-gray-300 grid grid-cols-3 gap-4 text-sm">
                           <div>
-                            <span className="text-slate-400">Branch: </span>
+                            <span className="text-gray-600">Branch: </span>
                             <span>{tenantDetails.branches.find(b => b.id === user.branch_id)?.name || "All Branches"}</span>
                           </div>
                           <div>
-                            <span className="text-slate-400">Created: </span>
+                            <span className="text-gray-600">Created: </span>
                             <span>{formatDate(user.created_at)}</span>
                           </div>
                           <div>
-                            <span className="text-slate-400">ID: </span>
+                            <span className="text-gray-600">ID: </span>
                             <span className="font-mono text-xs">{user.id.substring(0, 8)}...</span>
                           </div>
                         </div>
@@ -3130,7 +3130,7 @@ export default function SuperAdminDashboard() {
                 <div className="bg-slate-700/30 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <p className="text-sm text-slate-400">Current Plan</p>
+                      <p className="text-sm text-gray-600">Current Plan</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge className={`${getPlanColor(tenantDetails.tenant.subscription_plan || "free")} text-lg px-3 py-1`}>
                           {getPlanIcon(tenantDetails.tenant.subscription_plan || "free")}
@@ -3144,7 +3144,7 @@ export default function SuperAdminDashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-gray-600">
                         {tenantDetails.tenant.subscription_status === "paid" ? "Expires" : "Trial Ends"}
                       </p>
                       <p className="text-lg font-medium">
@@ -3156,16 +3156,16 @@ export default function SuperAdminDashboard() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-4 border-t border-slate-700">
+                <div className="flex gap-2 pt-4 border-t border-gray-200">
                   <Button onClick={() => setShowAssignPlan(true)} className="bg-blue-600 hover:bg-blue-700">
                     <Crown className="w-4 h-4 mr-2" />
                     Assign Plan
                   </Button>
-                  <Button variant="outline" onClick={() => setShowExtendValidity(true)} className="border-slate-600">
+                  <Button variant="outline" onClick={() => setShowExtendValidity(true)} className="border-gray-300">
                     <Calendar className="w-4 h-4 mr-2" />
                     Extend Validity
                   </Button>
-                  <Button variant="outline" onClick={() => setShowRecordPayment(true)} className="border-slate-600">
+                  <Button variant="outline" onClick={() => setShowRecordPayment(true)} className="border-gray-300">
                     <IndianRupee className="w-4 h-4 mr-2" />
                     Record Payment
                   </Button>
@@ -3174,7 +3174,7 @@ export default function SuperAdminDashboard() {
 
               <TabsContent value="payments" className="space-y-4 mt-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-slate-400">Payment History</p>
+                  <p className="text-sm font-medium text-gray-600">Payment History</p>
                   <Button size="sm" onClick={() => setShowRecordPayment(true)} className="bg-green-600 hover:bg-green-700">
                     <Plus className="w-4 h-4 mr-1" />
                     Record Payment
@@ -3191,7 +3191,7 @@ export default function SuperAdminDashboard() {
                           </div>
                           <div>
                             <p className="font-medium">{formatCurrency(payment.amount)}</p>
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-gray-600">
                               {payment.payment_mode.charAt(0).toUpperCase() + payment.payment_mode.slice(1)}
                               {payment.reference_number && ` • ${payment.reference_number}`}
                             </p>
@@ -3203,13 +3203,13 @@ export default function SuperAdminDashboard() {
                               {payment.plan.charAt(0).toUpperCase() + payment.plan.slice(1)}
                             </Badge>
                           )}
-                          <p className="text-xs text-slate-400 mt-1">{formatDate(payment.created_at)}</p>
+                          <p className="text-xs text-gray-600 mt-1">{formatDate(payment.created_at)}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-slate-400">
+                  <div className="text-center py-8 text-gray-600">
                     <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-50" />
                     <p>No payments recorded yet</p>
                   </div>
@@ -3217,7 +3217,7 @@ export default function SuperAdminDashboard() {
               </TabsContent>
 
               <TabsContent value="history" className="space-y-4 mt-4">
-                <p className="text-sm font-medium text-slate-400">Admin Action Logs</p>
+                <p className="text-sm font-medium text-gray-600">Admin Action Logs</p>
                 
                 {tenantDetails.action_logs && tenantDetails.action_logs.length > 0 ? (
                   <div className="space-y-2">
@@ -3228,7 +3228,7 @@ export default function SuperAdminDashboard() {
                           {log.action === "validity_extended" && <Clock className="w-4 h-4 text-blue-400" />}
                           {log.action === "payment_recorded" && <IndianRupee className="w-4 h-4 text-green-400" />}
                           {!["plan_assigned", "validity_extended", "payment_recorded"].includes(log.action) && (
-                            <FileText className="w-4 h-4 text-slate-400" />
+                            <FileText className="w-4 h-4 text-gray-600" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -3237,8 +3237,8 @@ export default function SuperAdminDashboard() {
                             {log.action === "validity_extended" && `Validity extended by ${log.days} days`}
                             {log.action === "payment_recorded" && `Payment of ${formatCurrency(log.amount)} recorded`}
                           </p>
-                          {log.notes && <p className="text-sm text-slate-400">{log.notes}</p>}
-                          {log.reason && <p className="text-sm text-slate-400">Reason: {log.reason}</p>}
+                          {log.notes && <p className="text-sm text-gray-600">{log.notes}</p>}
+                          {log.reason && <p className="text-sm text-gray-600">Reason: {log.reason}</p>}
                           <p className="text-xs text-slate-500 mt-1">
                             By {log.performed_by_name} • {formatDate(log.created_at)}
                           </p>
@@ -3247,7 +3247,7 @@ export default function SuperAdminDashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-slate-400">
+                  <div className="text-center py-8 text-gray-600">
                     <History className="w-12 h-12 mx-auto mb-2 opacity-50" />
                     <p>No action logs yet</p>
                   </div>
@@ -3260,7 +3260,7 @@ export default function SuperAdminDashboard() {
 
       {/* Assign Plan Modal */}
       <Dialog open={showAssignPlan} onOpenChange={setShowAssignPlan}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-white border-gray-200 text-gray-900">
           <DialogHeader>
             <DialogTitle>Assign Subscription Plan</DialogTitle>
           </DialogHeader>
@@ -3271,7 +3271,7 @@ export default function SuperAdminDashboard() {
                 value={assignPlanForm.plan}
                 onValueChange={(value) => setAssignPlanForm({ ...assignPlanForm, plan: value })}
               >
-                <SelectTrigger className="bg-slate-700 border-slate-600">
+                <SelectTrigger className="bg-slate-700 border-gray-300">
                   <SelectValue placeholder="Choose a plan" />
                 </SelectTrigger>
                 <SelectContent>
@@ -3280,7 +3280,7 @@ export default function SuperAdminDashboard() {
                       <div className="flex items-center gap-2">
                         {getPlanIcon(plan.id)}
                         <span>{plan.name}</span>
-                        <span className="text-slate-400">
+                        <span className="text-gray-600">
                           {plan.price === 0 ? "(Free)" : `(${formatCurrency(plan.price)}/${plan.billing_cycle})`}
                         </span>
                       </div>
@@ -3297,7 +3297,7 @@ export default function SuperAdminDashboard() {
                   value={assignPlanForm.duration_months.toString()}
                   onValueChange={(value) => setAssignPlanForm({ ...assignPlanForm, duration_months: parseInt(value) })}
                 >
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className="bg-slate-700 border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -3316,7 +3316,7 @@ export default function SuperAdminDashboard() {
                 value={assignPlanForm.notes}
                 onChange={(e) => setAssignPlanForm({ ...assignPlanForm, notes: e.target.value })}
                 placeholder="Add any notes about this plan change..."
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
           </div>
@@ -3336,7 +3336,7 @@ export default function SuperAdminDashboard() {
 
       {/* Extend Validity Modal */}
       <Dialog open={showExtendValidity} onOpenChange={setShowExtendValidity}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-white border-gray-200 text-gray-900">
           <DialogHeader>
             <DialogTitle>Extend Validity</DialogTitle>
           </DialogHeader>
@@ -3347,7 +3347,7 @@ export default function SuperAdminDashboard() {
                 value={extendForm.days.toString()}
                 onValueChange={(value) => setExtendForm({ ...extendForm, days: parseInt(value) })}
               >
-                <SelectTrigger className="bg-slate-700 border-slate-600">
+                <SelectTrigger className="bg-slate-700 border-gray-300">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -3368,7 +3368,7 @@ export default function SuperAdminDashboard() {
                 value={extendForm.reason}
                 onChange={(e) => setExtendForm({ ...extendForm, reason: e.target.value })}
                 placeholder="Why is validity being extended?"
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
           </div>
@@ -3384,7 +3384,7 @@ export default function SuperAdminDashboard() {
 
       {/* Record Payment Modal */}
       <Dialog open={showRecordPayment} onOpenChange={setShowRecordPayment}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-white border-gray-200 text-gray-900">
           <DialogHeader>
             <DialogTitle>Record Offline Payment</DialogTitle>
           </DialogHeader>
@@ -3397,7 +3397,7 @@ export default function SuperAdminDashboard() {
                   value={paymentForm.amount}
                   onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
                   placeholder="0"
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
               <div className="space-y-2">
@@ -3406,7 +3406,7 @@ export default function SuperAdminDashboard() {
                   value={paymentForm.payment_mode}
                   onValueChange={(value) => setPaymentForm({ ...paymentForm, payment_mode: value })}
                 >
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className="bg-slate-700 border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -3426,7 +3426,7 @@ export default function SuperAdminDashboard() {
                 value={paymentForm.reference_number}
                 onChange={(e) => setPaymentForm({ ...paymentForm, reference_number: e.target.value })}
                 placeholder="Transaction ID, Cheque No., etc."
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
 
@@ -3437,7 +3437,7 @@ export default function SuperAdminDashboard() {
                   value={paymentForm.plan || "none"}
                   onValueChange={(value) => setPaymentForm({ ...paymentForm, plan: value === "none" ? "" : value })}
                 >
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className="bg-slate-700 border-gray-300">
                     <SelectValue placeholder="No plan change" />
                   </SelectTrigger>
                   <SelectContent>
@@ -3457,7 +3457,7 @@ export default function SuperAdminDashboard() {
                     value={paymentForm.duration_months.toString()}
                     onValueChange={(value) => setPaymentForm({ ...paymentForm, duration_months: parseInt(value) })}
                   >
-                    <SelectTrigger className="bg-slate-700 border-slate-600">
+                    <SelectTrigger className="bg-slate-700 border-gray-300">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -3477,7 +3477,7 @@ export default function SuperAdminDashboard() {
                 value={paymentForm.notes}
                 onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
                 placeholder="Any additional notes..."
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
           </div>
@@ -3497,7 +3497,7 @@ export default function SuperAdminDashboard() {
 
       {/* Create Shop Modal */}
       <Dialog open={showCreateShop} onOpenChange={setShowCreateShop}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Store className="w-5 h-5 text-green-500" />
@@ -3512,7 +3512,7 @@ export default function SuperAdminDashboard() {
                   value={createShopForm.company_name}
                   onChange={(e) => setCreateShopForm({ ...createShopForm, company_name: e.target.value })}
                   placeholder="ABC Repairs"
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
               <div className="space-y-2">
@@ -3522,9 +3522,9 @@ export default function SuperAdminDashboard() {
                     value={createShopForm.subdomain}
                     onChange={(e) => setCreateShopForm({ ...createShopForm, subdomain: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') })}
                     placeholder="abcrepairs"
-                    className="bg-slate-700 border-slate-600"
+                    className="bg-slate-700 border-gray-300"
                   />
-                  <span className="text-slate-400 text-sm whitespace-nowrap">.aftersales.pro</span>
+                  <span className="text-gray-600 text-sm whitespace-nowrap">.aftersales.pro</span>
                 </div>
               </div>
             </div>
@@ -3536,7 +3536,7 @@ export default function SuperAdminDashboard() {
                   value={createShopForm.admin_name}
                   onChange={(e) => setCreateShopForm({ ...createShopForm, admin_name: e.target.value })}
                   placeholder="John Doe"
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
               <div className="space-y-2">
@@ -3546,7 +3546,7 @@ export default function SuperAdminDashboard() {
                   value={createShopForm.admin_email}
                   onChange={(e) => setCreateShopForm({ ...createShopForm, admin_email: e.target.value })}
                   placeholder="admin@example.com"
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
             </div>
@@ -3558,7 +3558,7 @@ export default function SuperAdminDashboard() {
                 value={createShopForm.admin_password}
                 onChange={(e) => setCreateShopForm({ ...createShopForm, admin_password: e.target.value })}
                 placeholder="Secure password"
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
 
@@ -3569,7 +3569,7 @@ export default function SuperAdminDashboard() {
                   value={createShopForm.subscription_plan}
                   onValueChange={(value) => setCreateShopForm({ ...createShopForm, subscription_plan: value })}
                 >
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className="bg-slate-700 border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -3587,7 +3587,7 @@ export default function SuperAdminDashboard() {
                   type="number"
                   value={createShopForm.trial_days}
                   onChange={(e) => setCreateShopForm({ ...createShopForm, trial_days: parseInt(e.target.value) || 14 })}
-                  className="bg-slate-700 border-slate-600"
+                  className="bg-slate-700 border-gray-300"
                 />
               </div>
             </div>
@@ -3610,7 +3610,7 @@ export default function SuperAdminDashboard() {
 
       {/* Create Announcement Modal */}
       <Dialog open={showCreateAnnouncement} onOpenChange={setShowCreateAnnouncement}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-blue-500" />
@@ -3624,7 +3624,7 @@ export default function SuperAdminDashboard() {
                 value={announcementForm.title}
                 onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })}
                 placeholder="Announcement title"
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
             
@@ -3634,7 +3634,7 @@ export default function SuperAdminDashboard() {
                 value={announcementForm.content}
                 onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })}
                 placeholder="Write your announcement..."
-                className="bg-slate-700 border-slate-600 min-h-[120px]"
+                className="bg-slate-700 border-gray-300 min-h-[120px]"
               />
             </div>
             
@@ -3645,7 +3645,7 @@ export default function SuperAdminDashboard() {
                   value={announcementForm.type}
                   onValueChange={(value) => setAnnouncementForm({ ...announcementForm, type: value })}
                 >
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className="bg-slate-700 border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -3662,7 +3662,7 @@ export default function SuperAdminDashboard() {
                   value={announcementForm.target}
                   onValueChange={(value) => setAnnouncementForm({ ...announcementForm, target: value })}
                 >
-                  <SelectTrigger className="bg-slate-700 border-slate-600">
+                  <SelectTrigger className="bg-slate-700 border-gray-300">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -3681,7 +3681,7 @@ export default function SuperAdminDashboard() {
                 type="date"
                 value={announcementForm.expires_at}
                 onChange={(e) => setAnnouncementForm({ ...announcementForm, expires_at: e.target.value })}
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
             </div>
           </div>
@@ -3703,7 +3703,7 @@ export default function SuperAdminDashboard() {
 
       {/* Suspend Shop Modal */}
       <Dialog open={showSuspendModal} onOpenChange={setShowSuspendModal}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-500">
               <Ban className="w-5 h-5" />
@@ -3724,7 +3724,7 @@ export default function SuperAdminDashboard() {
                 value={suspendReason}
                 onChange={(e) => setSuspendReason(e.target.value)}
                 placeholder="Enter the reason for suspending this shop..."
-                className="bg-slate-700 border-slate-600 min-h-[100px]"
+                className="bg-slate-700 border-gray-300 min-h-[100px]"
               />
             </div>
           </div>
@@ -3746,7 +3746,7 @@ export default function SuperAdminDashboard() {
 
       {/* Reset Password Modal */}
       <Dialog open={showResetPasswordModal} onOpenChange={setShowResetPasswordModal}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-orange-400">
               <Key className="w-5 h-5" />
@@ -3756,9 +3756,9 @@ export default function SuperAdminDashboard() {
           <div className="space-y-4 py-4">
             {selectedUser && (
               <div className="bg-slate-700/50 rounded-lg p-4">
-                <p className="text-sm text-slate-400">Resetting password for:</p>
-                <p className="font-medium text-white">{selectedUser.name}</p>
-                <p className="text-sm text-slate-400">{selectedUser.email}</p>
+                <p className="text-sm text-gray-600">Resetting password for:</p>
+                <p className="font-medium text-gray-900">{selectedUser.name}</p>
+                <p className="text-sm text-gray-600">{selectedUser.email}</p>
               </div>
             )}
             
@@ -3769,9 +3769,9 @@ export default function SuperAdminDashboard() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter new password (min 6 characters)"
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
               />
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-gray-600">
                 The user will need to use this password to login. Make sure to share it with them securely.
               </p>
             </div>
@@ -3794,7 +3794,7 @@ export default function SuperAdminDashboard() {
 
       {/* Quick Reset Admin Password Modal (from tenant list) */}
       <Dialog open={showQuickResetModal} onOpenChange={setShowQuickResetModal}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+        <DialogContent className="bg-white border-gray-200 text-gray-900 max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-orange-400">
               <Key className="w-5 h-5" />
@@ -3805,13 +3805,13 @@ export default function SuperAdminDashboard() {
             {quickResetTenant && (
               <div className="bg-slate-700/50 rounded-lg p-4 space-y-2">
                 <div>
-                  <p className="text-sm text-slate-400">Shop</p>
-                  <p className="font-medium text-white">{quickResetTenant.company_name}</p>
+                  <p className="text-sm text-gray-600">Shop</p>
+                  <p className="font-medium text-gray-900">{quickResetTenant.company_name}</p>
                   <p className="text-xs text-slate-500">{quickResetTenant.subdomain}.aftersales.pro</p>
                 </div>
-                <div className="border-t border-slate-600 pt-2">
-                  <p className="text-sm text-slate-400">Admin User</p>
-                  <p className="font-medium text-white">{quickResetTenant.adminUser?.name}</p>
+                <div className="border-t border-gray-300 pt-2">
+                  <p className="text-sm text-gray-600">Admin User</p>
+                  <p className="font-medium text-gray-900">{quickResetTenant.adminUser?.name}</p>
                   <p className="text-sm text-blue-400">{quickResetTenant.adminUser?.email}</p>
                 </div>
               </div>
@@ -3824,10 +3824,10 @@ export default function SuperAdminDashboard() {
                 value={quickResetPassword}
                 onChange={(e) => setQuickResetPassword(e.target.value)}
                 placeholder="Enter new password (min 6 characters)"
-                className="bg-slate-700 border-slate-600"
+                className="bg-slate-700 border-gray-300"
                 data-testid="quick-reset-password-input"
               />
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-gray-600">
                 Share this password securely with the shop owner. They can change it later from their settings.
               </p>
             </div>
@@ -3842,7 +3842,7 @@ export default function SuperAdminDashboard() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="text-xs border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="text-xs border-gray-300 text-gray-700 hover:bg-gray-100"
                     onClick={() => setQuickResetPassword(pwd)}
                   >
                     {pwd}
