@@ -540,22 +540,29 @@ export default function SuperAdminDashboard() {
   // Suspend/Unsuspend
   const handleSuspendShop = async () => {
     if (!suspendReason.trim()) {
-      alert("Please provide a reason for suspension");
+      toast.error("Please provide a reason for suspension");
       return;
     }
+    
+    const tenantId = selectedTenant?.id || tenantDetails?.tenant?.id;
+    if (!tenantId) {
+      toast.error("No tenant selected");
+      return;
+    }
+    
     setActionLoading(true);
     try {
-      await axios.post(`${API}/super-admin/tenants/${selectedTenant.id}/suspend`, {
+      await axios.post(`${API}/super-admin/tenants/${tenantId}/suspend`, {
         reason: suspendReason,
         notify_admin: true
       });
       fetchData();
-      fetchTenantDetails(selectedTenant.id);
+      fetchTenantDetails(tenantId);
       setShowSuspendModal(false);
       setSuspendReason("");
-      alert("Shop suspended successfully");
+      toast.success("Shop suspended successfully");
     } catch (error) {
-      alert(error.response?.data?.detail || "Failed to suspend shop");
+      toast.error(error.response?.data?.detail || "Failed to suspend shop");
     } finally {
       setActionLoading(false);
     }
@@ -861,16 +868,29 @@ export default function SuperAdminDashboard() {
 
   // Tenant action functions
   const handleAssignPlan = async () => {
-    if (!assignPlanForm.plan) return;
+    if (!assignPlanForm.plan) {
+      toast.error("Please select a plan");
+      return;
+    }
+    
+    // Use tenantDetails.tenant.id as fallback since selectedTenant might not be set
+    const tenantId = selectedTenant?.id || tenantDetails?.tenant?.id;
+    if (!tenantId) {
+      toast.error("No tenant selected");
+      return;
+    }
+    
     setActionLoading(true);
     try {
-      await axios.post(`${API}/super-admin/tenants/${selectedTenant.id}/assign-plan`, assignPlanForm);
+      const response = await axios.post(`${API}/super-admin/tenants/${tenantId}/assign-plan`, assignPlanForm);
+      toast.success(response.data.message || "Plan assigned successfully");
       fetchData();
-      fetchTenantDetails(selectedTenant.id);
+      fetchTenantDetails(tenantId);
       setShowAssignPlan(false);
       setAssignPlanForm({ plan: "", duration_months: 1, notes: "" });
     } catch (error) {
       console.error("Failed to assign plan:", error);
+      toast.error(error.response?.data?.detail || "Failed to assign plan");
     } finally {
       setActionLoading(false);
     }
@@ -878,15 +898,24 @@ export default function SuperAdminDashboard() {
 
   const handleExtendValidity = async () => {
     if (!extendForm.days) return;
+    
+    const tenantId = selectedTenant?.id || tenantDetails?.tenant?.id;
+    if (!tenantId) {
+      toast.error("No tenant selected");
+      return;
+    }
+    
     setActionLoading(true);
     try {
-      await axios.post(`${API}/super-admin/tenants/${selectedTenant.id}/extend-validity`, extendForm);
+      await axios.post(`${API}/super-admin/tenants/${tenantId}/extend-validity`, extendForm);
+      toast.success("Validity extended successfully");
       fetchData();
-      fetchTenantDetails(selectedTenant.id);
+      fetchTenantDetails(tenantId);
       setShowExtendValidity(false);
       setExtendForm({ days: 30, reason: "" });
     } catch (error) {
       console.error("Failed to extend validity:", error);
+      toast.error(error.response?.data?.detail || "Failed to extend validity");
     } finally {
       setActionLoading(false);
     }
@@ -894,15 +923,23 @@ export default function SuperAdminDashboard() {
 
   const handleRecordPayment = async () => {
     if (!paymentForm.amount) return;
+    
+    const tenantId = selectedTenant?.id || tenantDetails?.tenant?.id;
+    if (!tenantId) {
+      toast.error("No tenant selected");
+      return;
+    }
+    
     setActionLoading(true);
     try {
-      await axios.post(`${API}/super-admin/tenants/${selectedTenant.id}/record-payment`, {
+      await axios.post(`${API}/super-admin/tenants/${tenantId}/record-payment`, {
         ...paymentForm,
         amount: parseFloat(paymentForm.amount),
         plan: paymentForm.plan === "none" ? "" : paymentForm.plan
       });
+      toast.success("Payment recorded successfully");
       fetchData();
-      fetchTenantDetails(selectedTenant.id);
+      fetchTenantDetails(tenantId);
       setShowRecordPayment(false);
       setPaymentForm({
         amount: "",
@@ -914,6 +951,7 @@ export default function SuperAdminDashboard() {
       });
     } catch (error) {
       console.error("Failed to record payment:", error);
+      toast.error(error.response?.data?.detail || "Failed to record payment");
     } finally {
       setActionLoading(false);
     }

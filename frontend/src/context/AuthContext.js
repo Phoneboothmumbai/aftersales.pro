@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { formatCurrency, getCurrencySymbol } from "../utils/currency";
 
 const AuthContext = createContext(null);
 
@@ -146,6 +147,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAdmin = user?.role === "admin";
+  
+  // Currency helpers
+  const currency = tenant?.settings?.currency || "INR";
+  const currencySymbol = getCurrencySymbol(currency);
+  const formatAmount = (amount) => formatCurrency(amount, currency);
 
   return (
     <AuthContext.Provider
@@ -162,6 +168,9 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!token && !!user,
         isImpersonating,
         exitImpersonation,
+        currency,
+        currencySymbol,
+        formatAmount,
       }}
     >
       {children}

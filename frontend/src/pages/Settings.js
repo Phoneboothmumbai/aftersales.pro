@@ -11,9 +11,64 @@ import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../components/ui/card";
 import { Switch } from "../components/ui/switch";
 import { Separator } from "../components/ui/separator";
-import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText, Key, Eye, EyeOff, TrendingUp, Lock, ChevronRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Sun, Moon, Loader2, Building, Mail, Phone, MapPin, FileText, Key, Eye, EyeOff, TrendingUp, Lock, ChevronRight, Globe } from "lucide-react";
 import { toast } from "sonner";
 import ModuleSettings from "../components/ModuleSettings";
+
+// Popular world currencies
+const CURRENCIES = [
+  { code: "INR", symbol: "₹", name: "Indian Rupee" },
+  { code: "USD", symbol: "$", name: "US Dollar" },
+  { code: "EUR", symbol: "€", name: "Euro" },
+  { code: "GBP", symbol: "£", name: "British Pound" },
+  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
+  { code: "SAR", symbol: "﷼", name: "Saudi Riyal" },
+  { code: "AUD", symbol: "A$", name: "Australian Dollar" },
+  { code: "CAD", symbol: "C$", name: "Canadian Dollar" },
+  { code: "SGD", symbol: "S$", name: "Singapore Dollar" },
+  { code: "MYR", symbol: "RM", name: "Malaysian Ringgit" },
+  { code: "JPY", symbol: "¥", name: "Japanese Yen" },
+  { code: "CNY", symbol: "¥", name: "Chinese Yuan" },
+  { code: "KRW", symbol: "₩", name: "South Korean Won" },
+  { code: "THB", symbol: "฿", name: "Thai Baht" },
+  { code: "IDR", symbol: "Rp", name: "Indonesian Rupiah" },
+  { code: "PHP", symbol: "₱", name: "Philippine Peso" },
+  { code: "VND", symbol: "₫", name: "Vietnamese Dong" },
+  { code: "BDT", symbol: "৳", name: "Bangladeshi Taka" },
+  { code: "PKR", symbol: "₨", name: "Pakistani Rupee" },
+  { code: "LKR", symbol: "Rs", name: "Sri Lankan Rupee" },
+  { code: "NPR", symbol: "₨", name: "Nepalese Rupee" },
+  { code: "ZAR", symbol: "R", name: "South African Rand" },
+  { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
+  { code: "KES", symbol: "KSh", name: "Kenyan Shilling" },
+  { code: "EGP", symbol: "E£", name: "Egyptian Pound" },
+  { code: "BRL", symbol: "R$", name: "Brazilian Real" },
+  { code: "MXN", symbol: "MX$", name: "Mexican Peso" },
+  { code: "ARS", symbol: "AR$", name: "Argentine Peso" },
+  { code: "CLP", symbol: "CL$", name: "Chilean Peso" },
+  { code: "COP", symbol: "CO$", name: "Colombian Peso" },
+  { code: "PEN", symbol: "S/", name: "Peruvian Sol" },
+  { code: "CHF", symbol: "CHF", name: "Swiss Franc" },
+  { code: "SEK", symbol: "kr", name: "Swedish Krona" },
+  { code: "NOK", symbol: "kr", name: "Norwegian Krone" },
+  { code: "DKK", symbol: "kr", name: "Danish Krone" },
+  { code: "PLN", symbol: "zł", name: "Polish Zloty" },
+  { code: "CZK", symbol: "Kč", name: "Czech Koruna" },
+  { code: "HUF", symbol: "Ft", name: "Hungarian Forint" },
+  { code: "RON", symbol: "lei", name: "Romanian Leu" },
+  { code: "TRY", symbol: "₺", name: "Turkish Lira" },
+  { code: "ILS", symbol: "₪", name: "Israeli Shekel" },
+  { code: "QAR", symbol: "﷼", name: "Qatari Riyal" },
+  { code: "KWD", symbol: "د.ك", name: "Kuwaiti Dinar" },
+  { code: "BHD", symbol: "BD", name: "Bahraini Dinar" },
+  { code: "OMR", symbol: "﷼", name: "Omani Rial" },
+  { code: "NZD", symbol: "NZ$", name: "New Zealand Dollar" },
+  { code: "HKD", symbol: "HK$", name: "Hong Kong Dollar" },
+  { code: "TWD", symbol: "NT$", name: "Taiwan Dollar" },
+  { code: "RUB", symbol: "₽", name: "Russian Ruble" },
+  { code: "UAH", symbol: "₴", name: "Ukrainian Hryvnia" },
+];
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -39,6 +94,7 @@ export default function Settings() {
     phone: tenant?.settings?.phone || "",
     email: tenant?.settings?.email || "",
     footer_text: tenant?.settings?.footer_text || "",
+    currency: tenant?.settings?.currency || "INR",
   });
 
   const handleSave = async () => {
@@ -213,6 +269,35 @@ export default function Settings() {
                   rows={2}
                   data-testid="address-input"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="currency" className="flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  Currency
+                </Label>
+                <Select
+                  value={formData.currency}
+                  onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                >
+                  <SelectTrigger data-testid="currency-select">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    {CURRENCIES.map((currency) => (
+                      <SelectItem key={currency.code} value={currency.code}>
+                        <span className="flex items-center gap-2">
+                          <span className="w-6 text-center font-mono">{currency.symbol}</span>
+                          <span>{currency.code}</span>
+                          <span className="text-muted-foreground">- {currency.name}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  This currency will be used for all prices and invoices
+                </p>
               </div>
 
               <Separator />

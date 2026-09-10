@@ -27,13 +27,71 @@ export function formatDateTime(dateString) {
   });
 }
 
-export function formatCurrency(amount) {
-  if (amount === null || amount === undefined) return "₹0";
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 0,
+// Currency configuration for global support
+const CURRENCY_CONFIG = {
+  INR: { symbol: "₹", locale: "en-IN", position: "before" },
+  USD: { symbol: "$", locale: "en-US", position: "before" },
+  EUR: { symbol: "€", locale: "de-DE", position: "before" },
+  GBP: { symbol: "£", locale: "en-GB", position: "before" },
+  AED: { symbol: "د.إ", locale: "ar-AE", position: "before" },
+  SAR: { symbol: "﷼", locale: "ar-SA", position: "after" },
+  AUD: { symbol: "A$", locale: "en-AU", position: "before" },
+  CAD: { symbol: "C$", locale: "en-CA", position: "before" },
+  SGD: { symbol: "S$", locale: "en-SG", position: "before" },
+  MYR: { symbol: "RM", locale: "ms-MY", position: "before" },
+  JPY: { symbol: "¥", locale: "ja-JP", position: "before", decimals: 0 },
+  CNY: { symbol: "¥", locale: "zh-CN", position: "before" },
+  KRW: { symbol: "₩", locale: "ko-KR", position: "before", decimals: 0 },
+  THB: { symbol: "฿", locale: "th-TH", position: "before" },
+  IDR: { symbol: "Rp", locale: "id-ID", position: "before", decimals: 0 },
+  PHP: { symbol: "₱", locale: "fil-PH", position: "before" },
+  VND: { symbol: "₫", locale: "vi-VN", position: "after", decimals: 0 },
+  BDT: { symbol: "৳", locale: "bn-BD", position: "before" },
+  PKR: { symbol: "₨", locale: "ur-PK", position: "before" },
+  LKR: { symbol: "Rs", locale: "si-LK", position: "before" },
+  NPR: { symbol: "₨", locale: "ne-NP", position: "before" },
+  ZAR: { symbol: "R", locale: "en-ZA", position: "before" },
+  NGN: { symbol: "₦", locale: "en-NG", position: "before" },
+  KES: { symbol: "KSh", locale: "sw-KE", position: "before" },
+  EGP: { symbol: "E£", locale: "ar-EG", position: "before" },
+  BRL: { symbol: "R$", locale: "pt-BR", position: "before" },
+  MXN: { symbol: "MX$", locale: "es-MX", position: "before" },
+  CHF: { symbol: "CHF", locale: "de-CH", position: "before" },
+  TRY: { symbol: "₺", locale: "tr-TR", position: "before" },
+  RUB: { symbol: "₽", locale: "ru-RU", position: "after" },
+};
+
+/**
+ * Format amount with currency
+ * @param {number} amount - Amount to format
+ * @param {string} currencyCode - Currency code (default: INR)
+ * @returns {string} Formatted currency string
+ */
+export function formatCurrency(amount, currencyCode = "INR") {
+  if (amount === null || amount === undefined) return getCurrencySymbol(currencyCode) + "0";
+  
+  const config = CURRENCY_CONFIG[currencyCode] || CURRENCY_CONFIG.INR;
+  const decimals = config.decimals ?? 0;
+  
+  const formattedNumber = new Intl.NumberFormat(config.locale, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
   }).format(amount);
+  
+  if (config.position === "after") {
+    return `${formattedNumber} ${config.symbol}`;
+  }
+  return `${config.symbol}${formattedNumber}`;
+}
+
+/**
+ * Get currency symbol
+ * @param {string} currencyCode - Currency code
+ * @returns {string} Currency symbol
+ */
+export function getCurrencySymbol(currencyCode = "INR") {
+  const config = CURRENCY_CONFIG[currencyCode] || CURRENCY_CONFIG.INR;
+  return config.symbol;
 }
 
 export function getStatusColor(status) {

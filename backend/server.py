@@ -284,6 +284,7 @@ class SettingsUpdate(BaseModel):
     logo_url: Optional[str] = None
     theme: Optional[str] = None
     language: Optional[str] = None
+    currency: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
@@ -5589,7 +5590,7 @@ async def get_expiring_subscriptions(
                 ends_at = datetime.fromisoformat(tenant["subscription_ends_at"].replace("Z", "+00:00"))
                 days_remaining = (ends_at - now).days
                 tenant["days_remaining"] = days_remaining
-            except:
+            except Exception:
                 tenant["days_remaining"] = 0
         
         # Generate WhatsApp message
@@ -5941,7 +5942,7 @@ async def extend_tenant_validity(
         if current_end:
             try:
                 end_date = datetime.fromisoformat(current_end.replace('Z', '+00:00'))
-            except:
+            except Exception:
                 end_date = now
         else:
             end_date = now
@@ -5962,7 +5963,7 @@ async def extend_tenant_validity(
         if current_end:
             try:
                 end_date = datetime.fromisoformat(current_end.replace('Z', '+00:00'))
-            except:
+            except Exception:
                 end_date = now
         else:
             end_date = now
@@ -6041,7 +6042,7 @@ async def record_offline_payment(
                     end_date = datetime.fromisoformat(current_end.replace('Z', '+00:00'))
                     if end_date < now:
                         end_date = now
-                except:
+                except Exception:
                     end_date = now
             else:
                 end_date = now
@@ -7671,7 +7672,7 @@ async def get_current_billing(user: dict = Depends(get_current_user)):
             delta = end_date - now
             days_remaining = max(0, delta.days)
             is_expired = delta.total_seconds() < 0
-        except:
+        except Exception:
             pass
     
     # Get plan usage
@@ -8074,7 +8075,7 @@ async def change_plan(
                 if current_plan and current_plan.get("price", 0) > 0:
                     daily_rate = current_plan["price"] / 30
                     proration_credit = round(daily_rate * days_remaining, 2)
-            except:
+            except Exception:
                 pass
     
     # If downgrading to free plan
@@ -8083,7 +8084,7 @@ async def change_plan(
         if current_subscription and current_subscription.get("razorpay_subscription_id"):
             try:
                 razorpay_client.subscription.cancel(current_subscription["razorpay_subscription_id"])
-            except:
+            except Exception:
                 pass
         
         # Update to free plan

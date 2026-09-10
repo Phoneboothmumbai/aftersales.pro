@@ -54,12 +54,14 @@ import {
   Wrench,
   Calendar,
 } from "lucide-react";
-import { formatDate, formatCurrency } from "../lib/utils";
+import { formatDate } from "../lib/utils";
+import { useCurrency } from "../hooks/useCurrency";
 import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function ProfitReports() {
+  const { currencySymbol, formatCurrency } = useCurrency();
   // Auth state
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [password, setPassword] = useState("");
@@ -894,8 +896,8 @@ export default function ProfitReports() {
                         <TableHead>Customer</TableHead>
                         <TableHead>Device</TableHead>
                         <TableHead className="text-right">Amount Received</TableHead>
-                        <TableHead className="w-32">Parts Cost (₹)</TableHead>
-                        <TableHead className="w-32">Labor Cost (₹)</TableHead>
+                        <TableHead className="w-32">Parts Cost ({currencySymbol})</TableHead>
+                        <TableHead className="w-32">Labor Cost ({currencySymbol})</TableHead>
                         <TableHead className="text-right">Est. Profit</TableHead>
                       </TableRow>
                     </TableHeader>

@@ -52,7 +52,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { formatDateTime, formatCurrency, getStatusColor, getStatusLabel, PAYMENT_MODES } from "../lib/utils";
+import { formatDateTime, getStatusColor, getStatusLabel, PAYMENT_MODES } from "../lib/utils";
+import { useCurrency } from "../hooks/useCurrency";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -71,6 +72,7 @@ const STATUS_ICONS = {
 export default function JobDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { currencySymbol, formatCurrency } = useCurrency();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -450,7 +452,7 @@ ${accessories}`;
     if (job.diagnosis) {
       message += `\n\n*Diagnosis:*
 ${job.diagnosis.diagnosis}
-Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
+Est. Cost: ${formatCurrency(job.diagnosis.estimated_cost || 0)}`;
     }
 
     message += `\n\nPlease check and update the status.`;
@@ -1005,7 +1007,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Estimated Cost (₹) *</Label>
+                <Label>Estimated Cost ({currencySymbol}) *</Label>
                 <Input
                   type="number"
                   value={diagnosisForm.estimated_cost}
@@ -1064,7 +1066,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
               />
             </div>
             <div className="space-y-2">
-              <Label>Approved Amount (₹) *</Label>
+              <Label>Approved Amount ({currencySymbol}) *</Label>
               <Input
                 type="number"
                 value={approvalForm.approved_amount}
@@ -1256,7 +1258,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Final Amount (₹) *</Label>
+                <Label>Final Amount ({currencySymbol}) *</Label>
                 <Input
                   type="number"
                   value={repairForm.final_amount}
@@ -1332,7 +1334,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
               {deliveryForm.is_credit && (
                 <div className="bg-orange-500/10 border border-orange-500/30 rounded p-3">
                   <p className="text-sm text-orange-500">
-                    <strong>Credit Mode:</strong> The full amount of ₹{job.repair?.final_amount || 0} will be added to customer&apos;s outstanding balance.
+                    <strong>Credit Mode:</strong> The full amount of {formatCurrency(job.repair?.final_amount || 0)} will be added to customer&apos;s outstanding balance.
                   </p>
                 </div>
               )}
@@ -1340,7 +1342,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Amount Received (₹) {!deliveryForm.is_credit && '*'}</Label>
+                <Label>Amount Received ({currencySymbol}) {!deliveryForm.is_credit && '*'}</Label>
                 <Input
                   type="number"
                   value={deliveryForm.amount_received}
@@ -1386,7 +1388,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
               </p>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Parts/Materials Cost (₹)</Label>
+                  <Label>Parts/Materials Cost ({currencySymbol})</Label>
                   <Input
                     type="number"
                     value={deliveryForm.expense_parts}
@@ -1396,7 +1398,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Labor Cost (₹)</Label>
+                  <Label>Labor Cost ({currencySymbol})</Label>
                   <Input
                     type="number"
                     value={deliveryForm.expense_labor}
@@ -1410,7 +1412,7 @@ Est. Cost: ₹${job.diagnosis.estimated_cost || 0}`;
                 <div className="mt-2 text-sm bg-muted/50 p-2 rounded">
                   <span className="text-muted-foreground">Estimated Profit: </span>
                   <span className="font-bold text-green-600">
-                    ₹{((parseFloat(deliveryForm.amount_received) || 0) - (parseFloat(deliveryForm.expense_parts) || 0) - (parseFloat(deliveryForm.expense_labor) || 0)).toLocaleString()}
+                    {formatCurrency((parseFloat(deliveryForm.amount_received) || 0) - (parseFloat(deliveryForm.expense_parts) || 0) - (parseFloat(deliveryForm.expense_labor) || 0))}
                   </span>
                 </div>
               )}
