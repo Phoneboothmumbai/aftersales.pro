@@ -9,17 +9,32 @@ import ReactMarkdown from "react-markdown";
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const PAGE_CONFIG = {
-  privacy_policy: {
+  "privacy-policy": {
     title: "Privacy Policy",
     icon: Shield,
     description: "How we collect, use, and protect your data"
   },
-  terms_of_service: {
+  "privacy_policy": {
+    title: "Privacy Policy",
+    icon: Shield,
+    description: "How we collect, use, and protect your data"
+  },
+  "terms-of-service": {
     title: "Terms of Service",
     icon: Scale,
     description: "Terms and conditions for using our platform"
   },
-  refund_policy: {
+  "terms_of_service": {
+    title: "Terms of Service",
+    icon: Scale,
+    description: "Terms and conditions for using our platform"
+  },
+  "refund-policy": {
+    title: "Refund & Cancellation Policy",
+    icon: FileText,
+    description: "Our refund and cancellation terms"
+  },
+  "refund_policy": {
     title: "Refund & Cancellation Policy",
     icon: FileText,
     description: "Our refund and cancellation terms"
@@ -56,9 +71,11 @@ export default function LegalPage() {
       setError(null);
       try {
         const subdomain = getSubdomain();
+        // Convert hyphens to underscores for API
+        const apiPageType = pageType.replace(/-/g, '_');
         const url = subdomain 
-          ? `${API}/legal/${pageType}?subdomain=${subdomain}`
-          : `${API}/legal/${pageType}`;
+          ? `${API}/legal/${apiPageType}?subdomain=${subdomain}`
+          : `${API}/legal/${apiPageType}`;
         
         const response = await axios.get(url);
         setContent(response.data.content);
