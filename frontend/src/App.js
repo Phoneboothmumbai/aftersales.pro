@@ -36,6 +36,10 @@ import BuyDevice from "./pages/BuyDevice";
 import DeviceDetail from "./pages/DeviceDetail";
 import DeclinedIntakes from "./pages/DeclinedIntakes";
 
+// SEO Pages
+import ComparePage from "./pages/ComparePage";
+import FeaturePage from "./pages/FeaturePage";
+
 // Protected Route wrapper
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -315,6 +319,12 @@ function AppRoutes() {
 
       {/* Contact Page (Public) */}
       <Route path="/contact" element={<Contact />} />
+
+      {/* SEO - Comparison Pages */}
+      <Route path="/compare/:competitor" element={<ComparePage />} />
+      
+      {/* SEO - Feature Landing Pages */}
+      <Route path="/features/:feature" element={<FeaturePage />} />
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
