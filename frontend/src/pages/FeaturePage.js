@@ -222,6 +222,56 @@ const featurePages = {
     ],
     stats: { messages: "100K+", satisfaction: "+45%", calls: "-60%" }
   },
+  "used-phone-trading": {
+    title: "Used Mobile Phone Trading Software",
+    subtitle: "Buy & Sell Used Smartphones with Complete Tracking",
+    description: "Expand your repair shop revenue by trading used mobile phones. Track IMEI numbers, seller details, purchase prices, and profit margins all in one system.",
+    icon: Smartphone,
+    keywords: "used phone trading software, buy sell used mobiles, second hand phone business software, used smartphone trading, mobile phone resale software, refurbished phone management",
+    benefits: [
+      "IMEI Number Verification & Tracking",
+      "Device Condition Grading (A/B/C/D)",
+      "Seller ID Proof & Contact Storage",
+      "Purchase Price & Selling Price Tracking",
+      "Profit Margin Calculation per Device",
+      "Stock Inventory with Device Photos",
+      "Password-Protected Margin Visibility",
+      "Declined Intake Logging with Reasons"
+    ],
+    useCases: [
+      "Mobile repair shops buying trade-ins",
+      "Used phone dealers",
+      "Refurbished phone businesses",
+      "Multi-brand mobile stores",
+      "Phone exchange businesses"
+    ],
+    stats: { devices: "10,000+", profit: "+25%", tracking: "100%" }
+  },
+  "used-laptop-trading": {
+    title: "Used Laptop & IT Equipment Trading Software",
+    subtitle: "Manage Your Used IT Equipment Business",
+    description: "Trade used laptops, tablets, and IT accessories with complete record keeping. Track serial numbers, specifications, condition, and resale profits.",
+    icon: Laptop,
+    keywords: "used laptop trading software, buy sell used computers, second hand laptop business, IT equipment resale software, refurbished laptop management, used computer trading",
+    benefits: [
+      "Serial Number & Model Tracking",
+      "Detailed Specifications Recording",
+      "Condition Assessment & Grading",
+      "Seller Documentation & ID Storage",
+      "Purchase & Resale Price Management",
+      "Profit Tracking per Equipment",
+      "Category-wise Inventory Management",
+      "Complete Transaction History"
+    ],
+    useCases: [
+      "Computer repair shops",
+      "Used laptop dealers",
+      "IT equipment resellers",
+      "Corporate asset disposal",
+      "Refurbished IT businesses"
+    ],
+    stats: { equipment: "5,000+", categories: "20+", accuracy: "99%" }
+  },
 };
 
 export default function FeaturePage() {

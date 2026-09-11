@@ -186,11 +186,6 @@ export default function Landing() {
       description: t("landing.features.analytics.description"),
     },
     {
-      icon: Smartphone,
-      title: "Buy & Sell Used Devices",
-      description: "Keep complete records of old phones and laptops you buy and sell. Track seller details, stock value, and profit on each device.",
-    },
-    {
       icon: Shield,
       title: t("landing.features.dispute_prevention.title"),
       description: t("landing.features.dispute_prevention.description"),
@@ -205,6 +200,26 @@ export default function Landing() {
       title: t("landing.features.multi_branch.title"),
       description: t("landing.features.multi_branch.description"),
     },
+  ];
+
+  // All features for comprehensive display
+  const allFeatures = [
+    { icon: "📱", title: "Mobile Phone Trading", description: "Buy & sell used smartphones with complete seller records, IMEI tracking, condition grading, and profit margins." },
+    { icon: "💻", title: "IT Equipment Trading", description: "Trade laptops, tablets, and accessories. Track serial numbers, specifications, and resale value." },
+    { icon: "📋", title: "Job Management", description: "Track repairs from intake to delivery with status updates, technician assignment, and time tracking." },
+    { icon: "💬", title: "WhatsApp Integration", description: "Send automated status updates, approval requests, and delivery notifications to customers." },
+    { icon: "👥", title: "Customer CRM", description: "Complete customer database with device history, ledger, credit management, and communication logs." },
+    { icon: "📦", title: "Inventory Management", description: "Track spare parts, set reorder alerts, manage stock levels, and link parts to repairs." },
+    { icon: "🏢", title: "Multi-Branch Support", description: "Manage multiple shop locations from one dashboard with branch-wise reporting." },
+    { icon: "📄", title: "PDF Job Sheets", description: "Generate professional job sheets and invoices with QR codes for customer tracking." },
+    { icon: "💰", title: "Profit Tracking", description: "Track revenue, expenses, parts cost, labor cost, and profit margins per job." },
+    { icon: "👨‍💼", title: "Team Management", description: "Role-based access control for admin, technicians, and staff with activity logs." },
+    { icon: "🔍", title: "IMEI/Serial Tracking", description: "Record device identifiers, warranty status, and prevent duplicate entries." },
+    { icon: "📊", title: "Reports & Analytics", description: "Revenue reports, technician performance, customer insights, and business trends." },
+    { icon: "💳", title: "Customer Ledger", description: "Track outstanding balances, payment history, and offer credit to regular customers." },
+    { icon: "🌐", title: "Customer Self-Tracking", description: "Shareable tracking links let customers check repair status without calling." },
+    { icon: "💱", title: "Multi-Currency Support", description: "Set your shop's currency - INR, USD, EUR, GBP, AED, and 45+ currencies supported." },
+    { icon: "📱", title: "GST/Tax Compliant", description: "Generate tax-compliant invoices with proper GST/VAT calculations." },
   ];
 
   return (
@@ -382,6 +397,119 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Used Device Trading Module */}
+      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+              <Smartphone className="w-4 h-4" />
+              Trading Module
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Buy & Sell Used Devices
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Expand your revenue by trading used mobile phones and IT equipment. Track inventory, margins, and seller details all in one place.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Mobile Phone Trading */}
+            <Card className="border-2 border-blue-200 bg-white">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <span className="text-3xl">📱</span>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">Mobile Phone Trading</h3>
+                    <p className="text-muted-foreground">Buy & sell smartphones</p>
+                  </div>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "IMEI number tracking & verification",
+                    "Device condition grading (A/B/C/D)",
+                    "Seller ID proof & contact storage",
+                    "Purchase price & selling price tracking",
+                    "Profit margin calculation per device",
+                    "Stock inventory with photos",
+                    "Password-protected margin visibility",
+                    "Declined intake logging with reasons"
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* IT Equipment Trading */}
+            <Card className="border-2 border-purple-200 bg-white">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <span className="text-3xl">💻</span>
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">IT Equipment Trading</h3>
+                    <p className="text-muted-foreground">Laptops, tablets & accessories</p>
+                  </div>
+                </div>
+                <ul className="space-y-3">
+                  {[
+                    "Serial number & model tracking",
+                    "Specification details (RAM, Storage, etc.)",
+                    "Condition assessment & grading",
+                    "Seller documentation & records",
+                    "Purchase & resale price management",
+                    "Profit tracking per equipment",
+                    "Category-wise inventory",
+                    "Complete transaction history"
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-gray-700">
+                      <Check className="w-5 h-5 text-purple-600 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* All Features Grid */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Everything You Need to Run Your Repair Shop
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              A complete suite of tools designed specifically for mobile, laptop, and electronics repair businesses.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {allFeatures.map((feature, index) => (
+              <Card key={index} className="bg-muted/30 border-0 hover:bg-muted/50 transition-colors">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">{feature.icon}</span>
+                    <div>
+                      <h4 className="font-semibold text-sm mb-1">{feature.title}</h4>
+                      <p className="text-xs text-muted-foreground">{feature.description}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -528,6 +656,8 @@ export default function Landing() {
                 <li><a href="/features/laptop-repair-software" className="text-muted-foreground hover:text-foreground transition-colors">Laptop Repair Software</a></li>
                 <li><a href="/features/multi-branch-repair-software" className="text-muted-foreground hover:text-foreground transition-colors">Multi-Branch Management</a></li>
                 <li><a href="/features/whatsapp-repair-software" className="text-muted-foreground hover:text-foreground transition-colors">WhatsApp Integration</a></li>
+                <li><a href="/features/used-phone-trading" className="text-muted-foreground hover:text-foreground transition-colors">Used Phone Trading</a></li>
+                <li><a href="/features/used-laptop-trading" className="text-muted-foreground hover:text-foreground transition-colors">Used Laptop Trading</a></li>
               </ul>
             </div>
 
