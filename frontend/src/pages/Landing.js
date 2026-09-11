@@ -502,11 +502,12 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border py-12">
+      <footer className="border-t border-border py-12 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-8">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Wrench className="w-5 h-5 text-primary-foreground" />
                 </div>
@@ -514,28 +515,70 @@ export default function Landing() {
                   aftersales<span className="text-primary">.pro</span>
                 </span>
               </div>
-              <div className="flex flex-wrap justify-center gap-4 text-sm">
-                <a href="/contact" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
-                  {t("landing.footer.contact")}
-                </a>
-                <a href="/legal/privacy_policy" className="text-muted-foreground hover:text-foreground transition-colors">
-                  {t("landing.footer.privacy")}
-                </a>
-                <a href="/legal/terms_of_service" className="text-muted-foreground hover:text-foreground transition-colors">
-                  {t("landing.footer.terms")}
-                </a>
-                <a href="/legal/refund_policy" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Refund Policy
-                </a>
-                <a href="/legal/disclaimer" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Disclaimer
-                </a>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                The complete repair shop management solution for mobile, laptop & electronics repair businesses.
+              </p>
             </div>
-            <div className="text-center">
+
+            {/* Solutions */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm">Solutions</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/features/mobile-repair-software" className="text-muted-foreground hover:text-foreground transition-colors">Mobile Repair Software</a></li>
+                <li><a href="/features/laptop-repair-software" className="text-muted-foreground hover:text-foreground transition-colors">Laptop Repair Software</a></li>
+                <li><a href="/features/multi-branch-repair-software" className="text-muted-foreground hover:text-foreground transition-colors">Multi-Branch Management</a></li>
+                <li><a href="/features/whatsapp-repair-software" className="text-muted-foreground hover:text-foreground transition-colors">WhatsApp Integration</a></li>
+              </ul>
+            </div>
+
+            {/* Regions */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm">Regions</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/features/repair-shop-india" className="text-muted-foreground hover:text-foreground transition-colors">India</a></li>
+                <li><a href="/features/repair-shop-usa" className="text-muted-foreground hover:text-foreground transition-colors">United States</a></li>
+                <li><a href="/features/repair-shop-uk" className="text-muted-foreground hover:text-foreground transition-colors">United Kingdom</a></li>
+                <li><a href="/features/repair-shop-uae" className="text-muted-foreground hover:text-foreground transition-colors">UAE & Middle East</a></li>
+              </ul>
+            </div>
+
+            {/* Compare */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm">Compare</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/compare/repairdesk" className="text-muted-foreground hover:text-foreground transition-colors">vs RepairDesk</a></li>
+                <li><a href="/compare/repairshopr" className="text-muted-foreground hover:text-foreground transition-colors">vs RepairShopr</a></li>
+                <li><a href="/compare/bytephase" className="text-muted-foreground hover:text-foreground transition-colors">vs BytePhase</a></li>
+                <li><a href="/compare/servicecircle" className="text-muted-foreground hover:text-foreground transition-colors">vs ServiceCircle</a></li>
+                <li><a href="/compare/fixably" className="text-muted-foreground hover:text-foreground transition-colors">vs Fixably</a></li>
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact Us</a></li>
+                <li><a href="/legal/privacy-policy" className="text-muted-foreground hover:text-foreground transition-colors">Privacy Policy</a></li>
+                <li><a href="/legal/terms-of-service" className="text-muted-foreground hover:text-foreground transition-colors">Terms of Service</a></li>
+                <li><a href="/legal/refund-policy" className="text-muted-foreground hover:text-foreground transition-colors">Refund Policy</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-border pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-sm text-muted-foreground">
                 {t("landing.footer.copyright")}
               </p>
+              <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground">
+                <a href="/compare/mhelpdesk" className="hover:text-foreground">vs mHelpDesk</a>
+                <a href="/compare/repairq" className="hover:text-foreground">vs RepairQ</a>
+                <a href="/compare/cellsmartpos" className="hover:text-foreground">vs CellSmart POS</a>
+                <a href="/compare/orderry" className="hover:text-foreground">vs Orderry</a>
+                <a href="/compare/repaircms" className="hover:text-foreground">vs RepairCMS</a>
+              </div>
             </div>
           </div>
         </div>
